@@ -96,4 +96,18 @@ bool Queue<T>::get(T & obj, int msTimeout)
     return true;
 }
 
+//----------------------------------------------------------------------
+// Method: empty
+//----------------------------------------------------------------------
+template<typename T>
+bool Queue<T>::empty()
+{
+    bool isEmpty;
+    {
+	std::lock_guard<std::mutex> lock(queueMutex);
+	isEmpty = objects.empty();
+    }
+    return isEmpty;
+}
+
 template class Queue<std::string>;
