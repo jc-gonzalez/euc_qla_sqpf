@@ -229,19 +229,19 @@ private:
     vector<DirWatchedAndQueue> dirWatchers;
 
     vector<string> productsFromSuspTasks;
-    Queue<string> productsList;
+    Queue<string> productList;
 
     Queue<string> productsForProcessing;
     Queue<string> productsForArchival;
 
     Queue<string> outputProducts;
 
-    js hostInfo;
+    js nodeInfo;
 
     typedef int(*SelectNodeFn)(Master*);
     SelectNodeFn selectNodeFn;
 
-    bool hostsInfoIsAvailable;
+    bool nodeInfoIsAvailable;
     vector<js> nodeStatus;
 
     Logger logger;

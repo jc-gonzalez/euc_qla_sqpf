@@ -64,7 +64,7 @@ Master::Master(string _cfg, string _id, int _port, string _wa, int _bMode)
       balanceMode(_bMode),
       wa(WorkArea(_wa)),
       lastNodeUsed(0),
-      hostsInfoIsAvailable(false),
+      nodeInfoIsAvailable(false),
       logger(Log::getLogger(_id))
 {
     // Read configuration
@@ -196,7 +196,7 @@ vector<string> & Master::lookForSuspendedTasks()
 //----------------------------------------------------------------------
 void Master::appendProdsToQueue(vector<string> & prods)
 {
-    for (auto & fileName: prods) { productsList.push(std::move(fileName)); }
+    for (auto & fileName: prods) { productList.push(std::move(fileName)); }
     prods.clear();
 }
 
@@ -207,7 +207,7 @@ void Master::appendProdsToQueue(vector<string> & prods)
 void Master::appendProdsToQueue(Queue<string> & prods)
 {
     std::string fileName;
-    while (prods.get(fileName)) { productsList.push(std::move(fileName)); }
+    while (prods.get(fileName)) { productList.push(std::move(fileName)); }
 }
 
 //----------------------------------------------------------------------
@@ -270,8 +270,8 @@ bool Master::getNewEntriesFromDirWatcher(DirWatcher * dw, Queue<string> & q)
 //----------------------------------------------------------------------
 string Master::getHostInfo()
 {
-    if (hostsInfoIsAvailable) {
-	return hostInfo.asObject().str(); //hostInfo.asObject().str();
+    if (nodeInfoIsAvailable) {
+	return nodeInfo.asObject().str(); //nodeInfo.asObject().str();
     } else {
 	return "{}";
     }
@@ -293,7 +293,7 @@ bool Master::checkIfProduct(string & fileName, ProductMeta & meta)
 //----------------------------------------------------------------------
 void Master::distributeProducts()
 {
-    if (hostsInfoIsAvailable) {
+    if (nodeInfoIsAvailable) {
 	for (int i = 0; i < nodeStatus.size(); ++i) {
 	    jsa jloads = nodeStatus[i]["machine"]["load"].asArray();
 	    std::stringstream ss;
@@ -304,7 +304,7 @@ void Master::distributeProducts()
     }
 
     ProductName prod;
-    while (productsList.get(prod)) {
+    while (productList.get(prod)) {
 	int numOfNodeToUse = selectNodeFn(this);
 	string nodeToUse = net->nodeName[numOfNodeToUse];
 
@@ -341,7 +341,7 @@ void Master::scheduleProductsForProcessing()
 	distributeProducts();
     } else {
 	// Proc.node: Process all the products in the list
-	productsForProcessing.append(productsList);
+	productsForProcessing.append(productList);
     }
 
     // Process the products in one list
@@ -431,7 +431,7 @@ void Master::gatherNodesInfo()
 	}
 	nodeStatus.push_back(js(respObj));
     }
-    //hostsInfoIsAvailable = true;
+    //nodeInfoIsAvailable = true;
 }
 
 //----------------------------------------------------------------------
@@ -457,14 +457,15 @@ void Master::runMainLoop()
 	}
 
 	// Schedule the processing
-	scheduleProductsForProcessing();
-
+	if (!productList.empty()) {
+	    scheduleProductsForProcessing();
+	}
+	
 	// Retrieve agents information
-	if ((iteration % 10) == 0) {
-	    hostsInfoIsAvailable = tskMng->retrieveAgentsInfo(hostInfo);
-	    logger.debug(hostInfo.asObject().str());
+	if ((iteration == 1) || ((iteration % 10) == 0)) {
+	    nodeInfoIsAvailable = tskMng->retrieveAgentsInfo(nodeInfo);
+	    logger.debug("Node info retrieved: " + nodeInfo.asObject().str());
 	    tskMng->showSpectra();
-	    hostsInfoIsAvailable = true;
 	}
 
 	// Retrieve pending outputs
@@ -482,8 +483,8 @@ void Master::runMainLoop()
 	}
 
 	// Retrieve nodes information
-	if ((net->thisIsCommander) && ((iteration == 1) ||
-				       ((iteration % 20) == 0))) {
+	if ((net->thisIsCommander) &&
+	    ((iteration == 1) || ((iteration % 20) == 0))) {
 	    gatherNodesInfo();
 	}
 	
