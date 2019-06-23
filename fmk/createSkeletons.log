@@ -1,0 +1,289 @@
++ APP=QPF
++ DOMAIN=qpf.fmk
++ COPY='2019 Euclid SOC Team / J C Gonzalez'
++ cls=Master
++ mod=master
++ mths='void#run()'
++ mths='void#run()%void#startSession()'
++ mths='void#run()%void#startSession()|void#loadStateVector()'
++ mths='void#run()%void#startSession()|void#loadStateVector()|void#lookForSuspendedTasks()'
++ mths='void#run()%void#startSession()|void#loadStateVector()|void#lookForSuspendedTasks()|void#appendProdsToQueue(std::vector<std::string> & prods)'
++ mths='void#run()%void#startSession()|void#loadStateVector()|void#lookForSuspendedTasks()|void#appendProdsToQueue(std::vector<std::string> & prods)|void#setDirectoryWatchers()'
++ mths='void#run()%void#startSession()|void#loadStateVector()|void#lookForSuspendedTasks()|void#appendProdsToQueue(std::vector<std::string> & prods)|void#setDirectoryWatchers()|void#getHostInfo()'
++ mths='void#run()%void#startSession()|void#loadStateVector()|void#lookForSuspendedTasks()|void#appendProdsToQueue(std::vector<std::string> & prods)|void#setDirectoryWatchers()|void#getHostInfo()|ProductMeta &&#checkIfProduct(std::string & fileName)'
++ mths='void#run()%void#startSession()|void#loadStateVector()|void#lookForSuspendedTasks()|void#appendProdsToQueue(std::vector<std::string> & prods)|void#setDirectoryWatchers()|void#getHostInfo()|ProductMeta &&#checkIfProduct(std::string & fileName)|std::vector<std::string> &&#dispatch(std::vector<std::string> & prods)'
++ mths='void#run()%void#startSession()|void#loadStateVector()|void#lookForSuspendedTasks()|void#appendProdsToQueue(std::vector<std::string> & prods)|void#setDirectoryWatchers()|void#getHostInfo()|ProductMeta &&#checkIfProduct(std::string & fileName)|std::vector<std::string> &&#dispatch(std::vector<std::string> & prods)|void#scheduleProductsForProcessing(std::vector<std::string> & prods)'
++ mths='void#run()%void#startSession()|void#loadStateVector()|void#lookForSuspendedTasks()|void#appendProdsToQueue(std::vector<std::string> & prods)|void#setDirectoryWatchers()|void#getHostInfo()|ProductMeta &&#checkIfProduct(std::string & fileName)|std::vector<std::string> &&#dispatch(std::vector<std::string> & prods)|void#scheduleProductsForProcessing(std::vector<std::string> & prods)|void#archiveOutputs(std::vector<std::string> & prods)'
++ mths='void#run()%void#startSession()|void#loadStateVector()|void#lookForSuspendedTasks()|void#appendProdsToQueue(std::vector<std::string> & prods)|void#setDirectoryWatchers()|void#getHostInfo()|ProductMeta &&#checkIfProduct(std::string & fileName)|std::vector<std::string> &&#dispatch(std::vector<std::string> & prods)|void#scheduleProductsForProcessing(std::vector<std::string> & prods)|void#archiveOutputs(std::vector<std::string> & prods)|void#transferOutputsToCommander()'
++ mths='void#run()%void#startSession()|void#loadStateVector()|void#lookForSuspendedTasks()|void#appendProdsToQueue(std::vector<std::string> & prods)|void#setDirectoryWatchers()|void#getHostInfo()|ProductMeta &&#checkIfProduct(std::string & fileName)|std::vector<std::string> &&#dispatch(std::vector<std::string> & prods)|void#scheduleProductsForProcessing(std::vector<std::string> & prods)|void#archiveOutputs(std::vector<std::string> & prods)|void#transferOutputsToCommander()|void#transferRemoteLocalArchiveToCommander(std::vector<std::string> & prods)'
++ mths='void#run()%void#startSession()|void#loadStateVector()|void#lookForSuspendedTasks()|void#appendProdsToQueue(std::vector<std::string> & prods)|void#setDirectoryWatchers()|void#getHostInfo()|ProductMeta &&#checkIfProduct(std::string & fileName)|std::vector<std::string> &&#dispatch(std::vector<std::string> & prods)|void#scheduleProductsForProcessing(std::vector<std::string> & prods)|void#archiveOutputs(std::vector<std::string> & prods)|void#transferOutputsToCommander()|void#transferRemoteLocalArchiveToCommander(std::vector<std::string> & prods)|void#gatherNodesInfo()'
++ mths='void#run()%void#startSession()|void#loadStateVector()|void#lookForSuspendedTasks()|void#appendProdsToQueue(std::vector<std::string> & prods)|void#setDirectoryWatchers()|void#getHostInfo()|ProductMeta &&#checkIfProduct(std::string & fileName)|std::vector<std::string> &&#dispatch(std::vector<std::string> & prods)|void#scheduleProductsForProcessing(std::vector<std::string> & prods)|void#archiveOutputs(std::vector<std::string> & prods)|void#transferOutputsToCommander()|void#transferRemoteLocalArchiveToCommander(std::vector<std::string> & prods)|void#gatherNodesInfo()|void#runMainLoop()'
++ mths='void#run()%void#startSession()|void#loadStateVector()|void#lookForSuspendedTasks()|void#appendProdsToQueue(std::vector<std::string> & prods)|void#setDirectoryWatchers()|void#getHostInfo()|ProductMeta &&#checkIfProduct(std::string & fileName)|std::vector<std::string> &&#dispatch(std::vector<std::string> & prods)|void#scheduleProductsForProcessing(std::vector<std::string> & prods)|void#archiveOutputs(std::vector<std::string> & prods)|void#transferOutputsToCommander()|void#transferRemoteLocalArchiveToCommander(std::vector<std::string> & prods)|void#gatherNodesInfo()|void#runMainLoop()|void#terminate()'
++ /Users/jcgonzalez/bin/cpp/createC++Module.sh master Master QPF qpf.fmk '2019 Euclid SOC Team / J C Gonzalez' 'void#run()%void#startSession()|void#loadStateVector()|void#lookForSuspendedTasks()|void#appendProdsToQueue(std::vector<std::string> & prods)|void#setDirectoryWatchers()|void#getHostInfo()|ProductMeta &&#checkIfProduct(std::string & fileName)|std::vector<std::string> &&#dispatch(std::vector<std::string> & prods)|void#scheduleProductsForProcessing(std::vector<std::string> & prods)|void#archiveOutputs(std::vector<std::string> & prods)|void#transferOutputsToCommander()|void#transferRemoteLocalArchiveToCommander(std::vector<std::string> & prods)|void#gatherNodesInfo()|void#runMainLoop()|void#terminate()'
+Creating header file: master.h . . .
+- Adding declaration of method: void run()
+- Adding declaration of method: void startSession()
+- Adding declaration of method: void loadStateVector()
+- Adding declaration of method: void lookForSuspendedTasks()
+- Adding declaration of method: void appendProdsToQueue(std::vector<std::string> & prods)
+- Adding declaration of method: void setDirectoryWatchers()
+- Adding declaration of method: void getHostInfo()
+- Adding declaration of method: ProductMeta && checkIfProduct(std::string & fileName)
+- Adding declaration of method: std::vector<std::string> && dispatch(std::vector<std::string> & prods)
+- Adding declaration of method: void scheduleProductsForProcessing(std::vector<std::string> & prods)
+- Adding declaration of method: void archiveOutputs(std::vector<std::string> & prods)
+- Adding declaration of method: void transferOutputsToCommander()
+- Adding declaration of method: void transferRemoteLocalArchiveToCommander(std::vector<std::string> & prods)
+- Adding declaration of method: void gatherNodesInfo()
+- Adding declaration of method: void runMainLoop()
+- Adding declaration of method: void terminate()
+Creating source file: master.cpp . . .
+- Adding template for implementation of method: void run()
+- Adding template for implementation of method: void startSession()
+- Adding template for implementation of method: void loadStateVector()
+- Adding template for implementation of method: void lookForSuspendedTasks()
+- Adding template for implementation of method: void appendProdsToQueue(std::vector<std::string> & prods)
+- Adding template for implementation of method: void setDirectoryWatchers()
+- Adding template for implementation of method: void getHostInfo()
+- Adding template for implementation of method: ProductMeta && checkIfProduct(std::string & fileName)
+- Adding template for implementation of method: std::vector<std::string> && dispatch(std::vector<std::string> & prods)
+- Adding template for implementation of method: void scheduleProductsForProcessing(std::vector<std::string> & prods)
+- Adding template for implementation of method: void archiveOutputs(std::vector<std::string> & prods)
+- Adding template for implementation of method: void transferOutputsToCommander()
+- Adding template for implementation of method: void transferRemoteLocalArchiveToCommander(std::vector<std::string> & prods)
+- Adding template for implementation of method: void gatherNodesInfo()
+- Adding template for implementation of method: void runMainLoop()
+- Adding template for implementation of method: void terminate()
+Done.
+
+-rw-r--r--  1 jcgonzalez  staff  5040 Jun 14 13:52 master.cpp
+-rw-r--r--  1 jcgonzalez  staff  5988 Jun 14 13:52 master.h
++ cls=DataManager
++ mod=datamng
++ mths='%void#noop()'
++ mths='%void#noop()|#DataManager(cfg)'
++ mths='%void#noop()|#DataManager(cfg)|void#connect()'
++ mths='%void#noop()|#DataManager(cfg)|void#connect()|void#storeProductInfo(m)'
++ mths='%void#noop()|#DataManager(cfg)|void#connect()|void#storeProductInfo(m)|void#storeTaskInfo(taskId,taskStatus,taskInfo,initial)'
++ mths='%void#noop()|#DataManager(cfg)|void#connect()|void#storeProductInfo(m)|void#storeTaskInfo(taskId,taskStatus,taskInfo,initial)|void#storeProductQueue(queue)'
++ mths='%void#noop()|#DataManager(cfg)|void#connect()|void#storeProductInfo(m)|void#storeTaskInfo(taskId,taskStatus,taskInfo,initial)|void#storeProductQueue(queue)|void#storeHostsSpectra(info)'
++ /Users/jcgonzalez/bin/cpp/createC++Module.sh datamng DataManager QPF qpf.fmk '2019 Euclid SOC Team / J C Gonzalez' '%void#noop()|#DataManager(cfg)|void#connect()|void#storeProductInfo(m)|void#storeTaskInfo(taskId,taskStatus,taskInfo,initial)|void#storeProductQueue(queue)|void#storeHostsSpectra(info)'
+Creating header file: datamng.h . . .
+- Adding declaration of method: void noop()
+- Adding declaration of method:  DataManager(cfg)
+- Adding declaration of method: void connect()
+- Adding declaration of method: void storeProductInfo(m)
+- Adding declaration of method: void storeTaskInfo(taskId,taskStatus,taskInfo,initial)
+- Adding declaration of method: void storeProductQueue(queue)
+- Adding declaration of method: void storeHostsSpectra(info)
+Creating source file: datamng.cpp . . .
+Done.
+
+-rw-r--r--  1 jcgonzalez  staff  1424 Jun 14 13:52 datamng.cpp
+-rw-r--r--  1 jcgonzalez  staff  3850 Jun 14 13:52 datamng.h
++ cls=FiFo
++ mod=fifo
++ mths='%void#noop()'
++ mths='%void#noop()|#FiFo(sz)'
++ mths='%void#noop()|#FiFo(sz)|void#put(o)'
++ mths='%void#noop()|#FiFo(sz)|void#put(o)|void#append(o)'
++ mths='%void#noop()|#FiFo(sz)|void#put(o)|void#append(o)|void#find(o)'
++ /Users/jcgonzalez/bin/cpp/createC++Module.sh fifo FiFo QPF qpf.fmk '2019 Euclid SOC Team / J C Gonzalez' '%void#noop()|#FiFo(sz)|void#put(o)|void#append(o)|void#find(o)'
+Creating header file: fifo.h . . .
+- Adding declaration of method: void noop()
+- Adding declaration of method:  FiFo(sz)
+- Adding declaration of method: void put(o)
+- Adding declaration of method: void append(o)
+- Adding declaration of method: void find(o)
+Creating source file: fifo.cpp . . .
+Done.
+
+-rw-r--r--  1 jcgonzalez  staff  1369 Jun 14 13:52 fifo.cpp
+-rw-r--r--  1 jcgonzalez  staff  3246 Jun 14 13:52 fifo.h
++ cls=MasterServer
++ mod=masterserver
++ mths='%void#noop()'
++ mths='%void#noop()|void#popup()'
++ mths='%void#noop()|void#popup()|void#set_master_handler()'
++ /Users/jcgonzalez/bin/cpp/createC++Module.sh masterserver MasterServer QPF qpf.fmk '2019 Euclid SOC Team / J C Gonzalez' '%void#noop()|void#popup()|void#set_master_handler()'
+Creating header file: masterserver.h . . .
+- Adding declaration of method: void noop()
+- Adding declaration of method: void popup()
+- Adding declaration of method: void set_master_handler()
+Creating source file: masterserver.cpp . . .
+Done.
+
+-rw-r--r--  1 jcgonzalez  staff  1441 Jun 14 13:52 masterserver.cpp
+-rw-r--r--  1 jcgonzalez  staff  2969 Jun 14 13:52 masterserver.h
++ cls=MasterRequester
++ mod=masterrequester
++ mths='%void#noop()'
++ /Users/jcgonzalez/bin/cpp/createC++Module.sh masterrequester MasterRequester QPF qpf.fmk '2019 Euclid SOC Team / J C Gonzalez' '%void#noop()'
+Creating header file: masterrequester.h . . .
+- Adding declaration of method: void noop()
+Creating source file: masterrequester.cpp . . .
+Done.
+
+-rw-r--r--  1 jcgonzalez  staff  1468 Jun 14 13:52 masterrequester.cpp
+-rw-r--r--  1 jcgonzalez  staff  2585 Jun 14 13:52 masterrequester.h
++ cls=TaskAgent
++ mod=taskagent
++ mths='%void#noop()'
++ mths='%void#noop()|#TaskAgent(wa,ident,iq,oq,tq,isCommander)'
++ mths='%void#noop()|#TaskAgent(wa,ident,iq,oq,tq,isCommander)|void#substitute(rule)'
++ mths='%void#noop()|#TaskAgent(wa,ident,iq,oq,tq,isCommander)|void#substitute(rule)|void#get_substitution_rules()'
++ mths='%void#noop()|#TaskAgent(wa,ident,iq,oq,tq,isCommander)|void#substitute(rule)|void#get_substitution_rules()|void#is_substitution_rules()'
++ mths='%void#noop()|#TaskAgent(wa,ident,iq,oq,tq,isCommander)|void#substitute(rule)|void#get_substitution_rules()|void#is_substitution_rules()|void#stateToTaskStatus(inspCode)'
++ mths='%void#noop()|#TaskAgent(wa,ident,iq,oq,tq,isCommander)|void#substitute(rule)|void#get_substitution_rules()|void#is_substitution_rules()|void#stateToTaskStatus(inspCode)|void#isEnded()'
++ mths='%void#noop()|#TaskAgent(wa,ident,iq,oq,tq,isCommander)|void#substitute(rule)|void#get_substitution_rules()|void#is_substitution_rules()|void#stateToTaskStatus(inspCode)|void#isEnded()|void#do_rules(item)'
++ mths='%void#noop()|#TaskAgent(wa,ident,iq,oq,tq,isCommander)|void#substitute(rule)|void#get_substitution_rules()|void#is_substitution_rules()|void#stateToTaskStatus(inspCode)|void#isEnded()|void#do_rules(item)|void#sendSpectrumToMng()'
++ mths='%void#noop()|#TaskAgent(wa,ident,iq,oq,tq,isCommander)|void#substitute(rule)|void#get_substitution_rules()|void#is_substitution_rules()|void#stateToTaskStatus(inspCode)|void#isEnded()|void#do_rules(item)|void#sendSpectrumToMng()|void#prepareNewTask(taskId,taskFld,proc)'
++ mths='%void#noop()|#TaskAgent(wa,ident,iq,oq,tq,isCommander)|void#substitute(rule)|void#get_substitution_rules()|void#is_substitution_rules()|void#stateToTaskStatus(inspCode)|void#isEnded()|void#do_rules(item)|void#sendSpectrumToMng()|void#prepareNewTask(taskId,taskFld,proc)|void#launchContainer()'
++ mths='%void#noop()|#TaskAgent(wa,ident,iq,oq,tq,isCommander)|void#substitute(rule)|void#get_substitution_rules()|void#is_substitution_rules()|void#stateToTaskStatus(inspCode)|void#isEnded()|void#do_rules(item)|void#sendSpectrumToMng()|void#prepareNewTask(taskId,taskFld,proc)|void#launchContainer()|void#launchNewTask()'
++ mths='%void#noop()|#TaskAgent(wa,ident,iq,oq,tq,isCommander)|void#substitute(rule)|void#get_substitution_rules()|void#is_substitution_rules()|void#stateToTaskStatus(inspCode)|void#isEnded()|void#do_rules(item)|void#sendSpectrumToMng()|void#prepareNewTask(taskId,taskFld,proc)|void#launchContainer()|void#launchNewTask()|void#scheduleContainerForRemoval(cnt)'
++ mths='%void#noop()|#TaskAgent(wa,ident,iq,oq,tq,isCommander)|void#substitute(rule)|void#get_substitution_rules()|void#is_substitution_rules()|void#stateToTaskStatus(inspCode)|void#isEnded()|void#do_rules(item)|void#sendSpectrumToMng()|void#prepareNewTask(taskId,taskFld,proc)|void#launchContainer()|void#launchNewTask()|void#scheduleContainerForRemoval(cnt)|void#removeOldContainers()'
++ mths='%void#noop()|#TaskAgent(wa,ident,iq,oq,tq,isCommander)|void#substitute(rule)|void#get_substitution_rules()|void#is_substitution_rules()|void#stateToTaskStatus(inspCode)|void#isEnded()|void#do_rules(item)|void#sendSpectrumToMng()|void#prepareNewTask(taskId,taskFld,proc)|void#launchContainer()|void#launchNewTask()|void#scheduleContainerForRemoval(cnt)|void#removeOldContainers()|void#atom_move(src,dst)'
++ mths='%void#noop()|#TaskAgent(wa,ident,iq,oq,tq,isCommander)|void#substitute(rule)|void#get_substitution_rules()|void#is_substitution_rules()|void#stateToTaskStatus(inspCode)|void#isEnded()|void#do_rules(item)|void#sendSpectrumToMng()|void#prepareNewTask(taskId,taskFld,proc)|void#launchContainer()|void#launchNewTask()|void#scheduleContainerForRemoval(cnt)|void#removeOldContainers()|void#atom_move(src,dst)|void#prepareOutputs()'
++ mths='%void#noop()|#TaskAgent(wa,ident,iq,oq,tq,isCommander)|void#substitute(rule)|void#get_substitution_rules()|void#is_substitution_rules()|void#stateToTaskStatus(inspCode)|void#isEnded()|void#do_rules(item)|void#sendSpectrumToMng()|void#prepareNewTask(taskId,taskFld,proc)|void#launchContainer()|void#launchNewTask()|void#scheduleContainerForRemoval(cnt)|void#removeOldContainers()|void#atom_move(src,dst)|void#prepareOutputs()|void#monitorTasks()'
++ mths='%void#noop()|#TaskAgent(wa,ident,iq,oq,tq,isCommander)|void#substitute(rule)|void#get_substitution_rules()|void#is_substitution_rules()|void#stateToTaskStatus(inspCode)|void#isEnded()|void#do_rules(item)|void#sendSpectrumToMng()|void#prepareNewTask(taskId,taskFld,proc)|void#launchContainer()|void#launchNewTask()|void#scheduleContainerForRemoval(cnt)|void#removeOldContainers()|void#atom_move(src,dst)|void#prepareOutputs()|void#monitorTasks()|void#run()'
++ /Users/jcgonzalez/bin/cpp/createC++Module.sh taskagent TaskAgent QPF qpf.fmk '2019 Euclid SOC Team / J C Gonzalez' '%void#noop()|#TaskAgent(wa,ident,iq,oq,tq,isCommander)|void#substitute(rule)|void#get_substitution_rules()|void#is_substitution_rules()|void#stateToTaskStatus(inspCode)|void#isEnded()|void#do_rules(item)|void#sendSpectrumToMng()|void#prepareNewTask(taskId,taskFld,proc)|void#launchContainer()|void#launchNewTask()|void#scheduleContainerForRemoval(cnt)|void#removeOldContainers()|void#atom_move(src,dst)|void#prepareOutputs()|void#monitorTasks()|void#run()'
+Creating header file: taskagent.h . . .
+- Adding declaration of method: void noop()
+- Adding declaration of method:  TaskAgent(wa,ident,iq,oq,tq,isCommander)
+- Adding declaration of method: void substitute(rule)
+- Adding declaration of method: void get_substitution_rules()
+- Adding declaration of method: void is_substitution_rules()
+- Adding declaration of method: void stateToTaskStatus(inspCode)
+- Adding declaration of method: void isEnded()
+- Adding declaration of method: void do_rules(item)
+- Adding declaration of method: void sendSpectrumToMng()
+- Adding declaration of method: void prepareNewTask(taskId,taskFld,proc)
+- Adding declaration of method: void launchContainer()
+- Adding declaration of method: void launchNewTask()
+- Adding declaration of method: void scheduleContainerForRemoval(cnt)
+- Adding declaration of method: void removeOldContainers()
+- Adding declaration of method: void atom_move(src,dst)
+- Adding declaration of method: void prepareOutputs()
+- Adding declaration of method: void monitorTasks()
+- Adding declaration of method: void run()
+Creating source file: taskagent.cpp . . .
+Done.
+
+-rw-r--r--  1 jcgonzalez  staff  1414 Jun 14 13:52 taskagent.cpp
+-rw-r--r--  1 jcgonzalez  staff  6197 Jun 14 13:52 taskagent.h
++ mths='%void#noop()|#TaskAgent(wa,ident,iq,oq,tq,isCommander)|void#substitute(rule)|void#get_substitution_rules()|void#is_substitution_rules()|void#stateToTaskStatus(inspCode)|void#isEnded()|void#do_rules(item)|void#sendSpectrumToMng()|void#prepareNewTask(taskId,taskFld,proc)|void#launchContainer()|void#launchNewTask()|void#scheduleContainerForRemoval(cnt)|void#removeOldContainers()|void#atom_move(src,dst)|void#prepareOutputs()|void#monitorTasks()|void#run()|void#create_agent(lst,wa,iq,oq,tq,isComm)'
++ cls=TaskManager
++ mod=taskmng
++ mths='%void#noop()'
++ mths='%void#noop()|#TaskManager(cfg,id,wa,net)'
++ mths='%void#noop()|#TaskManager(cfg,id,wa,net)|void#setDirectoryWatchers()'
++ mths='%void#noop()|#TaskManager(cfg,id,wa,net)|void#setDirectoryWatchers()|void#createAgents()'
++ mths='%void#noop()|#TaskManager(cfg,id,wa,net)|void#setDirectoryWatchers()|void#createAgents()|void#createTaskId(tskAgId,n)'
++ mths='%void#noop()|#TaskManager(cfg,id,wa,net)|void#setDirectoryWatchers()|void#createAgents()|void#createTaskId(tskAgId,n)|void#createTaskFolders(tskWkDir)'
++ mths='%void#noop()|#TaskManager(cfg,id,wa,net)|void#setDirectoryWatchers()|void#createAgents()|void#createTaskId(tskAgId,n)|void#createTaskFolders(tskWkDir)|void#createTask(prod,tskAgId,n,processor)'
++ mths='%void#noop()|#TaskManager(cfg,id,wa,net)|void#setDirectoryWatchers()|void#createAgents()|void#createTaskId(tskAgId,n)|void#createTaskFolders(tskWkDir)|void#createTask(prod,tskAgId,n,processor)|void#selectAgent()'
++ mths='%void#noop()|#TaskManager(cfg,id,wa,net)|void#setDirectoryWatchers()|void#createAgents()|void#createTaskId(tskAgId,n)|void#createTaskFolders(tskWkDir)|void#createTask(prod,tskAgId,n,processor)|void#selectAgent()|void#updateAgent(taskId,agNum,agName,agNumTsk)'
++ mths='%void#noop()|#TaskManager(cfg,id,wa,net)|void#setDirectoryWatchers()|void#createAgents()|void#createTaskId(tskAgId,n)|void#createTaskFolders(tskWkDir)|void#createTask(prod,tskAgId,n,processor)|void#selectAgent()|void#updateAgent(taskId,agNum,agName,agNumTsk)|void#updateContainer(agName,contId,contStatus)'
++ mths='%void#noop()|#TaskManager(cfg,id,wa,net)|void#setDirectoryWatchers()|void#createAgents()|void#createTaskId(tskAgId,n)|void#createTaskFolders(tskWkDir)|void#createTask(prod,tskAgId,n,processor)|void#selectAgent()|void#updateAgent(taskId,agNum,agName,agNumTsk)|void#updateContainer(agName,contId,contStatus)|void#updateTasksInfo(datmng)'
++ mths='%void#noop()|#TaskManager(cfg,id,wa,net)|void#setDirectoryWatchers()|void#createAgents()|void#createTaskId(tskAgId,n)|void#createTaskFolders(tskWkDir)|void#createTask(prod,tskAgId,n,processor)|void#selectAgent()|void#updateAgent(taskId,agNum,agName,agNumTsk)|void#updateContainer(agName,contId,contStatus)|void#updateTasksInfo(datmng)|void#schedule(prod,processor)'
++ mths='%void#noop()|#TaskManager(cfg,id,wa,net)|void#setDirectoryWatchers()|void#createAgents()|void#createTaskId(tskAgId,n)|void#createTaskFolders(tskWkDir)|void#createTask(prod,tskAgId,n,processor)|void#selectAgent()|void#updateAgent(taskId,agNum,agName,agNumTsk)|void#updateContainer(agName,contId,contStatus)|void#updateTasksInfo(datmng)|void#schedule(prod,processor)|void#retrieveOutputs()'
++ mths='%void#noop()|#TaskManager(cfg,id,wa,net)|void#setDirectoryWatchers()|void#createAgents()|void#createTaskId(tskAgId,n)|void#createTaskFolders(tskWkDir)|void#createTask(prod,tskAgId,n,processor)|void#selectAgent()|void#updateAgent(taskId,agNum,agName,agNumTsk)|void#updateContainer(agName,contId,contStatus)|void#updateTasksInfo(datmng)|void#schedule(prod,processor)|void#retrieveOutputs()|void#retrieveAgentsInfo()'
++ mths='%void#noop()|#TaskManager(cfg,id,wa,net)|void#setDirectoryWatchers()|void#createAgents()|void#createTaskId(tskAgId,n)|void#createTaskFolders(tskWkDir)|void#createTask(prod,tskAgId,n,processor)|void#selectAgent()|void#updateAgent(taskId,agNum,agName,agNumTsk)|void#updateContainer(agName,contId,contStatus)|void#updateTasksInfo(datmng)|void#schedule(prod,processor)|void#retrieveOutputs()|void#retrieveAgentsInfo()|void#showSpectra()'
++ mths='%void#noop()|#TaskManager(cfg,id,wa,net)|void#setDirectoryWatchers()|void#createAgents()|void#createTaskId(tskAgId,n)|void#createTaskFolders(tskWkDir)|void#createTask(prod,tskAgId,n,processor)|void#selectAgent()|void#updateAgent(taskId,agNum,agName,agNumTsk)|void#updateContainer(agName,contId,contStatus)|void#updateTasksInfo(datmng)|void#schedule(prod,processor)|void#retrieveOutputs()|void#retrieveAgentsInfo()|void#showSpectra()|void#terminate()'
++ /Users/jcgonzalez/bin/cpp/createC++Module.sh taskmng TaskManager QPF qpf.fmk '2019 Euclid SOC Team / J C Gonzalez' '%void#noop()|#TaskManager(cfg,id,wa,net)|void#setDirectoryWatchers()|void#createAgents()|void#createTaskId(tskAgId,n)|void#createTaskFolders(tskWkDir)|void#createTask(prod,tskAgId,n,processor)|void#selectAgent()|void#updateAgent(taskId,agNum,agName,agNumTsk)|void#updateContainer(agName,contId,contStatus)|void#updateTasksInfo(datmng)|void#schedule(prod,processor)|void#retrieveOutputs()|void#retrieveAgentsInfo()|void#showSpectra()|void#terminate()'
+Creating header file: taskmng.h . . .
+- Adding declaration of method: void noop()
+- Adding declaration of method:  TaskManager(cfg,id,wa,net)
+- Adding declaration of method: void setDirectoryWatchers()
+- Adding declaration of method: void createAgents()
+- Adding declaration of method: void createTaskId(tskAgId,n)
+- Adding declaration of method: void createTaskFolders(tskWkDir)
+- Adding declaration of method: void createTask(prod,tskAgId,n,processor)
+- Adding declaration of method: void selectAgent()
+- Adding declaration of method: void updateAgent(taskId,agNum,agName,agNumTsk)
+- Adding declaration of method: void updateContainer(agName,contId,contStatus)
+- Adding declaration of method: void updateTasksInfo(datmng)
+- Adding declaration of method: void schedule(prod,processor)
+- Adding declaration of method: void retrieveOutputs()
+- Adding declaration of method: void retrieveAgentsInfo()
+- Adding declaration of method: void showSpectra()
+- Adding declaration of method: void terminate()
+Creating source file: taskmng.cpp . . .
+Done.
+
+-rw-r--r--  1 jcgonzalez  staff  1424 Jun 14 13:52 taskmng.cpp
+-rw-r--r--  1 jcgonzalez  staff  5813 Jun 14 13:52 taskmng.h
++ cls=TaskOrchestrator
++ mod=taskorc
++ mths='%void#noop()'
++ mths='%void#noop()|#TaskOrchestrator(cfg)'
++ mths='%void#noop()|#TaskOrchestrator(cfg)|void#checkRules(prod)'
++ mths='%void#noop()|#TaskOrchestrator(cfg)|void#checkRules(prod)|void#schedule(prod,manager)'
++ /Users/jcgonzalez/bin/cpp/createC++Module.sh taskorc TaskOrchestrator QPF qpf.fmk '2019 Euclid SOC Team / J C Gonzalez' '%void#noop()|#TaskOrchestrator(cfg)|void#checkRules(prod)|void#schedule(prod,manager)'
+Creating header file: taskorc.h . . .
+- Adding declaration of method: void noop()
+- Adding declaration of method:  TaskOrchestrator(cfg)
+- Adding declaration of method: void checkRules(prod)
+- Adding declaration of method: void schedule(prod,manager)
+Creating source file: taskorc.cpp . . .
+Done.
+
+-rw-r--r--  1 jcgonzalez  staff  1459 Jun 14 13:52 taskorc.cpp
+-rw-r--r--  1 jcgonzalez  staff  3221 Jun 14 13:52 taskorc.h
++ cls=HttpCommServer
++ mod=httpcommsrv
++ mths='%void#noop()'
++ mths='%void#noop()|#HttpCommServer(addr,port,base_path)'
++ /Users/jcgonzalez/bin/cpp/createC++Module.sh httpcommsrv HttpCommServer QPF qpf.fmk '2019 Euclid SOC Team / J C Gonzalez' '%void#noop()|#HttpCommServer(addr,port,base_path)'
+Creating header file: httpcommsrv.h . . .
+- Adding declaration of method: void noop()
+- Adding declaration of method:  HttpCommServer(addr,port,base_path)
+Creating source file: httpcommsrv.cpp . . .
+Done.
+
+-rw-r--r--  1 jcgonzalez  staff  1453 Jun 14 13:52 httpcommsrv.cpp
+-rw-r--r--  1 jcgonzalez  staff  2799 Jun 14 13:52 httpcommsrv.h
++ cls=HttpCommRequester
++ mod=httpcommrqst
++ mths='%void#noop()'
++ mths='%void#noop()|#HttpCommRequester()'
++ mths='%void#noop()|#HttpCommRequester()|void#set_server_url(server_url)'
++ mths='%void#noop()|#HttpCommRequester()|void#set_server_url(server_url)|void#request_info(route)'
++ mths='%void#noop()|#HttpCommRequester()|void#set_server_url(server_url)|void#request_info(route)|void#request_data(route)'
++ mths='%void#noop()|#HttpCommRequester()|void#set_server_url(server_url)|void#request_info(route)|void#request_data(route)|void#request_data_and_save_to_file(route,file)'
++ mths='%void#noop()|#HttpCommRequester()|void#set_server_url(server_url)|void#request_info(route)|void#request_data(route)|void#request_data_and_save_to_file(route,file)|void#post_file(file,route)'
++ /Users/jcgonzalez/bin/cpp/createC++Module.sh httpcommrqst HttpCommRequester QPF qpf.fmk '2019 Euclid SOC Team / J C Gonzalez' '%void#noop()|#HttpCommRequester()|void#set_server_url(server_url)|void#request_info(route)|void#request_data(route)|void#request_data_and_save_to_file(route,file)|void#post_file(file,route)'
+Creating header file: httpcommrqst.h . . .
+- Adding declaration of method: void noop()
+- Adding declaration of method:  HttpCommRequester()
+- Adding declaration of method: void set_server_url(server_url)
+- Adding declaration of method: void request_info(route)
+- Adding declaration of method: void request_data(route)
+- Adding declaration of method: void request_data_and_save_to_file(route,file)
+- Adding declaration of method: void post_file(file,route)
+Creating source file: httpcommrqst.cpp . . .
+Done.
+
+-rw-r--r--  1 jcgonzalez  staff  1476 Jun 14 13:52 httpcommrqst.cpp
+-rw-r--r--  1 jcgonzalez  staff  3926 Jun 14 13:52 httpcommrqst.h
++ /Users/jcgonzalez/bin/cpp/createC++Module.sh balmode BalancingMode QPF qpf.fmk '2019 Euclid SOC Team / J C Gonzalez' %
+Creating header file: balmode.h . . .
+Creating source file: balmode.cpp . . .
+Done.
+
+-rw-r--r--  1 jcgonzalez  staff  1438 Jun 14 13:52 balmode.cpp
+-rw-r--r--  1 jcgonzalez  staff  2367 Jun 14 13:52 balmode.h
++ /Users/jcgonzalez/bin/cpp/createC++Module.sh wa WorkArea QPF qpf.fmk '2019 Euclid SOC Team / J C Gonzalez' %
+Creating header file: wa.h . . .
+Creating source file: wa.cpp . . .
+Done.
+
+-rw-r--r--  1 jcgonzalez  staff  1393 Jun 14 13:52 wa.cpp
+-rw-r--r--  1 jcgonzalez  staff  2317 Jun 14 13:52 wa.h
++ /Users/jcgonzalez/bin/cpp/createC++Module.sh procnet ProcessingNetwork QPF qpf.fmk '2019 Euclid SOC Team / J C Gonzalez' %
+Creating header file: procnet.h . . .
+Creating source file: procnet.cpp . . .
+Done.
+
+-rw-r--r--  1 jcgonzalez  staff  1466 Jun 14 13:52 procnet.cpp
+-rw-r--r--  1 jcgonzalez  staff  2403 Jun 14 13:52 procnet.h
