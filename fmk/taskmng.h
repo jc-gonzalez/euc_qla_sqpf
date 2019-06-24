@@ -159,7 +159,8 @@ private:
     //----------------------------------------------------------------------
     // Method: updateContainer
     //----------------------------------------------------------------------
-    void updateContainer(string & agName, string & contId, TaskStatus & contStatus);
+    void updateContainer(string & agName, string contId = string(""),
+			 TaskStatus contStatus = TaskStatus(TASK_SCHEDULED));
 
     //----------------------------------------------------------------------
     // Method: terminate

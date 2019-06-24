@@ -59,6 +59,13 @@
 #include <algorithm>
 #include <stdexcept>
 
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <cerrno>
+#include <cstring>
+
+#include "q.h"
+
 using std::queue;
 using std::string;
 using std::vector;
@@ -72,6 +79,7 @@ using std::map;
 // Topic: Project headers
 //------------------------------------------------------------
 #include "json.h"
+template <class T> class Queue;
 
 typedef const char *   cstr;
 
@@ -86,7 +94,15 @@ typedef dict           Config;
 typedef std::string    ProductName;
 typedef dict           ProductMeta; 
 
+typedef Queue<string>  ProductList;
+typedef vector<ProductMeta> ProductMetaList;
+
+typedef json::Value    TaskInfo;
+
 #define forever for(;;)
+
+extern mode_t PathMode;
+
 
 //==========================================================================
 // Enum: TaskStatus
@@ -116,6 +132,7 @@ private:
 
 public:
     TaskStatus(const TaskStatusEnum& v) : value{v} {} //not explicit here.
+ TaskStatus(const int i) : value{TaskStatusEnum(i)} {} //not explicit here.
     operator TaskStatusEnum() const { return value; }
     TaskStatus& operator=(TaskStatusEnum v) { value = v; return *this;}
     bool operator==(const TaskStatusEnum v) const { return value == v; }
@@ -158,6 +175,20 @@ public:
     void fromStr(std::string & s);
 };
 
+struct TskStatSpectra {
+    TskStatSpectra(int r, int s, int p, int st, int fl, int f) :
+        running(r), scheduled(s), paused(p),
+        stopped(st), failed(fl), finished(f),
+        total(r+s+p+st+fl+f) {}
+    int    running;
+    int    scheduled;
+    int    paused;
+    int    stopped;
+    int    failed;
+    int    finished;
+    int    total;
+};
+
 //==========================================================================
 // Python style list comprehensions for C++.
 // Example: multiply all elements of vector literal by 2.
@@ -197,5 +228,8 @@ int indexOf(const std::vector<T>& v, const T& elem)
     int npos = std::find(v.begin(), v.end(), elem) - v.begin();
     if (npos >= v.size()) { return -1; } else { return npos; }
 }
+
+//== UNUSED ================================
+#define UNUSED(x) (void)(x)
 
 #endif // TYPES_H

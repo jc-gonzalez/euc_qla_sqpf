@@ -11,39 +11,49 @@ include (../common.cmake)
 project (fmk)
 
 set (libfmk_hdr
-datamng.h
-fifo.h
-fnamespec.h
-log.h
-master.h
-masterrequester.h
-masterserver.h
-procnet.h
-prodloc.h
-q.h
-taskagent.h
-taskmng.h
-taskorc.h
-types.h
-wa.h
+  datamng.h
+  dckmng.h      
+  cntrmng.h     
+  srvmng.h      
+  dbhdl.h       
+  dbhdlpostgre.h
+  fifo.h
+  fmt.h
+  fnamespec.h
+  log.h
+  master.h
+  masterrequester.h
+  masterserver.h
+  procnet.h
+  prodloc.h
+  q.h
+  taskagent.h
+  taskmng.h
+  taskorc.h
+  types.h
+  wa.h
 )
 
 set (libfmk_src
-datamng.cpp
-fifo.cpp
-fnamespec.cpp
-log.cpp
-master.cpp
-masterrequester.cpp
-masterserver.cpp
-procnet.cpp
-prodloc.cpp
-q.cpp
-taskagent.cpp
-taskmng.cpp
-taskorc.cpp
-types.cpp
-wa.cpp
+  datamng.cpp
+  dckmng.cpp    
+  cntrmng.cpp   
+  srvmng.cpp    
+  dbhdlpostgre.cpp
+  fifo.cpp
+  fnamespec.cpp
+  log.cpp
+  master.cpp
+  masterrequester.cpp
+  masterserver.cpp
+  procnet.cpp
+  prodloc.cpp
+  q.cpp
+  taskagent.cpp
+  taskmng.cpp
+  taskorc.cpp
+  types.cpp
+  wa.cpp
 )
 
 #===== Project sections/libraries =======
@@ -55,6 +65,7 @@ target_include_directories (fmk PUBLIC . ../httpsc
   ${TOOLS_ROOT_DIR}
   ${FILETOOLS_ROOT_DIR}
   ${VOS_ROOT_DIR}
+  ${PSQLINCDIR}
 #  ${LOG_ROOT_DIR}
 #  ${INFIX_ROOT_DIR}
 #  ${NNCOMM_ROOT_DIR}
@@ -62,7 +73,6 @@ target_include_directories (fmk PUBLIC . ../httpsc
 #  ${UUID_ROOT_DIR}
 #  ${NNMSGINCDIR}
 #  ${PCRE2INCDIR}
-#  ${PSQLINCDIR}
 #  ${UUIDINCDIR}
 #  ${MONGOOSEDIR}
 )
@@ -74,9 +84,11 @@ target_link_libraries (fmk
   tools
   vos
 #  log
-# filehdl infix str log tools uuidxx nncomm uuid vos
+#  filehdl infix str log tools
+#  uuidxx nncomm uuid vos
 #  nanomsg mongoose
-#  ${PCRE2LIB} pcre2-8 ${PSQLLIB}
+#  ${PCRE2LIB} pcre2-8
+  ${PSQLLIB}
   log4cpp
   pthread)
 set_target_properties (fmk PROPERTIES LINKER_LANGUAGE CXX)

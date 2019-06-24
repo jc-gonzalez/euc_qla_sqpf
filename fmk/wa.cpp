@@ -54,8 +54,6 @@ WorkArea::WorkArea()
 //----------------------------------------------------------------------
 WorkArea::WorkArea(string _wa)
 {
-    mode_t PathMode = 0755;
-
     wa            = _wa;
 
     procArea      = wa + "/bin";
@@ -82,7 +80,11 @@ WorkArea::WorkArea(string _wa)
     logs          = sessionDir + "/log";
 
     for (auto & p: {sessionDir, tasks, logs}) {
-        mkdir(p.c_str(), PathMode);
+	if (mkdir(p.c_str(), PathMode) < 0) {
+	    std::cerr << "Couldn't create folder "
+		      << p << ": " << strerror(errno) << '\n';
+	    abort();
+	}
     }
 }
 

@@ -52,6 +52,7 @@
 #include "filetools.h"
 #include "fnamespec.h"
 #include "prodloc.h"
+#include "fmt.h"
 
 //----------------------------------------------------------------------
 // Constructor
@@ -256,8 +257,9 @@ bool Master::getNewEntriesFromDirWatcher(DirWatcher * dw, Queue<string> & q)
         // TODO: Process directories that appear at inbox
         if (! e.isDir) {
             // Build full file name and add it to the queue
-	    q.push(std::string(e.path) + "/" +
-		   std::string(e.name));
+	    // q.push(std::string(e.path) + "/" +
+	    // 	   std::string(e.name));
+	    q.push(fmt("$/$", e.path, e.name));
 	    ++numEvents;
         }
     }

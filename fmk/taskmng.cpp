@@ -51,7 +51,7 @@
 TaskManager::TaskManager(Config & _cfg, string _id, 
                          WorkArea & _wa, ProcessingNetwork & _net)
     : cfg(_cfg), id(_id), wa(_wa), net(_net),
-      defaultProcCfg(std::string("cample.cfg.json")),
+      defaultProcCfg(std::string("sample.cfg.json")),
       logger(Log::getLogger("tskmng"))
 {
     thisNodeNum = indexOf<string>(net.nodeName, id);
@@ -155,6 +155,13 @@ string TaskManager::createTaskId(string tskAgId, int n)
 //----------------------------------------------------------------------
 void TaskManager::createTaskFolders(string & tskWkDir)
 {
+    vector<string> pths ;
+    for (auto & p: {tskWkDir, tskWkDir + "/in", tskWkDir + "/out", tskWkDir + "/log"}) {
+        if (mkdir(p.c_str(), PathMode) < 0) {
+	    logger.error("Couldn't create folder %s: %s",
+			 p.c_str(), strerror(errno));
+	}
+    }	
 }
 
 //----------------------------------------------------------------------
@@ -198,17 +205,23 @@ std::tuple<int, int> TaskManager::selectAgent()
 
 //----------------------------------------------------------------------
 // Method: updateAgent
+// Update agents information structure
 //----------------------------------------------------------------------
 void TaskManager::updateAgent(string & taskId, int agNum,
 			      string & agName, int agNumTsk)
-{
+{/*
+    self.agentsInfo["agent_num_tasks"][agNum] = agNumTsk
+        agInfo = dict(self.agentsInfo["agents"][agName])
+        agInfo["task_id"] = taskId
+        agInfo["num_tasks"] = agNumTsk
+        self.agentsInfo["agents"][agName] = agInfo*/
 }
 
 //----------------------------------------------------------------------
 // Method: updateContainer
 //----------------------------------------------------------------------
-void TaskManager::updateContainer(string & agName, string & contId,
-				  TaskStatus & contStatus)
+void TaskManager::updateContainer(string & agName, string contId,
+				  TaskStatus contStatus)
 {
 }
 
@@ -225,14 +238,25 @@ void TaskManager::updateTasksInfo(DataManager & datmng)
 //----------------------------------------------------------------------
 void TaskManager::schedule(ProductMeta & meta, string & processor)
 {
-    int numAg, numTasks;
-    std::tie<int, int>(numAg, numTasks) = selectAgent();
-    string agName = agentsInfo["agent_names"][numAg].asString();
+    int agNum, numTasks;
+    std::tie<int, int>(agNum, numTasks) = selectAgent();
+    string agName = agentsInfo["agent_names"][agNum].asString();
     numTasks++;
 
+    // Create task id and environment
     string taskId, taskFolder;
-    std::tie<string, string>(taskId, taskFolder) = createTask(meta, agName,
-							      numTasks, processor);
+    std::tie<string, string>(taskId, taskFolder) =
+	createTask(meta, agName, numTasks, processor);
+
+    // Pass task id to selected agent
+    Queue<string> * iq = agentsInQueue.at(agNum);
+    iq->push(std::move(std::string(taskId)));
+    iq->push(std::move(std::string(taskFolder)));
+    iq->push(std::move(processor));
+
+    // Update agents information structures
+    updateAgent(taskId, agNum, agName, numTasks);
+    updateContainer(agName);
 }
 
 //----------------------------------------------------------------------
