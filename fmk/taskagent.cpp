@@ -40,6 +40,9 @@
 
 #include "taskagent.h"
 #include "str.h"
+#include "fnamespec.h"
+#include "filetools.h"
+#include "prodloc.h"
 
 //----------------------------------------------------------------------
 // Constructor
@@ -231,6 +234,24 @@ void TaskAgent::scheduleContainerForRemoval()
 //----------------------------------------------------------------------
 void TaskAgent::removeOldContainers()
 {
+    static const clock_t tOffset = 5 * CLOCKS_PER_SEC; // 5 seconds
+
+    vector<string> containersToRemoveNow;
+
+    clock_t now = clock();
+    for (auto & p: containersToRemove) {
+	clock_t clk = p.first;
+	if ((now - clk) > tOffset) { containersToRemoveNow.push_back(p.second); }	    
+    }
+
+    for (auto & c: containersToRemoveNow) {
+	// remove container
+	// dckMng.???
+	logger.debug("Removing container %s", c.c_str());
+    }
+
+    containersToRemove.erase(containersToRemove.begin(),
+			     containersToRemove.begin() + containersToRemoveNow.size());
 }
 
 //----------------------------------------------------------------------
@@ -242,9 +263,40 @@ void TaskAgent::atom_move(string src, string dst)
 
 //----------------------------------------------------------------------
 // Method: prepareOutputs
+// Prepare outputs, placing them in the outputs folder or in the remote
+// outputs folder to be sent to the commander host
 //----------------------------------------------------------------------
 void TaskAgent::prepareOutputs()
 {
+    static FileNameSpec fns;
+
+    vector<string> logFiles = FileTools::filesInFolder(taskFolder + "/log", "log");
+    vector<string> outFiles = FileTools::filesInFolder(taskFolder + "/out");
+
+    // Move the outputs to the outbox folder, so they are sent to the archive
+    for (auto & f: logFiles) {
+	ProductMeta meta;
+	if (! fns.parse(f, meta)) {
+	    logger.error("Cannot parse file name for product %s", f.c_str());
+	    continue;
+	}
+	if (! ProductLocator::toLocalOutputs(meta, wa)) {
+	    logger.error("Cannot move %s to local outputs folder", f.c_str());
+	}
+    }
+    
+    // Move, instead, the output files to the inbox, so they are checked
+    // if they trigger a new rule
+    for (auto & f: outFiles) {
+	ProductMeta meta;
+	if (! fns.parse(f, meta)) {
+	    logger.error("Cannot parse file name for product %s", f.c_str());
+	    continue;
+	}
+	if (! ProductLocator::toLocalInbox(meta, wa)) {
+	    logger.error("Cannot move %s to local inbox folder", f.c_str());
+	}
+    }
 }
 
 //----------------------------------------------------------------------
