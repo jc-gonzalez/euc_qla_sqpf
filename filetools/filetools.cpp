@@ -40,6 +40,8 @@
 
 #include "filetools.h"
 
+#include "str.h"
+
 #include <cstdio>
 #include <cstring>
 #include <unistd.h>
@@ -47,6 +49,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+
+#include <dirent.h>
 
 #if defined(__APPLE__) && defined(__MACH__)
 #   warning "Compiling for Mac OS X . . ."
@@ -130,6 +134,33 @@ int fileSize(std::string pathName)
 {
     struct stat sb;
     return (stat(pathName.c_str(), &sb) == 0) ? sb.st_size : -1;
+}
+
+//----------------------------------------------------------------------
+// Method: filesInFolder
+//----------------------------------------------------------------------
+std::vector<std::string> filesInFolder(std::string folder, std::string ext)
+{
+    std::vector<std::string> v;
+    
+    DIR *dir;
+    struct dirent *ent;
+    if ((dir = opendir(folder.c_str())) != NULL) {
+	/* print all the files and directories within directory */
+	while ((ent = readdir(dir)) != NULL) {
+	    std::string filename(ent->d_name);
+	    if (!ext.empty()) {
+		std::string entext(str::getExtension(filename));
+		if (entext != ext) continue;		    
+	    }
+	    v.push_back(folder + "/" + filename);
+	}
+	closedir(dir);
+    } else {
+	/* could not open directory */
+	perror("filesInFolder");
+    }
+    return v;
 }
     
 //----------------------------------------------------------------------

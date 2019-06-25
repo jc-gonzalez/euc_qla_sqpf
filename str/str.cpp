@@ -242,6 +242,7 @@ void toLower(std::string & s)
     char * c = const_cast<char*>(s.data());
     f.tolower(c, c + s.size());
 }
+
 //----------------------------------------------------------------------
 // Function: getExtension
 // Returns the extension  part of filename

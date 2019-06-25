@@ -42,6 +42,7 @@
 
 #include <string>
 #include <tuple>
+#include <vector>
 
 //======================================================================
 // Namespace: FileTools
@@ -79,6 +80,12 @@ namespace FileTools {
     // Returns the size of the file
     //----------------------------------------------------------------------
     int fileSize(std::string pathName);
+    
+    //----------------------------------------------------------------------
+    // Method: filesInFolder
+    //----------------------------------------------------------------------
+    std::vector<std::string> filesInFolder(std::string folder,
+					   std::string ext = std::string(""));
     
     //----------------------------------------------------------------------
     // Method: copyfile
