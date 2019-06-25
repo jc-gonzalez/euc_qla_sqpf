@@ -95,6 +95,18 @@ public:
 			    ProductLocatorMethod method = LINK);
  
     //----------------------------------------------------------------------
+    // Method: toLocalOutputs
+    //----------------------------------------------------------------------
+    static bool toLocalOutputs(ProductMeta & m, WorkArea & wa,
+			       ProductLocatorMethod method = MOVE);
+ 
+    //----------------------------------------------------------------------
+    // Method: toLocalInbox
+    //----------------------------------------------------------------------
+    static bool toLocalInbox(ProductMeta & m, WorkArea & wa,
+			     ProductLocatorMethod method = MOVE);
+ 
+    //----------------------------------------------------------------------
     // Method: sendToVOSpace
     //----------------------------------------------------------------------
     static bool sendToVOSpace(std::string user, std::string pwd,

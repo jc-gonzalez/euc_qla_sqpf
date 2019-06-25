@@ -97,6 +97,40 @@ bool ProductLocator::toTaskInput(ProductMeta & m, WorkArea & wa,
 }
  
 //----------------------------------------------------------------------
+// Method: toLocalOutputs
+//----------------------------------------------------------------------
+bool ProductLocator::toLocalOutputs(ProductMeta & m, WorkArea & wa,
+				    ProductLocatorMethod method)
+{
+    std::string origBaseName = m["fileinfo"]["bname"].asString();
+    std::string origFile = m["fileinfo"]["full"].asString();
+    std::string newFile = wa.localOutputs + "/" + origBaseName;
+    bool result = relocate(origFile, newFile, method);
+    if (result) {
+	m["fileinfo"]["full"] = newFile;
+	m["fileinfo"]["path"] = wa.localOutputs;
+    }
+    return result;
+}
+ 
+//----------------------------------------------------------------------
+// Method: toLocalInbox
+//----------------------------------------------------------------------
+bool ProductLocator::toLocalInbox(ProductMeta & m, WorkArea & wa,
+				  ProductLocatorMethod method)
+{
+    std::string origBaseName = m["fileinfo"]["bname"].asString();
+    std::string origFile = m["fileinfo"]["full"].asString();
+    std::string newFile = wa.localInbox + "/" + origBaseName;
+    bool result = relocate(origFile, newFile, method);
+    if (result) {
+	m["fileinfo"]["full"] = newFile;
+	m["fileinfo"]["path"] = wa.localInbox;
+    }
+    return result;
+}
+ 
+//----------------------------------------------------------------------
 // Method: sendToVOSpace
 //----------------------------------------------------------------------
 bool ProductLocator::sendToVOSpace(std::string user, std::string pwd,
