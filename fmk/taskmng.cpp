@@ -121,16 +121,17 @@ void TaskManager::createAgents()
 	Queue<string> * iq = new Queue<string>;
 	Queue<string> * oq = new Queue<string>;
 	Queue<string> * tq = new Queue<string>;
-	createAgent(thisNodeAgentNames.at(i), wa, iq, oq, tq, net.thisIsCommander);
+	string agName = thisNodeAgentNames.at(i);
+	createAgent(agName, wa, iq, oq, tq, net.thisIsCommander);
 	logger.debug("Creating agent " + std::to_string(i + 1) + " of " +
-		     std::to_string(numOfAgents) + " :  " +
-		     thisNodeAgentNames.at(i));
+		     std::to_string(numOfAgents) + " :  " + agName);
 	agentsInQueue.push_back(iq);
 	agentsOutQueue.push_back(oq);
 	agentsTskQueue.push_back(tq);
-
-	agentsData.append(thisNodeAgentNames.at(i), agentData);
-	agentsNames.append(thisNodeAgentNames.at(i));
+	agentsContainer[agName] = std::make_tuple(std::string(""), 
+						  int(TaskStatus(TASK_UNKNOWN_STATE)));
+	agentsData.append(agName, agentData);
+	agentsNames.append(agName);
 	agentsTasks.append(0);
     }
 
@@ -209,20 +210,50 @@ std::tuple<int, int> TaskManager::selectAgent()
 //----------------------------------------------------------------------
 void TaskManager::updateAgent(string & taskId, int agNum,
 			      string & agName, int agNumTsk)
-{/*
-    self.agentsInfo["agent_num_tasks"][agNum] = agNumTsk
-        agInfo = dict(self.agentsInfo["agents"][agName])
-        agInfo["task_id"] = taskId
-        agInfo["num_tasks"] = agNumTsk
-        self.agentsInfo["agents"][agName] = agInfo*/
+{
+    agentsInfo["agent_num_tasks"][agNum] = agNumTsk;
+    jso agInfo = agentsInfo["agents"][agName].asObject();
+    agInfo["task_id"] = taskId;
+    agInfo["num_tasks"] = agNumTsk;
+    agentsInfo["agents"][agName] = agInfo;
 }
 
 //----------------------------------------------------------------------
 // Method: updateContainer
+// Update container status in agent information structure
 //----------------------------------------------------------------------
 void TaskManager::updateContainer(string & agName, string contId,
 				  TaskStatus contStatus)
 {
+    jso agInfo = agentsInfo["agents"][agName].asObject();
+    agInfo["cont_id"] = contId;
+    agInfo["cont_status"] = int(contStatus);
+    jso agInfoSpec = agInfo["spectrum"].asObject();
+
+    string storedContId;
+    int storedStatusVal;
+    std::tie(storedContId, storedStatusVal) = agentsContainer[agName];
+    TaskStatus storedContStatus(storedStatusVal);
+    string storedContStatusLowStr = storedContStatus.lstr();
+    int count = 0;
+    bool newCont = storedContId.empty();
+
+    if (newCont) {
+	count = agInfoSpec[storedContStatusLowStr].asInt();
+	agInfoSpec[storedContStatusLowStr] = count - 1;
+	logger.info("Container %s launched, current status is %s",
+		    contId.c_str(), contStatus.str());
+    } else {
+	logger.debug("Container %s changed from %s to %s",
+                     contId.c_str(), storedContStatus.str(), contStatus.str());
+    }
+    
+    agentsContainer[agName] = std::make_tuple(contId, int(contStatus));
+    string newStatusLowStr = contStatus.lstr();
+    count = agInfoSpec[newStatusLowStr].asInt();
+    agInfoSpec[newStatusLowStr] = count + 1;
+    agInfo["spectrum"] = agInfoSpec;
+    agentsInfo["agents"][agName] = agInfo;
 }
 
 //----------------------------------------------------------------------

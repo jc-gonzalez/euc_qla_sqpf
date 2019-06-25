@@ -164,7 +164,7 @@ namespace json {
 
     std::vector<std::string> & Object::getKeys() { return keys; }
     std::string Object::str() {
-	std::stringstream ss("");
+	std::stringstream ss;
 	ss << *this;
 	return ss.str();
     }

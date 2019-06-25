@@ -186,6 +186,9 @@ private:
     vector<Queue<string>*> agentsOutQueue;
     vector<Queue<string>*> agentsTskQueue;
 
+    map< string,
+	 std::tuple<string, int> > agentsContainer;
+	
     jso agentsInfo;
 
     string defaultProcCfg;

@@ -70,6 +70,7 @@ using std::queue;
 using std::string;
 using std::vector;
 using std::map;
+using std::pair;
 
 //------------------------------------------------------------
 // Topic: External packages
@@ -99,10 +100,13 @@ typedef vector<ProductMeta> ProductMetaList;
 
 typedef json::Value    TaskInfo;
 
+typedef int            percent;
+
+typedef map<string, int> CntrSpectrum;
+
 #define forever for(;;)
 
 extern mode_t PathMode;
-
 
 //==========================================================================
 // Enum: TaskStatus
@@ -132,7 +136,7 @@ private:
 
 public:
     TaskStatus(const TaskStatusEnum& v) : value{v} {} //not explicit here.
- TaskStatus(const int i) : value{TaskStatusEnum(i)} {} //not explicit here.
+    TaskStatus(const int i) : value{TaskStatusEnum(i)} {} //not explicit here.
     operator TaskStatusEnum() const { return value; }
     TaskStatus& operator=(TaskStatusEnum v) { value = v; return *this;}
     bool operator==(const TaskStatusEnum v) const { return value == v; }
@@ -140,6 +144,7 @@ public:
     operator std::string() const;
     operator int() const;
     std::string str() const;
+    std::string lstr() const;
     void fromStr(std::string & s);
 };
 

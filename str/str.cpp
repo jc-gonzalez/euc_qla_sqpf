@@ -233,6 +233,16 @@ void toUpper(std::string & s)
 }
 
 //----------------------------------------------------------------------
+// Function: toLower
+// Converts string to lower case
+//----------------------------------------------------------------------
+void toLower(std::string & s)
+{
+    auto & f = std::use_facet<std::ctype<char>>(std::locale());
+    char * c = const_cast<char*>(s.data());
+    f.tolower(c, c + s.size());
+}
+//----------------------------------------------------------------------
 // Function: getExtension
 // Returns the extension  part of filename
 //----------------------------------------------------------------------

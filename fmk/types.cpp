@@ -39,6 +39,7 @@
  ******************************************************************************/
 
 #include "types.h"
+#include "str.h"
 
 mode_t PathMode = 0755;
 
@@ -67,6 +68,13 @@ TaskStatus::operator int() const
 std::string TaskStatus::str() const
 {
     return TaskStatusStr[value];
+}
+
+std::string TaskStatus::lstr() const
+{
+    string s = TaskStatusStr[value];
+    str::toLower(s);
+    return s;
 }
 
 void TaskStatus::fromStr(std::string & s)

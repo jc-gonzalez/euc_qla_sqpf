@@ -49,11 +49,12 @@
 // Topic: System headers
 //   - iostream
 //------------------------------------------------------------
-#include <iostream>
+#include <ctime>
 
 //------------------------------------------------------------
 // Topic: External packages
 //------------------------------------------------------------
+#include "log.h"
 
 //------------------------------------------------------------
 // Topic: Project headers
@@ -61,6 +62,10 @@
 #include "types.h"
 #include "wa.h"
 #include "q.h"
+#include "cs.h"
+#include "json.h"
+
+#include "cntrmng.h"
 
 //==========================================================================
 // Class: TaskAgent
@@ -111,12 +116,12 @@ private:
     //----------------------------------------------------------------------
     // Method: stateToTaskStatus
     //----------------------------------------------------------------------
-    void stateToTaskStatus(int inspCode);
+    TaskStatus stateToTaskStatus(string inspStatus, int inspCode);
 
     //----------------------------------------------------------------------
     // Method: isEnded
     //----------------------------------------------------------------------
-    void isEnded();
+    bool isEnded(TaskStatus st);
 
     //----------------------------------------------------------------------
     // Method: do_rules
@@ -131,22 +136,28 @@ private:
     //----------------------------------------------------------------------
     // Method: prepareNewTask
     //----------------------------------------------------------------------
-    void prepareNewTask(string taskId, string taskFld, string proc);
+    bool prepareNewTask(string taskId, string taskFld, string proc);
 
     //----------------------------------------------------------------------
     // Method: launchContainer
     //----------------------------------------------------------------------
-    void launchContainer();
+    bool launchContainer(string & contId);
 
+    //----------------------------------------------------------------------
+    // Method: inspectContainer
+    //----------------------------------------------------------------------
+    string inspectContainer(string cntId, bool fullInfo = true,
+			    string filter = string(""));
+    
     //----------------------------------------------------------------------
     // Method: launchNewTask
     //----------------------------------------------------------------------
-    void launchNewTask();
+    std::string launchNewTask();
 
     //----------------------------------------------------------------------
     // Method: scheduleContainerForRemoval
     //----------------------------------------------------------------------
-    void scheduleContainerForRemoval(string cnt);
+    void scheduleContainerForRemoval();
 
     //----------------------------------------------------------------------
     // Method: removeOldContainers
@@ -168,6 +179,12 @@ private:
     //----------------------------------------------------------------------
     void monitorTasks();
 
+    //----------------------------------------------------------------------
+    // Method: delay
+    // Waits for a small time lapse for system sync
+    //----------------------------------------------------------------------
+    void delay(int ms);
+    
 private:
     string id;
     WorkArea & wa;
@@ -175,6 +192,24 @@ private:
     Queue<string> * oq;
     Queue<string> * tq;
     bool isCommander;
+
+    bool iAmQuitting;
+    
+    Queue<string> taskQueue;
+
+    string taskId;
+    string taskFolder;
+    string processor;
+    string containerId;
+    ContainerSpectrum containerSpectrum;
+    string inspect;
+    TaskStatus status;
+
+    vector< pair<clock_t, string> > containersToRemove;
+    
+    std::shared_ptr<ContainerMng> dckMng;
+    
+    Logger logger;
 };
 
 #endif // TASKAGENT_H

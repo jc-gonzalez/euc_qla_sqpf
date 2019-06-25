@@ -15,7 +15,7 @@
         "processingNodes": {
             "master": { "address": "127.0.0.1", "port": 50000, "agents": 2},
             "node1": { "address": "127.0.0.1", "port": 50001, "agents": 5},
-            "node2": { "address": "127.0.0.1", "port": 50002, "agents": 20}
+            "node2": { "address": "127.0.0.1", "port": 50002, "agents": 3}
         }
     },
     "db": {

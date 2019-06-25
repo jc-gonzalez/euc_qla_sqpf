@@ -14,7 +14,8 @@ set (libfmk_hdr
   datamng.h
   dckmng.h      
   cntrmng.h     
-  srvmng.h      
+  srvmng.h
+  cs.h
   dbhdl.h       
   dbhdlpostgre.h
   fifo.h
@@ -38,7 +39,8 @@ set (libfmk_src
   datamng.cpp
   dckmng.cpp    
   cntrmng.cpp   
-  srvmng.cpp    
+  srvmng.cpp
+  cs.cpp
   dbhdlpostgre.cpp
   fifo.cpp
   fnamespec.cpp

@@ -66,7 +66,7 @@ Master::Master(string _cfg, string _id, int _port, string _wa, int _bMode)
       wa(WorkArea(_wa)),
       lastNodeUsed(0),
       nodeInfoIsAvailable(false),
-      logger(Log::getLogger(_id))
+      logger(Log::getLogger("master"))
 {
     // Read configuration
     JsonFileHandler jFile(cfgFileName);

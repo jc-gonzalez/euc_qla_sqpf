@@ -232,6 +232,12 @@ std::string quoted(std::string s, char q = '\'');
 void toUpper(std::string & s);
 
 //----------------------------------------------------------------------
+// Function: toLower
+// Returns the string in lower case
+//----------------------------------------------------------------------
+void toLower(std::string & s);
+
+//----------------------------------------------------------------------
 // Function: getExtension
 // Returns the extension  part of filename
 //----------------------------------------------------------------------
