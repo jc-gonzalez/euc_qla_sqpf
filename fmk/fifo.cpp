@@ -39,14 +39,18 @@
  ******************************************************************************/
 
 #include "fifo.h"
+#include <chrono>
+
+template<typename T>
+const T FiFo<T>::null = T(); 
 
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
 template<typename T>
-FiFo<T>::FiFo(int sz)
+FiFo<T>::FiFo(size_t _sz)
+    : objects(), queueMutex(), cv(), sz(_sz), ln(0)
 {
-    init();
 }
 
 //----------------------------------------------------------------------
@@ -58,11 +62,88 @@ FiFo<T>::~FiFo()
 }
 
 //----------------------------------------------------------------------
-// Method: init
-// Initialize the component
+// Method: setSize
 //----------------------------------------------------------------------
 template<typename T>
-void FiFo<T>::init()
+void FiFo<T>::setSize(size_t _sz)
 {
+    sz = _sz;
 }
 
+//----------------------------------------------------------------------
+// Method: put
+//----------------------------------------------------------------------
+template<typename T>
+T FiFo<T>::put(T && obj)
+{
+    std::lock_guard<std::mutex> lock(queueMutex);
+    if (ln == sz) {
+	T first = std::move(objects.front());
+	objects.pop(); objects.push(std::move(obj));
+	return first;
+    } else {
+	objects.push(std::move(obj));
+	++ln;
+	return null;
+    }
+}
+
+//----------------------------------------------------------------------
+// Method: find
+//----------------------------------------------------------------------
+template<typename T>
+bool FiFo<T>::find(T obj)
+{
+    std::lock_guard<std::mutex> lock(queueMutex);
+    bool isIn = false;
+    for (int i = 0; i < ln; ++i) {
+        T elem = std::move(objects.front());
+	isIn |= (elem == obj);
+	objects.pop(); objects.push(elem);
+    }
+    return isIn;
+}
+
+//----------------------------------------------------------------------
+// Method: empty
+//----------------------------------------------------------------------
+template<typename T>
+bool FiFo<T>::empty()
+{
+    bool isEmpty;
+    {
+	std::lock_guard<std::mutex> lock(queueMutex);
+	isEmpty = objects.empty();
+    }
+    return isEmpty;
+}
+
+//----------------------------------------------------------------------
+// Method: size
+//----------------------------------------------------------------------
+template<typename T>
+size_t FiFo<T>::size()
+{
+    size_t _sz;
+    {
+	std::lock_guard<std::mutex> lock(queueMutex);
+	_sz = sz;
+    }
+    return _sz;
+}
+
+//----------------------------------------------------------------------
+// Method: len
+//----------------------------------------------------------------------
+template<typename T>
+size_t FiFo<T>::len()
+{
+    size_t _ln;
+    {
+	std::lock_guard<std::mutex> lock(queueMutex);
+	_ln = ln;
+    }
+    return _ln;
+}
+
+template class FiFo<std::string>;
