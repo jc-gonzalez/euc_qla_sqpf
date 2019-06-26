@@ -259,9 +259,23 @@ void TaskManager::updateContainer(string & agName, string contId,
 
 //----------------------------------------------------------------------
 // Method: updateTasksInfo
+// Update task info in task queue
 //----------------------------------------------------------------------
 void TaskManager::updateTasksInfo(DataManager & datmng)
 {
+    int numOfAgents = net.thisNodeNumOfAgents;
+    for (int agNum = 0; agNum < numOfAgents; ++agNum) {
+	Queue<string> * tq = agentsTskQueue.at(agNum);
+	string justCreated, taskId, inspect, percent, status;
+	while (tq->get(justCreated)) {
+	    tq->get(taskId);
+	    tq->get(inspect);
+	    tq->get(percent);
+	    tq->get(status);
+	    datmng.storeTaskInfo(taskId, TaskStatusDowncaseVal(status),
+				 inspect, justCreated == "true");
+	}
+    }
 }
 
 //----------------------------------------------------------------------
