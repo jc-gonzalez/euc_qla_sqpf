@@ -99,14 +99,20 @@ private:
     virtual void init();
 
     //----------------------------------------------------------------------
+    // Method: getFiles
+    // Get the files according to a item expresion (i.e.: in/*.fits)
+    //----------------------------------------------------------------------
+    vector<string> getFiles(string item);
+    
+    //----------------------------------------------------------------------
     // Method: substitute
     //----------------------------------------------------------------------
-    void substitute(dict & rule);
+    string substitute(string value, string rule);
 
     //----------------------------------------------------------------------
     // Method: get_substitution_rules
     //----------------------------------------------------------------------
-    std::tuple<string, string> getSubstitutionRules(string item);
+    std::tuple< string, vector<string> > getSubstitutionRules(string item);
 
     //----------------------------------------------------------------------
     // Method: isSubstitutionRules
@@ -126,7 +132,7 @@ private:
     //----------------------------------------------------------------------
     // Method: doRules
     //----------------------------------------------------------------------
-    void doRules(dict item);
+    vector<string> doRules(string item);
 
     //----------------------------------------------------------------------
     // Method: sendSpectrumToMng
@@ -165,11 +171,6 @@ private:
     void removeOldContainers();
 
     //----------------------------------------------------------------------
-    // Method: atom_move
-    //----------------------------------------------------------------------
-    void atom_move(string src, string dst);
-
-    //----------------------------------------------------------------------
     // Method: prepareOutputs
     //----------------------------------------------------------------------
     void prepareOutputs();
@@ -205,15 +206,30 @@ private:
     string inspect;
     TaskStatus status;
 
+    string uid;
+    string uname;
+    
     vector< pair<clock_t, string> > containersToRemove;
     
     std::shared_ptr<ContainerMng> dckMng;
 
+    Config pcfg;
     vector<string> p_inputs;
     vector<string> p_outputs;
     vector<string> p_logs;
+
+    string dck_image;
+    string dck_exe;
+    vector<string> dck_args;
+    string dck_workdir;
+    map<string, string> dck_mapping;
     
     Logger logger;
+
+    static const string QPFDckImageDefault;
+    static const string QPFDckImageRunPath;
+    static const string QPFDckImageProcPath;
+
 };
 
 #endif // TASKAGENT_H

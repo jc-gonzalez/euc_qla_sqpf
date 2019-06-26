@@ -67,6 +67,7 @@ bool ContainerMng::createContainer(std::string img, std::vector<std::string> opt
     static char fileIdTpl[] = "dockerId_XXXXXX";
 
     procxx::process cnt("docker", "run");
+    for (auto & o : {"--detach", "--publish-all", "--privileged"}) { cnt.add_argument(o); }
     for (auto & o : opts) { cnt.add_argument(o); }
     for (auto & kv : maps) {
         cnt.add_argument("-v");

@@ -43,9 +43,15 @@
 #include "fnamespec.h"
 #include "filetools.h"
 #include "prodloc.h"
+#include "jsonfhdl.h"
 
 #include <unistd.h>
+#include <sys/types.h>
 
+const string TaskAgent::QPFDckImageDefault("debian");
+const string TaskAgent::QPFDckImageRunPath("/qpf/run");
+const string TaskAgent::QPFDckImageProcPath("/qlabin");
+    
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
@@ -77,23 +83,43 @@ void TaskAgent::init()
 {
     // Create Container Manager
     dckMng = std::make_shared<ContainerMng>(ContainerMng(wa));
+
+    // Initialize user variables
+    std::stringstream ss;
+    ss << getuid();
+    uid = ss.str();
+    uname = string(getenv("USER"));
+}
+
+//----------------------------------------------------------------------
+// Method: getFiles
+// Get the files according to a item expresion (i.e.: in/*.fits)
+//----------------------------------------------------------------------
+vector<string> TaskAgent::getFiles(string item)
+{
+    return FileTools::filesInFolder(str::getBaseName(item.c_str()),
+				    str::getExtension(item.c_str()));
 }
 
 //----------------------------------------------------------------------
 // Method: substitute
 //----------------------------------------------------------------------
-void TaskAgent::substitute(dict & rule)
+string TaskAgent::substitute(string value, string rule)
 {
+    size_t pos = value.find("=>");
+    string from = value.substr(0, pos);
+    string to = value.substr(pos+2);
+    return str::replaceAll(value, from, to);
 }
 
 //----------------------------------------------------------------------
 // Method: getubstitutionRules
 // Get the list of substitution rules
 //----------------------------------------------------------------------
-std::tuple<string, string> TaskAgent::getSubstitutionRules(string item)
+std::tuple< string, vector<string> > TaskAgent::getSubstitutionRules(string item)
 {
     auto v = str::split(item.substr(1, item.length()-2), ':');
-    return std::make_tuple(v.at(0), v.at(1));
+    return std::make_tuple(v.at(0), str::split(v.at(1), ','));
 }
 
 //----------------------------------------------------------------------
@@ -149,16 +175,26 @@ bool TaskAgent::isEnded(TaskStatus st)
 //----------------------------------------------------------------------
 vector<string> TaskAgent::doRules(string item)
 {
-    string from_var, rules;
+    string from_var;
+    vector<string> rules;
     std::tie(from_var, rules) = getSubstitutionRules(item);
 
-    string value
-        value = ' '.join(self.__dict__['p_' + from_var])
-        #logger.debug(self.I + "Original value: {}".format(value))
-        for rule in rules:
-            #logger.debug(self.I + "{} : {}".format(value, rule))
-            value = TaskAgent.substitute(value, rule)
-        return value.split(' ')
+    string value;
+    if (from_var == "input") {
+	value = str::join(p_inputs, " ");
+    } else if (from_var == "output") {
+	value = str::join(p_outputs, " ");
+    } else if (from_var == "log") {
+	value = str::join(p_logs, " ");
+    } else {
+	value = pcfg[from_var].asString();
+    }
+
+    for (auto & rule: rules) {
+	value = substitute(value, rule);
+    }
+
+    return str::split(value, ' ');
 }
 
 //----------------------------------------------------------------------
@@ -183,7 +219,7 @@ void TaskAgent::sendSpectrumToMng()
 bool TaskAgent::prepareNewTask(string taskId, string taskFld, string proc)
 {
     // Read processor config. file
-    string cfgFile(fmt("$/$.cfg", taskFld, proc));
+    string cfgFile(taskFld + "/" + proc + ".cfg");
     logger.debug("%s: %s", id.c_str(), cfgFile.c_str());
 
     // Read configuration
@@ -191,89 +227,104 @@ bool TaskAgent::prepareNewTask(string taskId, string taskFld, string proc)
     if (!jFile.read()) {
 	logger.fatal("Cannot open processor config. file '" + cfgFile + "'. Exiting.");
     }
-    Config pcfg(jFile.getData());
+    pcfg = jFile.getData();
 
     // Evaluate configuration entries 
     // 1. Input file(s), outputs and log)
-    char curdir[PATH_MAX];
-    getwd(curdir);
-    if (chdir(taskFld) < 0) {
+    char curdir[200];
+    getcwd(curdir, 200);
+    if (chdir(taskFld.c_str()) < 0) {
 	logger.error("Cannot change to task folder " + taskFld);
 	return false;
     }
 
-    p_inputs = FileTools::filesInFolder(pcfg["input"].asString());
+    p_inputs = getFiles(pcfg["input"].asString());
     if (p_inputs.size() < 1) {
         logger.error("No input files provided to the processor %s", proc.c_str());
         return false;
     }
+    string p_input = str::join(p_inputs, ",");
     //logger.debug("Processing task %s will process %s", taskId.c_str(), p_input.c_str());
 
-    p_outputs = FileTools::filesInFolder(pcfg["output"].asString());
-    p_logs    = FileTools::filesInFolder(pcfg["log"].asString());
+    string p_output = pcfg["output"].asString();
+    if (isSubstitutionRules(p_output)) {
+	p_outputs = doRules(p_output);
+    } else {
+	p_outputs = getFiles(p_output);
+    }
+    p_output = str::join(p_outputs, ",");
+    
+    string p_log    = pcfg["log"].asString();
+    if (isSubstitutionRules(p_log)) {
+	p_logs = doRules(p_log);
+    } else {
+	p_logs = getFiles(p_log);
+    }
+    p_log = str::join(p_logs, ",");
 
     chdir(curdir);
 
     // 2. Processor subfolder name (folder under QPF_WA/bin/"
     string p_processor = pcfg["processor"].asString();
     // 3. Processor entire subfolder name
-    string p_proc_dir = qpfProcsPath;  // + "/" + p_processor
+    string p_proc_dir = wa.procArea;  // + "/" + p_processor
     // 4. Main script to invoke processor (something like driver.py)
     string p_script = pcfg["script"].asString();
+
+    // 5. Arguments
     string p_args = pcfg["args"].asString();
-
-    string p_output = str::join(p_outputs, ",");
-    string p_log    = str::join(p_logs, ",");
-    // Expand/process output and log (if needed)
-    if (isSubstitutionRules(p_output)) { p_output = doRules(p_output); }
-    if (isSubstitutionRules(p_log)) { p_log = doRules(p_log); }
-
-    // Expand arguments
-    // Valid placeholders are:
-    // - {input}  : Content of the input variable, comma separated if multiple
-    // - {output} : Content of the output variable, comma separated if multiple
-    // - {log}    : Content of the log variable
-    // p_args = re.sub('{input}',
-    //                    ','.join(p_input),
-    //                    re.sub('{output}',
-    //                           ','.join(p_output),
-    //                           re.sub('{log}',
-    //                                  ','.join(p_log),
-    //                                  p_args)))
-    expansor = [](vector<string> x){ return str::join(x, ","); };
     
     Config entries(pcfg);
-    entry_in = expansor(p_input)
-    entry_out = expansor(p_output)
-    entry_log = expansor(p_log)
-    entries.update({"input": entry_in, "output": entry_out, "log": entry_log})
-    for kitem, vitem in entries.items():
-        p_args = re.sub('{' + kitem + '}', str(vitem), p_args)
+    entries["input"]  = p_input;
+    entries["output"] = p_output;
+    entries["log"]    = p_log;
+    for (auto & kv: entries) {
+	p_args = str::replaceAll(p_args, "{" + kv.first + "}", kv.second.asString());
+    }
 
-    //logger.debug(I + 'Arguments: %s', p_args)
+    logger.debug("Arguments: %s", p_args);
 
     // Prepare Docker folder mapping, just in case...
-    taskFld_img = TaskAgent.QPFDckImageRunPath + "/" + taskId
-    p_proc_dir_img = TaskAgent.QPFDckImageProcPath  // + "/" + processor
+    string taskFld_img = TaskAgent::QPFDckImageRunPath + "/" + taskId;
+    string p_proc_dir_img = TaskAgent::QPFDckImageProcPath;  // + "/" + processor
 
-    p_maps = {"task_dir": [taskFld, taskFld_img],
-                   "proc_dir": [p_proc_dir, p_proc_dir_img]}
-    dck_mapping = {}
-    for mkey, mval in p_maps.items():
-        dck_mapping[mval[0]] = {"bind": mval[1], "mode": "rw"}
-
-    dck_image = pcfg["image"]  // Processor.QPFDckImageDefault
-    dck_workdir = taskFld_img
-
+    // Prepare Docker launch variables
+    dck_image   = pcfg["image"].asString();  // Processor.QPFDckImageDefault
+    dck_exe     = pcfg["exe"].asString() + " " + pcfg["script"].asString();  
+    dck_args    = str::split(p_args, ' ');
+    dck_workdir = taskFld_img;
+    dck_mapping = { {taskFld, taskFld_img + ":rw"},
+                    {p_proc_dir, p_proc_dir_img + ":rw"} };
 
     return true;
 }
 
 //----------------------------------------------------------------------
 // Method: launchContainer
+// Launches container on the given task folder
 //----------------------------------------------------------------------
 bool TaskAgent::launchContainer(string & contId)
 {
+    vector<string> opts {"--workdir", dck_workdir,
+	    "--env", "UID=" + uid,
+	    "--env", "UNAME=" + uname,
+	    "--env", "WDIR=" + dck_workdir};
+    
+    if (! dckMng->createContainer(dck_image, opts, dck_mapping,
+				  dck_exe, dck_args, containerId)) {
+	logger.error("Cannot launch container as follows: ");
+	string fullCmdLine("docker run -dP ");
+	fullCmdLine += str::join(opts, " ");
+	for (auto & kv: dck_mapping) {
+	    fullCmdLine += " -v " + kv.first + ":" + kv.second;
+	}
+	fullCmdLine += " " + dck_image + " ";
+	fullCmdLine += dck_exe + " " + str::join(dck_args, " ");
+	logger.fatal(fullCmdLine);
+	return false;
+    }
+
+    contId = containerId;
     return true;
 }
 
@@ -364,13 +415,6 @@ void TaskAgent::removeOldContainers()
 
     containersToRemove.erase(containersToRemove.begin(),
 			     containersToRemove.begin() + containersToRemoveNow.size());
-}
-
-//----------------------------------------------------------------------
-// Method: atom_move
-//----------------------------------------------------------------------
-void TaskAgent::atom_move(string src, string dst)
-{
 }
 
 //----------------------------------------------------------------------
