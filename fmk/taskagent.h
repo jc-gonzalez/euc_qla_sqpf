@@ -106,12 +106,12 @@ private:
     //----------------------------------------------------------------------
     // Method: get_substitution_rules
     //----------------------------------------------------------------------
-    void get_substitution_rules();
+    std::tuple<string, string> getSubstitutionRules(string item);
 
     //----------------------------------------------------------------------
-    // Method: is_substitution_rules
+    // Method: isSubstitutionRules
     //----------------------------------------------------------------------
-    void is_substitution_rules();
+    bool isSubstitutionRules(string item);
 
     //----------------------------------------------------------------------
     // Method: stateToTaskStatus
@@ -124,9 +124,9 @@ private:
     bool isEnded(TaskStatus st);
 
     //----------------------------------------------------------------------
-    // Method: do_rules
+    // Method: doRules
     //----------------------------------------------------------------------
-    void do_rules(dict item);
+    void doRules(dict item);
 
     //----------------------------------------------------------------------
     // Method: sendSpectrumToMng
@@ -208,6 +208,10 @@ private:
     vector< pair<clock_t, string> > containersToRemove;
     
     std::shared_ptr<ContainerMng> dckMng;
+
+    vector<string> p_inputs;
+    vector<string> p_outputs;
+    vector<string> p_logs;
     
     Logger logger;
 };
