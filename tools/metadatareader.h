@@ -86,7 +86,7 @@ protected:
             blockBytesLeft -= BUF_LEN;
             tbytes         += BUF_LEN;
 
-            std::cerr << "{{" << std::string(buffer, BUF_LEN) << "}}";
+            // std::cerr << "{{" << std::string(buffer, BUF_LEN) << "}}";
 
             // Get and cheeck tag
             std::string tag = std::string(buffer, TAG_LEN);
@@ -128,7 +128,7 @@ protected:
                         }
                     }
                 }
-                std::cerr << "  => '" << tag << "': '" << content << "'\n";
+                // std::cerr << "  => '" << tag << "': '" << content << "'\n";
             }
 
             isStart = false;

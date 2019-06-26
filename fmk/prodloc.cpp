@@ -54,6 +54,7 @@
 #include <cstring>
 #include <libgen.h>
 
+#define TRC(s)  std::cerr << s << '\n'
 
 std::string ProductLocator::master_address;
 std::string ProductLocator::remote_address;
@@ -66,10 +67,10 @@ bool ProductLocator::toLocalArchive(ProductMeta & m, WorkArea & wa,
 				    ProductLocatorMethod method)
 {
     //std::string origPath = m["fileinfo"]["path"].asString();
-    std::string origBaseName = m["fileinfo"]["bname"].asString();
+    std::string origBaseName = m["fileinfo"]["base"].asString();
     std::string origFile = m["fileinfo"]["full"].asString();
     std::string newFile = wa.archive + "/" + origBaseName;
-    bool result = relocate(origFile, newFile, method);
+    bool result = relocate(origFile, newFile, method) == 0;
     if (result) {
 	m["fileinfo"]["full"] = newFile;
 	m["fileinfo"]["path"] = wa.archive;
@@ -84,11 +85,11 @@ bool ProductLocator::toTaskInput(ProductMeta & m, WorkArea & wa,
 				 std::string & taskId,
 				 ProductLocatorMethod method)
 {
-    std::string origBaseName = m["fileinfo"]["bname"].asString();
+    std::string origBaseName = m["fileinfo"]["base"].asString();
     std::string origFile = m["fileinfo"]["full"].asString();
     std::string newPath = wa.tasks + "/" + taskId;
     std::string newFile = newPath + "/" + origBaseName;
-    bool result = relocate(origFile, newFile, method);
+    bool result = relocate(origFile, newFile, method) == 0;
     if (result) {
 	m["fileinfo"]["full"] = newFile;
 	m["fileinfo"]["path"] = newPath;
@@ -102,10 +103,10 @@ bool ProductLocator::toTaskInput(ProductMeta & m, WorkArea & wa,
 bool ProductLocator::toLocalOutputs(ProductMeta & m, WorkArea & wa,
 				    ProductLocatorMethod method)
 {
-    std::string origBaseName = m["fileinfo"]["bname"].asString();
+    std::string origBaseName = m["fileinfo"]["base"].asString();
     std::string origFile = m["fileinfo"]["full"].asString();
     std::string newFile = wa.localOutputs + "/" + origBaseName;
-    bool result = relocate(origFile, newFile, method);
+    bool result = relocate(origFile, newFile, method) == 0;
     if (result) {
 	m["fileinfo"]["full"] = newFile;
 	m["fileinfo"]["path"] = wa.localOutputs;
@@ -119,10 +120,10 @@ bool ProductLocator::toLocalOutputs(ProductMeta & m, WorkArea & wa,
 bool ProductLocator::toLocalInbox(ProductMeta & m, WorkArea & wa,
 				  ProductLocatorMethod method)
 {
-    std::string origBaseName = m["fileinfo"]["bname"].asString();
+    std::string origBaseName = m["fileinfo"]["base"].asString();
     std::string origFile = m["fileinfo"]["full"].asString();
     std::string newFile = wa.localInbox + "/" + origBaseName;
-    bool result = relocate(origFile, newFile, method);
+    bool result = relocate(origFile, newFile, method) == 0;
     if (result) {
 	m["fileinfo"]["full"] = newFile;
 	m["fileinfo"]["path"] = wa.localInbox;
@@ -177,26 +178,25 @@ int ProductLocator::relocate(std::string & sFrom, std::string & sTo,
         }
     }
 
-    
     int retVal = 0;
     switch(method) {
     case LINK:
         //(void)unlink(sTo.c_str());
         retVal = link(sFrom.c_str(), sTo.c_str());
-        //TRC("LINK: Hard link of " << sFrom << " to " << sTo);
+        TRC("LINK: Hard link of " << sFrom << " to " << sTo);
         break;
     case SYMLINK:
         //(void)unlink(sTo.c_str());
         retVal = symlink(sFrom.c_str(), sTo.c_str());
-        //TRC("SYMLINK: Soft link of " << sFrom << " to " << sTo);
+        TRC("SYMLINK: Soft link of " << sFrom << " to " << sTo);
         break;
     case MOVE:
         retVal = rename(sFrom.c_str(), sTo.c_str());
-        //TRC("MOVE: Moving file from " << sFrom << " to " << sTo
-	//    << "   retVal=" << retVal);
+        TRC("MOVE: Moving file from " << sFrom << " to " << sTo
+	    << "   retVal=" << retVal);
         if (retVal != 0) {
-            //TRC("MOVE: errno=" << errno << "  (EXDEV:" << EXDEV
-            //    << ",EEXIST:" << EEXIST << ")");
+            TRC("MOVE: errno=" << errno << "  (EXDEV:" << EXDEV
+                << ",EEXIST:" << EEXIST << ")");
             if (errno = EXDEV) {
                 // Error due to move between different logical devices
                 // Try copy & remove
@@ -217,13 +217,13 @@ int ProductLocator::relocate(std::string & sFrom, std::string & sTo,
         break;
     case COPY:
         retVal = FileTools::copyfile(sFrom, sTo);
-        //TRC("COPY: Copying file from " << sFrom << " to " << sTo);
+        TRC("COPY: Copying file from " << sFrom << " to " << sTo);
         break;
     case COPY_TO_REMOTE:
     case COPY_TO_MASTER:
         retVal = FileTools::rcopyfile(sFrom, sTo, master_address, method == COPY_TO_REMOTE);
-        //TRC(((method == COPY_TO_REMOTE) ? "COPY_TO_REMOTE: " : "COPY_TO_MASTER: ")
-        //    << "Transferring file from " << sFrom << " to " << sTo);
+        TRC(((method == COPY_TO_REMOTE) ? "COPY_TO_REMOTE: " : "COPY_TO_MASTER: ")
+            << "Transferring file from " << sFrom << " to " << sTo);
         break;
     default:
         break;
@@ -233,6 +233,7 @@ int ProductLocator::relocate(std::string & sFrom, std::string & sTo,
         perror(("ERROR (" + std::to_string(retVal) + "/" + std::to_string(errno) +
                 ") relocating product:\n\t" +
                 sFrom + std::string(" => ") + sTo).c_str());
+	abort();
         //showBacktrace();
     }
     return retVal;

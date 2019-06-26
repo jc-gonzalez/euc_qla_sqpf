@@ -244,7 +244,7 @@ bool TaskAgent::prepareNewTask(string taskId, string taskFld, string proc)
         return false;
     }
     string p_input = str::join(p_inputs, ",");
-    //logger.debug("Processing task %s will process %s", taskId.c_str(), p_input.c_str());
+    logger.debug("Processing task %s will process %s", taskId.c_str(), p_input.c_str());
 
     string p_output = pcfg["output"].asString();
     if (isSubstitutionRules(p_output)) {
@@ -282,7 +282,7 @@ bool TaskAgent::prepareNewTask(string taskId, string taskFld, string proc)
 	p_args = str::replaceAll(p_args, "{" + kv.first + "}", kv.second.asString());
     }
 
-    logger.debug("Arguments: %s", p_args);
+    logger.debug("Arguments: %s", p_args.c_str());
 
     // Prepare Docker folder mapping, just in case...
     string taskFld_img = TaskAgent::QPFDckImageRunPath + "/" + taskId;
@@ -538,8 +538,10 @@ void TaskAgent::run()
 	    iq->get(itaskFolder);
 	    iq->get(iprocessor);
 	    
-	    logger.debug("New task id queued at Task Agent %s: %s", id.c_str(), itaskId.c_str());
-	    logger.debug("Execution to be done in work. dir. %s", itaskFolder.c_str());
+	    logger.debug("New task id queued at Task Agent %s: %s",
+			 id.c_str(), itaskId.c_str());
+	    logger.debug("Execution to be done in work. dir. %s",
+			 itaskFolder.c_str());
 	    logger.debug("Processor to use: %s", iprocessor.c_str());
 	    taskQueue.push(std::move(itaskId));
 	    taskQueue.push(std::move(itaskFolder));

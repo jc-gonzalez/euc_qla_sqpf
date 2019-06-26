@@ -42,7 +42,9 @@
 #include "master.h"
 
 #include <memory>
+#include <fstream>
 #include <thread>
+#include "prodloc.h"
 
 /*
 ------------------------------------------------------------
@@ -109,7 +111,7 @@ private:
 
 class RscPostReceiver : public http_resource {
 public:
-    void setMasterHdl(Master * hdl) { mhdl = hdl; }
+    void setWorkArea(WorkArea * _wa) { wa = _wa; }
     
     const HttpRespPtr render_POST(const http_request&rqst) {
 	std::vector<std::string> pathItems = rqst.get_path_pieces();
@@ -117,8 +119,18 @@ public:
 	std::cerr << rqst << "\n\n";
 	for (auto & p : pathItems) { std::cerr << p << " | "; }
 	std::cerr << '\n';
-	//std::cerr << "Content:\n";
-	//std::cerr << rqst.get_content() << '\n';
+
+	// Save content to local file in server folder
+	string fullFileName = wa->serverBase + rqst.get_path();
+	std::ofstream fout(fullFileName);
+	fout << rqst.get_content();
+	fout.close();
+	system(("ls -l " + fullFileName).c_str());
+	// Move created file to local inbox
+	string newFullFileName = wa->localInbox + "/" + pathItems.at(1);
+	int res = ProductLocator::relocate(fullFileName, newFullFileName,
+					   ProductLocator::MOVE);
+	
         return HttpRespPtr(new strResp("Done.", 200));
     }
 
@@ -126,14 +138,14 @@ public:
         return HttpRespPtr(new strResp("", 404));
     }
 private:
-    Master * mhdl;
+    WorkArea * wa;
 };
 
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
-MasterServer::MasterServer(Master * hdl, int prt, string & pth)
-    : HttpCommServer(prt, pth), mhdl(hdl)
+MasterServer::MasterServer(Master * hdl, int prt, WorkArea & _wa)
+    : HttpCommServer(prt, _wa.serverBase), mhdl(hdl), wa(_wa)
 {
 }
 
@@ -170,6 +182,7 @@ void MasterServer::run()
     addRoute(ws, "/status", &rscStatus);
 
     RscPostReceiver rscPostRcv;
+    rscPostRcv.setWorkArea(&wa);
     addRoute(ws, "/inbox/{prod}", &rscPostRcv);
 
     ws.start(true);

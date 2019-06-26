@@ -55,9 +55,13 @@ TaskOrchestrator::TaskOrchestrator(Config & _cfg, string _id)
 		    {"processing", r["processing"].asString()}});
     }
 
-    js jprocs =  cfg["orchestration"]["processing"];
+    js jprocs =  cfg["orchestration"]["processors"];
     for (auto & kv: jprocs.asObject()) {
-	processors[kv.first] = kv.second.asString();
+	string k(kv.first);
+	string v(kv.second.asString());
+	processors[k] = v;
+	logger.debug("Storing proc.: %s => %s", k.c_str(), v.c_str());
+		     
     }
 }
 
@@ -82,22 +86,21 @@ bool TaskOrchestrator::checkRules(ProductMeta & prod)
 	auto r = kv.second;
 
 	string inputs = r["inputs"] + ",";
-	if (inputs.find(pType) == string::npos) {
-	    logger.error("Product type %s does not appear in the configuration", pType);
-	    continue;
-	}
+	if (inputs.find(pType) == string::npos) { continue; }
 	
 	string procId = r["processing"];
 	if (processors.find(procId) == processors.end()) {
-	    logger.error("Cannot process %s (rule fired is %s): no such processor",
-			 rname, procId);
+	    logger.error("Cannot find %s processor config. "
+			 "(rule fired is %s)",
+			 procId.c_str(), rname.c_str());
 	    continue;
 	}
 	
 	string processor = processors[procId];
 	firedRules.push_back(map<string, string>({{"name", rname},
 			{"processor", processor}}));
-	logger.info("Rule %s fired by %s product", rname, pType);
+	logger.info("Rule %s fired by %s product",
+		    rname.c_str(), pType.c_str());
     }
 
     return !firedRules.empty();
@@ -110,7 +113,8 @@ bool TaskOrchestrator::schedule(ProductMeta & meta, TaskManager & manager)
 {
     if (!checkRules(meta)) {
 	logger.warn("No rule found for %s product %s",
-		    meta["type"].asString(), meta["fileinfo"]["bname"].asString());
+		    meta["type"].asString().c_str(),
+		    meta["fileinfo"]["base"].asString().c_str());
 	return false;
     }
 

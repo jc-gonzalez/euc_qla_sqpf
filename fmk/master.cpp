@@ -92,7 +92,7 @@ Master::Master(string _cfg, string _id, int _port, string _wa, int _bMode)
     dataMng = (net->thisIsCommander) ? new DataManager(cfg) : nullptr;
 
     // Create HTTP server and requester object
-    httpServer = new MasterServer(this, port, wa.serverBase);
+    httpServer = new MasterServer(this, port, wa);
     httpRqstr = new MasterRequester;
 
     logger.info("HTTP Server started at port " + std::to_string(port) +
@@ -123,7 +123,8 @@ Master::Master(string _cfg, string _id, int _port, string _wa, int _bMode)
     default:
 	selectNodeFn = [](Master * m){ return 0; };
     }
-
+    selectNodeFn = [](Master * m){ return 1; };
+    
     // Launch server
     httpServer->launch();
 
@@ -319,7 +320,8 @@ void Master::distributeProducts()
             httpRqstr->setServerUrl(net->nodeServerUrl[numOfNodeToUse]);
 	    if (!httpRqstr->postFile("/inbox", prod,
 				     "application/octet-stream")) {
-		logger.error("Cannot send file %s to node %s", prod, nodeToUse);
+		logger.error("Cannot send file %s to node %s",
+			     prod.c_str(), nodeToUse.c_str());
 		continue;
 	    } else {
                 productsForArchival.push(std::move(prod));
@@ -356,9 +358,10 @@ void Master::scheduleProductsForProcessing()
 	    continue;
 	}
 	logger.info("Product '" + prod + "' will be processed");
-
+	logger.debug("Meta: " + meta.str());
+	
 	if (!ProductLocator::toLocalArchive(meta, wa)) {
-	    logger.error("Move (link) to archive of %s failed", prod);
+	    logger.error("Move (link) to archive of %s failed", prod.c_str());
 	    continue;
 	}
 

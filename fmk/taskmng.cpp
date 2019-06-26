@@ -94,7 +94,7 @@ void TaskManager::createAgents()
     numOfAgents = net.nodeNumOfAgents[thisNodeNum];
 
     logger.info("Creating processing %d agents for node %s. . .",
-		numOfAgents, id);
+		numOfAgents, id.c_str());
     
     jso emptySpec;
     emptySpec.append("aborted", 0);
@@ -245,7 +245,8 @@ void TaskManager::updateContainer(string & agName, string contId,
 		    contId.c_str(), contStatus.str());
     } else {
 	logger.debug("Container %s changed from %s to %s",
-                     contId.c_str(), storedContStatus.str(), contStatus.str());
+                     contId.c_str(), storedContStatus.str().c_str(),
+		     contStatus.str());
     }
     
     agentsContainer[agName] = std::make_tuple(contId, int(contStatus));
