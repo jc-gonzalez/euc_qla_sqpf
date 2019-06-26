@@ -46,7 +46,8 @@
 //----------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
-    Log::initialize("/home/jcgonzalez/.qpf/log4cpp.properties");
+    string HOME(getenv("HOME"));
+    Log::initialize(HOME + "/.qpf/log4cpp.properties");
 
     Deployer deployer(argc, argv);
     return deployer.run();
