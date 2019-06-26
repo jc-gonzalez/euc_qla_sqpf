@@ -59,6 +59,8 @@
 // Topic: Project headers
 //------------------------------------------------------------
 #include "types.h"
+#include "log.h"
+#include "procnet.h"
 
 //==========================================================================
 // Class: DataManager
@@ -69,16 +71,19 @@ public:
     //----------------------------------------------------------------------
     // Constructor
     //----------------------------------------------------------------------
-    DataManager(Config & _cfg);
+    DataManager(Config & _cfg, ProcessingNetwork & _net);
 
     //----------------------------------------------------------------------
     // Destructor
     //----------------------------------------------------------------------
     virtual ~DataManager();
 
-protected:
+    //----------------------------------------------------------------------
+    // Method: initializeDB
+    // Initialize the DB
+    //----------------------------------------------------------------------
+    void initializeDB();
 
-private:
     //----------------------------------------------------------------------
     // Method: connect
     //----------------------------------------------------------------------
@@ -92,7 +97,8 @@ private:
     //----------------------------------------------------------------------
     // Method: storeTaskInfo
     //----------------------------------------------------------------------
-    void storeTaskInfo(string taskId, int taskStatus, dict & taskInfo, bool initial=false);
+    void storeTaskInfo(string & taskId, int taskStatus,
+		       string & taskInfo, bool initial);
 
     //----------------------------------------------------------------------
     // Method: storeProductQueue
@@ -105,8 +111,10 @@ private:
     void storeHostsSpectra(dict & info);
 
 private:
-    int id;
+    ProcessingNetwork & net;
     Config & cfg;
+
+    Logger logger;
 };
 
 #endif // DATAMANAGER_H

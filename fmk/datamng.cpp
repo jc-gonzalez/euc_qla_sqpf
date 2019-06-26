@@ -40,11 +40,16 @@
 
 #include "datamng.h"
 
+#include "dbhdlpostgre.h"
+
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
-DataManager::DataManager(Config & _cfg) : cfg(_cfg)
+DataManager::DataManager(Config & _cfg, ProcessingNetwork & _net)
+    : cfg(_cfg), net(_net),
+      logger(Log::getLogger("datmng"))
 {
+    
 }
 
 //----------------------------------------------------------------------
@@ -52,6 +57,28 @@ DataManager::DataManager(Config & _cfg) : cfg(_cfg)
 //----------------------------------------------------------------------
 DataManager::~DataManager()
 {
+}
+
+//----------------------------------------------------------------------
+// Method: initializeDB
+// Initialize the DB
+//----------------------------------------------------------------------
+void DataManager::initializeDB()
+{
+    std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL(net, logger));
+
+    dbHdl->setConnectionParams(cfg["db"]["host"].asString(),
+			       cfg["db"]["port"].asInt(),
+			       cfg["db"]["name"].asString(),
+			       cfg["db"]["user"].asString(),
+			       cfg["db"]["pwd"].asString());
+    
+    // Check that connection with the DB is possible
+    if (dbHdl->openConnection()) {
+	logger.info("Connection params. initialized for DB %s",
+		    cfg["db"]["name"].asString().c_str());
+	dbHdl->closeConnection();
+    }
 }
 
 //----------------------------------------------------------------------
@@ -73,8 +100,8 @@ void DataManager::storeProductInfo(ProductMeta & m)
 //----------------------------------------------------------------------
 // Method: storeTaskInfo
 //----------------------------------------------------------------------
-void DataManager::storeTaskInfo(string taskId, int taskStatus,
-                                dict & taskInfo, bool initial)
+void DataManager::storeTaskInfo(string & taskId, int taskStatus,
+                                string & taskInfo, bool initial)
 {
 
 }
