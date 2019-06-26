@@ -51,8 +51,8 @@
 //----------------------------------------------------------------------
 // Constructor: DBHdlPostgreSQL
 //----------------------------------------------------------------------
-DBHdlPostgreSQL::DBHdlPostgreSQL(ProcessingNetwork & _net)
-    : net(_net), conn(0), res(0)
+DBHdlPostgreSQL::DBHdlPostgreSQL(ProcessingNetwork & _net, Logger & _logger)
+    : net(_net), logger(_logger), conn(0), res(0)
 {
 }
 
@@ -83,8 +83,8 @@ bool DBHdlPostgreSQL::openConnection(const char * data)
     }
     conn = PQconnectdb(connStr);
     if (PQstatus(conn) != CONNECTION_OK) {
-        PQfinish(conn);
         logger.fatal("Connection to database failed: %s", PQerrorMessage(conn));
+        PQfinish(conn);
     }
     return true;
 }

@@ -82,7 +82,7 @@ public:
     //----------------------------------------------------------------------
     // Constructor: DBHdlPostgreSQL
     //----------------------------------------------------------------------
-    DBHdlPostgreSQL(ProcessingNetwork & _net);
+    DBHdlPostgreSQL(ProcessingNetwork & _net, Logger & _logger);
 
     //----------------------------------------------------------------------
     // Destructor: ~DBHdlPostgreSQL (virtual)
@@ -313,6 +313,7 @@ private:
     ProcessingNetwork & net;
     PGconn     * conn;
     PGresult   * res;
+    Logger & logger;
 };
 
 //}
