@@ -58,6 +58,7 @@
 
 #include <algorithm>
 #include <stdexcept>
+#include <memory>
 
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -70,7 +71,12 @@ using std::queue;
 using std::string;
 using std::vector;
 using std::map;
+
 using std::pair;
+using std::make_pair;
+
+using std::shared_ptr;
+using std::make_shared;
 
 //------------------------------------------------------------
 // Topic: External packages
@@ -128,6 +134,8 @@ enum TaskStatusEnum { TTASK_STATUS_LIST };
 
 extern map<int, string> TaskStatusStr;
 extern map<string, int> TaskStatusVal;
+
+int TaskStatusDowncaseVal(std::string & s);
 
 class TaskStatus {
 private:

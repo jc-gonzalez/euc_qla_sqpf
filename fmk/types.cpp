@@ -82,6 +82,12 @@ void TaskStatus::fromStr(std::string & s)
     value = TaskStatusEnum(TaskStatusVal[s]);
 }
 
+int TaskStatusDowncaseVal(std::string & s)
+{
+    std::string ss(s);
+    str::toUpper(ss);
+    return TaskStatusVal[ss];
+}
 
 //==========================================================================
 // Enum: BalancingMode
