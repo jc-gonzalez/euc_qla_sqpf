@@ -89,7 +89,8 @@ Master::Master(string _cfg, string _id, int _port, string _wa, int _bMode)
     tskMng = new TaskManager(cfg, id, wa, *net);
 
     // Create Data Manager
-    dataMng = (net->thisIsCommander) ? new DataManager(cfg) : nullptr;
+    dataMng = (net->thisIsCommander) ? new DataManager(cfg, *net) : nullptr;
+    dataMng->initializeDB();
 
     // Create HTTP server and requester object
     httpServer = new MasterServer(this, port, wa);
