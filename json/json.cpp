@@ -628,6 +628,7 @@ namespace json {
                                 }                                
                             }
                             k += kk - 1;
+			    break;
                         }
                     }
                     
