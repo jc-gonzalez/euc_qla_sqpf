@@ -44,6 +44,7 @@
 #include "tools.h"
 #include "filetools.h"
 #include "prodloc.h"
+#include "str.h"
 
 //----------------------------------------------------------------------
 // Constructor
@@ -266,12 +267,15 @@ void TaskManager::updateTasksInfo(DataManager & datmng)
     int numOfAgents = net.thisNodeNumOfAgents;
     for (int agNum = 0; agNum < numOfAgents; ++agNum) {
 	Queue<string> * tq = agentsTskQueue.at(agNum);
-	string justCreated, taskId, inspect, percent, status;
+        string agName = agentsInfo["agent_names"][agNum].asString();
+	string justCreated, taskId, contId, inspect, percent, status;
 	while (tq->get(justCreated)) {
 	    tq->get(taskId);
+	    tq->get(contId);
 	    tq->get(inspect);
 	    tq->get(percent);
 	    tq->get(status);
+            updateContainer(agName, contId, TaskStatusDowncaseVal(status));
 	    datmng.storeTaskInfo(taskId, TaskStatusDowncaseVal(status),
 				 inspect, justCreated == "true");
 	}
@@ -302,7 +306,7 @@ void TaskManager::schedule(ProductMeta & meta, string & processor)
 
     // Update agents information structures
     updateAgent(taskId, agNum, agName, numTasks);
-    updateContainer(agName);
+    //updateContainer(agName);
 }
 
 //----------------------------------------------------------------------
@@ -324,14 +328,18 @@ bool TaskManager::retrieveAgentsInfo(js & hi)
     vector<string> & nodeAgNames = net.nodeAgents[id];
     
     for (int agNum = 0; agNum < numOfAgents; ++agNum) {
+        string serialAgName = nodeAgNames.at(agNum);
 	Queue<string> * oq = agentsOutQueue.at(agNum);
+        string agName;
 	string msg;
-	while (oq->get(msg)) {
-	    json::Object msgObj;
-	    jparser.parse(msg, msgObj);
-	    int k = msgObj["agId"].asInt();
-	    js spec(msgObj["spectrum"]);
-	    agentsInfo["agents"][nodeAgNames.at(agNum)]["spectrum"] = spec;
+	while (oq->get(agName)) {
+            oq->get(msg);
+            jso spec;
+            for (auto & el: str::split(msg, ' ')) {
+                vector<string> parts = str::split(el, ':');
+                spec.append(parts.at(0), std::stoi(parts.at(1)));
+            }
+            agentsInfo["agents"][agName]["spectrum"] = spec;
 	}
     }
 

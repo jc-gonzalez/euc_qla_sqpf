@@ -81,9 +81,9 @@ Master::Master(string _cfg, string _id, int _port, string _wa, int _bMode)
 	    " processing agents");
 
     dist = new std::uniform_int_distribution<int>(0, net->numOfNodes - 1);
-	
+
     masterLoopSleep_ms = cfg["general"]["masterHeartBeat"].asInt();
-	
+
     // Create task orchestrator and manager
     tskOrc = new TaskOrchestrator(cfg, id);
     tskMng = new TaskManager(cfg, id, wa, *net);
@@ -129,7 +129,7 @@ Master::Master(string _cfg, string _id, int _port, string _wa, int _bMode)
 	selectNodeFn = [](Master * m){ return 0; };
     }
     selectNodeFn = [](Master * m){ return 1; };
-    
+
     // Launch server
     httpServer->launch();
 
@@ -317,7 +317,7 @@ void Master::distributeProducts()
 	string nodeToUse = net->nodeName[numOfNodeToUse];
 
 	logger.debug("Processing of " + prod + " will be done by node " + nodeToUse);
-	
+
 	if (nodeToUse != id) {
 	    // If the node is not the commander (I'm the commander in
 	    // this function), dispatch it to the selected node, and
@@ -363,8 +363,8 @@ void Master::scheduleProductsForProcessing()
 	    continue;
 	}
 	logger.info("Product '" + prod + "' will be processed");
-	logger.debug("Meta: " + meta.str());
-	
+	//logger.debug("Meta: " + meta.str());
+
 	if (!ProductLocator::toLocalArchive(meta, wa)) {
 	    logger.error("Move (link) to archive of %s failed", prod.c_str());
 	    continue;
@@ -381,7 +381,7 @@ void Master::scheduleProductsForProcessing()
 	while (productsForArchival.get(prod)) {
 	    (void)unlink(prod.c_str());
 	}
-    }	
+    }
 }
 
 //----------------------------------------------------------------------
@@ -414,10 +414,10 @@ void Master::transferOutputsToCommander()
 //----------------------------------------------------------------------
 void Master::gatherNodesInfo()
 {
-    if (nodeStatus.size() < net->numOfNodes) {
-    	nodeStatus.reserve(net->numOfNodes);
-    }
-    //nodeStatus.clear();
+    //if (nodeStatus.size() < net->numOfNodes) {
+    //	nodeStatus.reserve(net->numOfNodes);
+    //}
+    nodeStatus.clear();
     for (auto & node: net->nodesButComm) {
 	auto it = std::find(net->nodeName.begin(),
 			    net->nodeName.end(), node);
@@ -429,7 +429,7 @@ void Master::gatherNodesInfo()
 			"master commander", node.c_str());
 	    nodeStatus.push_back(js(-1));
 	    continue;
-	}	    
+	}
 	jso respObj;
 	logger.debug("Response from %s: %s", node.c_str(), resp.c_str());
 	json::Parser jParser;
@@ -454,7 +454,7 @@ void Master::runMainLoop()
     int iteration = 0;
 
     FileNameSpec fns;
-    
+
     forever {
 
 	++iteration;
@@ -470,7 +470,7 @@ void Master::runMainLoop()
 	if (!productList.empty()) {
 	    scheduleProductsForProcessing();
 	}
-	
+
 	// Retrieve agents information
 	if ((iteration == 1) || ((iteration % 10) == 0)) {
 	    nodeInfoIsAvailable = tskMng->retrieveAgentsInfo(nodeInfo);
@@ -497,7 +497,7 @@ void Master::runMainLoop()
 	    ((iteration == 1) || ((iteration % 20) == 0))) {
 	    gatherNodesInfo();
 	}
-	
+
 	// Wait a little bit until next loop
 	delay(masterLoopSleep_ms);
 
@@ -540,6 +540,3 @@ int Master::genRandomNode()
 
 std::mt19937 Master::mt;
 
-
-
- 

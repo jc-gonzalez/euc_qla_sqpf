@@ -142,7 +142,9 @@ int fileSize(std::string pathName)
 std::vector<std::string> filesInFolder(std::string folder, std::string ext)
 {
     std::vector<std::string> v;
-    
+    std::cerr << __FUNCTION__ << ":" << __LINE__
+              << '"' << folder << '"' << ", "
+              << '"' << ext << '"' << '\n';
     DIR *dir;
     struct dirent *ent;
     if ((dir = opendir(folder.c_str())) != NULL) {

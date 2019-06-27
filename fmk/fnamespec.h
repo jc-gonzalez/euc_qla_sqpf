@@ -41,6 +41,9 @@
 #ifndef FILENAMESPEC_H
 #define FILENAMESPEC_H
 
+#define USE_CXX11_REGEX
+#undef  USE_CXX11_REGEX
+
 //============================================================
 // Group: External Dependencies
 //============================================================
@@ -50,7 +53,10 @@
 //   - iostream
 //------------------------------------------------------------
 #include <iostream>
+
+#ifdef USE_CXX11_REGEX
 #include <regex>
+#endif
 
 //------------------------------------------------------------
 // Topic: External packages
@@ -94,14 +100,26 @@ private:
     //----------------------------------------------------------------------
     void parseInstance(string inst, ProductMeta & meta);
 
+#ifdef USE_CXX11_REGEX
+#else
+    //----------------------------------------------------------------------
+    // Method: parse
+    //----------------------------------------------------------------------
+    bool parseSnameNoRE(string sname, string & mission, string & proc_func,
+                        string & instance, string & datetime, string & version);
+
+    //----------------------------------------------------------------------
+    // Method: parse
+    //----------------------------------------------------------------------
+    bool fieldIsMadeOf(string & fld, string chars);
+#endif // USE_CXX11_REGEX
+    
     //----------------------------------------------------------------------
     // Method: retrieveInternalMetadata
     //----------------------------------------------------------------------
     void retrieveInternalMetadata(string fileName, ProductMeta & meta);
     
 private:
-    //std::regex && re;
-
     static const string BnameRe;
     static const string SpectralBands;
     static const string Creators;

@@ -603,6 +603,34 @@ namespace json {
 			break;
 		    }
 
+                    if ((c == TRUE_START) || (c == FALSE_START)) {
+                        Value v;
+                        size_t kk = 0;
+                        if (s.substr(k, 4) == "true") {
+                            v.assign(true), kk = 4;
+                        } else if (s.substr(k, 5) == "false") {
+                            v.assign(false), kk = 5;
+                        } else {
+                            parseResult = false;
+                        }
+
+                        if (kk > 0) {
+                            if (state == IN_ARRAY) {
+                                a->append(v);
+                            } else {
+                                if (hasKey) {
+                                    o->append(key, v);
+                                    hasKey = false;
+                                    key = "";
+                                } else {
+                                    parseResult = false;
+                                    std::cerr << "char is '" << c << "'\n";
+                                }                                
+                            }
+                            k += kk - 1;
+                        }
+                    }
+                    
 		    if ((c == SPACE) ||
                         (c == TABULATOR) ||
                         (c == NEWLINE)) { break; }
@@ -629,14 +657,14 @@ namespace json {
                                 hasKey = false;
                                 key = "";
                             } else {
-                                parseResult = false; 		std::cerr << "char is '" << c << "'\n";
-
+                                parseResult = false;
+                                std::cerr << "char is '" << c << "'\n";
                             }
 
                         }
                     } else {
-                        parseResult = false; 		std::cerr << "char is '" << c << "'\n";
-
+                        parseResult = false;
+                        std::cerr << "char is '" << c << "'\n";
                     }
                 }
                 break;

@@ -76,7 +76,7 @@ public:
     //----------------------------------------------------------------------
     // Method: TaskAgent
     //----------------------------------------------------------------------
-    TaskAgent(WorkArea & _wa, string _ident,
+    TaskAgent(WorkArea _wa, string _ident,
 	      Queue<string> * _iq, Queue<string> * _oq, Queue<string> * _tq,
               bool _isCommander);
 
@@ -188,7 +188,7 @@ private:
     
 private:
     string id;
-    WorkArea & wa;
+    WorkArea wa;
     Queue<string> * iq;
     Queue<string> * oq;
     Queue<string> * tq;

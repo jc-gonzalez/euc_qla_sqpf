@@ -62,41 +62,63 @@ ContainerMng::ContainerMng(WorkArea & _wa) : DockerMng(_wa)
 bool ContainerMng::createContainer(std::string img, std::vector<std::string> opts,
                                    std::map<std::string, std::string> maps,
                                    std::string exe, std::vector<std::string> args,
-                                   std::string & containerId)
+                                   std::string & containerId, string & cmd_line)
 {
     static char fileIdTpl[] = "dockerId_XXXXXX";
 
-    procxx::process cnt("docker", "run");
-    for (auto & o : {"--detach", "--publish-all", "--privileged"}) { cnt.add_argument(o); }
+    procxx::process cnt("/usr/bin/docker", "run");
+    for (auto & o : {"--detach", "--publish-all", "--privileged=true"}) { cnt.add_argument(o); }
     for (auto & o : opts) { cnt.add_argument(o); }
     for (auto & kv : maps) {
         cnt.add_argument("-v");
         cnt.add_argument(kv.first + ":" + kv.second);
     }
 
-    cnt.add_argument("-u");
-    cnt.add_argument("eucops");
+    //cnt.add_argument("-u");
+    //cnt.add_argument("eucops");
     
-    std::string tmpFileName;
-    (void)mkTmpFileName(fileIdTpl, tmpFileName);
+    std::string tmpFileName("docker.id");
+    //(void)mkTmpFileName(fileIdTpl, tmpFileName);
 
-    cnt.add_argument("--cidfile");
-    cnt.add_argument(tmpFileName);
+    //cnt.add_argument("--cidfile");
+    //cnt.add_argument(tmpFileName);
 
     cnt.add_argument(img);
 
     cnt.add_argument(exe);
     for (auto & a : args) { cnt.add_argument(a); }
 
+    cmd_line = cnt.cmd_line();
+    
     cnt.exec();
+
+    std::stringstream info("");
+    std::string line;
+    while (std::getline(cnt.output(), line)) {
+        info << line << std::endl;
+        if (!cnt.running() ||
+            !procxx::running(cnt.id()) ||
+            !running(cnt)) {
+            break;
+        }
+    }
+    std::cerr << "CNT: " << info.str() << '\n';
     cnt.wait();
 
-    while (containerId.empty()) {
+    std::ofstream d(tmpFileName);
+    d << info.str() << '\n';
+    d.close();
+    
+    int k = 0;
+    while ((containerId.empty()) && (k < 100)) {
         std::ifstream dockerIdFile(tmpFileName);
         std::getline(dockerIdFile, containerId);
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        ++k;
     }
     
-    return (cnt.code() == 0);
+    std::cerr << "CONTAINER CODE: " << cnt.code() << '\n';
+    return (k < 100);
 }
 
 //----------------------------------------------------------------------
@@ -142,7 +164,7 @@ bool ContainerMng::createContainer(std::string proc, std::string workDir,
 //----------------------------------------------------------------------
 bool ContainerMng::getInfo(std::string id, std::stringstream & info)
 {
-    procxx::process cntInspect("docker", "inspect");
+    procxx::process cntInspect("/usr/bin/docker", "inspect");
     std::string fmt = info.str();
     if (fmt.length() > 0) {
         cntInspect.add_argument("--format");

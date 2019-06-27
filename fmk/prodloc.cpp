@@ -87,7 +87,7 @@ bool ProductLocator::toTaskInput(ProductMeta & m, WorkArea & wa,
 {
     std::string origBaseName = m["fileinfo"]["base"].asString();
     std::string origFile = m["fileinfo"]["full"].asString();
-    std::string newPath = wa.tasks + "/" + taskId;
+    std::string newPath = wa.tasks + "/" + taskId + "/in";
     std::string newFile = newPath + "/" + origBaseName;
     bool result = relocate(origFile, newFile, method) == 0;
     if (result) {

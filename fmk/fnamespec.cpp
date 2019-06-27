@@ -94,6 +94,7 @@ bool FileNameSpec::parse(string & fullFileName, ProductMeta & meta)
     meta.append("url", "file://" + fullFileName);
     meta.append("format", genProdFormat(ext));
 
+#ifdef USE_CXX11_REGEX
     std::regex re(BnameRe);
     std::smatch matches;
     if (!std::regex_search(sname, matches, re)) { return false; }
@@ -107,7 +108,23 @@ bool FileNameSpec::parse(string & fullFileName, ProductMeta & meta)
     meta.append("version",    matches[Version].str());
 
     parseInstance(matches[Instance].str(), meta);
+#else
+    
+    string mission, proc_func, instance, datetime, version;
+    parseSnameNoRE(sname, mission, proc_func, instance,
+                   datetime, version);
+        
+    meta.append("mission",    mission);
+    meta.append("proc_func",  proc_func);
+    meta.append("creator",    proc_func);
+    meta.append("instance",   instance);
+    meta.append("start_time", datetime);
+    meta.append("end_time",   datetime);
+    meta.append("version",    version);
 
+    parseInstance(instance, meta);
+#endif // USE_CXX11_REGEX
+    
     bool fileExists = FileTools::exists(fullFileName);
     meta.append("exists", fileExists ? "yes" : "no");
     meta.append("size", FileTools::fileSize(fullFileName));
@@ -117,6 +134,77 @@ bool FileNameSpec::parse(string & fullFileName, ProductMeta & meta)
 
     return true;
 }
+
+#ifdef USE_CXX11_REGEX
+#else
+//----------------------------------------------------------------------
+// Method: parse
+//----------------------------------------------------------------------
+bool FileNameSpec::parseSnameNoRE(string sname,
+                                  string & mission,
+                                  string & proc_func,
+                                  string & instance,
+                                  string & datetime,
+                                  string & version)
+{
+    static const string Letters("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    static const string letters("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    static const string digits("0123456789");
+    
+    string fld = sname.substr(0,3);
+    if (! fieldIsMadeOf(fld, Letters)) { return false; }
+    mission = fld;
+
+    if (! sname.at(3) == '_') { return false; }
+
+    fld = sname.substr(4,3);
+    if (! fieldIsMadeOf(fld, Letters + digits)) { return false; }
+    proc_func = fld;
+    
+    if (! sname.at(3) == '_') { return false; }
+
+    string ss = sname.substr(8);
+    int sz = ss.length();
+    
+    string fld1 = ss.substr(sz - 5, 2);
+    string fld2 = ss.substr(sz - 2);
+    if ((fieldIsMadeOf(fld1, digits)) &&
+        (fieldIsMadeOf(fld2, digits)) &&
+        (ss.at(sz-3) == '.') &&
+        (ss.at(sz-6) == '_')) {
+        version = fld1 + "." + fld2;
+        ss = ss.substr(0, sz-6);
+        sz = ss.length();
+    }
+    
+    if (ss.at(sz-1) != 'Z') { return false; }
+
+    size_t sepi = ss.find_first_of("_");
+    if (sepi == string::npos) { return false; }
+    instance = ss.substr(0, sepi);
+    ss = sname.substr(sepi+1);
+
+    fld1 = ss.substr(0,8);
+    if (! fieldIsMadeOf(fld1, digits)) { return false; }
+
+    if (ss.at(8) != 'T') { return false; }
+    
+    fld2 = ss.substr(9);
+    if (! fieldIsMadeOf(fld2, digits + ".")) { return false; }
+
+    datetime = ss;
+
+    return true;
+}
+
+//----------------------------------------------------------------------
+// Method: parse
+//----------------------------------------------------------------------
+bool FileNameSpec::fieldIsMadeOf(string & fld, string chars)
+{
+    return fld.find_first_not_of(chars) == string::npos;
+}
+#endif // USE_CXX11_REGEX
 
 //----------------------------------------------------------------------
 // Method: genProdFormat
@@ -185,7 +273,7 @@ void FileNameSpec::retrieveInternalMetadata(string fileName, ProductMeta & meta)
 	} else {
 	    meta.append("meta", "<none>");
 	}
-    }	
+    }
 }
 
 const string FileNameSpec::BnameRe("([A-Z]{3,3})_"              // mission

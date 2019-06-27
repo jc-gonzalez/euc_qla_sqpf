@@ -61,7 +61,6 @@ TaskOrchestrator::TaskOrchestrator(Config & _cfg, string _id)
 	string v(kv.second.asString());
 	processors[k] = v;
 	logger.debug("Storing proc.: %s => %s", k.c_str(), v.c_str());
-		     
     }
 }
 
@@ -78,16 +77,16 @@ TaskOrchestrator::~TaskOrchestrator()
 bool TaskOrchestrator::checkRules(ProductMeta & prod)
 {
     firedRules.clear();
-    
+
     string pType = prod["type"].asString();
-    
+
     for (auto & kv: rules) {
 	auto rname = kv.first;
 	auto r = kv.second;
 
 	string inputs = r["inputs"] + ",";
 	if (inputs.find(pType) == string::npos) { continue; }
-	
+
 	string procId = r["processing"];
 	if (processors.find(procId) == processors.end()) {
 	    logger.error("Cannot find %s processor config. "
@@ -95,7 +94,7 @@ bool TaskOrchestrator::checkRules(ProductMeta & prod)
 			 procId.c_str(), rname.c_str());
 	    continue;
 	}
-	
+
 	string processor = processors[procId];
 	firedRules.push_back(map<string, string>({{"name", rname},
 			{"processor", processor}}));

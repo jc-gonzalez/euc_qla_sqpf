@@ -82,7 +82,9 @@
             T(COMMENT_SLASH, '/'),              \
             T(COMMENT_HASH, '#'),               \
             T(DIGIT_ZERO, '0'),                 \
-            T(DIGIT_NINE, '9')
+            T(DIGIT_NINE, '9'),                 \
+            T(FALSE_START, 'f'),                \
+            T(TRUE_START, 't')
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: json

@@ -83,7 +83,7 @@ public:
     virtual bool createContainer(std::string img, std::vector<std::string> opts,
                                  std::map<std::string, std::string> maps,
                                  std::string exe, std::vector<std::string> args,
-                                 std::string & containerId);
+                                 std::string & containerId, string & cmd_line);
 
     //----------------------------------------------------------------------
     // Method: createContainer

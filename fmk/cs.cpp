@@ -91,7 +91,7 @@ CntrSpectrum ContainerSpectrum::spectrum()
 {
     CntrSpectrum spec(savedSpec);
     for (auto & kv: cntStatus) {
-	spec[kv.first] = spec[kv.first] + 1;
+	spec[kv.second] = spec[kv.second] + 1;
     }
     return spec;
 }
