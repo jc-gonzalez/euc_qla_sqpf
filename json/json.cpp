@@ -720,9 +720,13 @@ namespace json {
             case JSON_INT:    os << v.ivalue;  break;
             case JSON_FLOAT:
                 if (floatPrecision > 0) { os << std::setprecision(floatPrecision); }
-                os << ((floatFmt == SCI) ? std::scientific :
-                       (floatFmt == FIX) ? std::fixed : std::defaultfloat)
-                   << v.xvalue;  break;
+                if      (floatFmt == SCI) { os << std::scientific << v.xvalue; }
+                else if (floatFmt == FIX) { os << std::fixed << v.xvalue; }
+                else                      { os << v.xvalue; }
+                //os << ((floatFmt == SCI) ? std::scientific :
+                //       (floatFmt == FIX) ? std::fixed : std::defaultfloat)
+                //   << v.xvalue;  
+                break;
             case JSON_STRING: os << "\"" << v.svalue << "\"";  break;
             case JSON_ARRAY:  os << v.avalue;  break;
             case JSON_OBJECT: os << v.ovalue;  break;
