@@ -142,7 +142,7 @@ int fileSize(std::string pathName)
 std::vector<std::string> filesInFolder(std::string folder, std::string ext)
 {
     std::vector<std::string> v;
-    std::cerr << __FUNCTION__ << ":" << __LINE__
+    std::cerr << __FUNCTION__ << ":" << __LINE__ << ":  "
               << '"' << folder << '"' << ", "
               << '"' << ext << '"' << '\n';
     DIR *dir;
@@ -150,6 +150,7 @@ std::vector<std::string> filesInFolder(std::string folder, std::string ext)
     if ((dir = opendir(folder.c_str())) != NULL) {
 	/* print all the files and directories within directory */
 	while ((ent = readdir(dir)) != NULL) {
+	    if (ent->d_name[0] == '.') continue; // Skip dot files
 	    std::string filename(ent->d_name);
 	    if (!ext.empty()) {
 		std::string entext(str::getExtension(filename));
