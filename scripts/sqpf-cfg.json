@@ -8,7 +8,8 @@
         "userArea": "",
         "logLevel": "INFO",
         "masterHeartBeat": 500,
-        "agentsHeartBeat": 300
+        "agentsHeartBeat": 300,
+	"testvalue": true
     },
     "network": {
         "commander": "master",
