@@ -105,20 +105,15 @@ bool ContainerMng::createContainer(std::string img, std::vector<std::string> opt
     std::cerr << "CNT: " << info.str() << '\n';
     cnt.wait();
 
-    std::ofstream d(tmpFileName);
-    d << info.str() << '\n';
-    d.close();
+    std::ofstream dockerIdFile(tmpFileName);
+    dockerIdFile << info.str() << '\n';
+    dockerIdFile.close();
     
-    int k = 0;
-    while ((containerId.empty()) && (k < 100)) {
-        std::ifstream dockerIdFile(tmpFileName);
-        std::getline(dockerIdFile, containerId);
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        ++k;
-    }
-    
+    containerId = info.str();
+    containerId.pop_back();
+
     std::cerr << "CONTAINER CODE: " << cnt.code() << '\n';
-    return (k < 100);
+    return (cnt.code() == 0);
 }
 
 //----------------------------------------------------------------------
@@ -165,13 +160,15 @@ bool ContainerMng::createContainer(std::string proc, std::string workDir,
 bool ContainerMng::getInfo(std::string id, std::stringstream & info)
 {
     procxx::process cntInspect("/usr/bin/docker", "inspect");
+    cntInspect.add_argument(id);
     std::string fmt = info.str();
     if (fmt.length() > 0) {
         cntInspect.add_argument("--format");
         cntInspect.add_argument(fmt);
     }
-    cntInspect.add_argument(id);
     cntInspect.exec();
+
+    std::cerr << "CONTAINER CMD: " << cntInspect.cmd_line() << '\n';
 
     info.str("");
     std::string line;
@@ -183,8 +180,14 @@ bool ContainerMng::getInfo(std::string id, std::stringstream & info)
             break;
         }
     }
+    std::string completeInfo = info.str().substr(1);
+    completeInfo.pop_back();
+    info.str(completeInfo);
+
+    std::cerr << "CONTAINER RETURN: " << info.str() << '\n';
 
     cntInspect.wait();
+    std::cerr << "CONTAINER CODE: " << cntInspect.code() << '\n';
     return (cntInspect.code() == 0);
 }
 

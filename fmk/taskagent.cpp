@@ -301,9 +301,9 @@ bool TaskAgent::prepareNewTask(string taskId, string taskFld, string proc)
 
     // Prepare Docker launch variables
     dck_image   = pcfg["image"].asString();  // Processor.QPFDckImageDefault
-    dck_exe     = (pcfg["exe"].asString() + " " +
-                   p_proc_dir_img + "/" + p_processor + "/" +
-                   pcfg["script"].asString());
+    dck_exe     = pcfg["exe"].asString(); 
+    p_args.insert(0, (p_proc_dir_img + "/" + p_processor + "/" +
+		      pcfg["script"].asString() + " "));
     dck_args    = str::split(p_args, ' ');
     dck_workdir = taskFld_img;
     dck_mapping = { {taskFld, taskFld_img + ":rw"},
@@ -347,10 +347,15 @@ string TaskAgent::inspectContainer(string cntId, bool fullInfo, string filter)
 {
     // Get inspect information
     std::stringstream info;
+    info.str(fullInfo ? "" : "'" + filter + "'");
+    if (!dckMng->getInfo(cntId, info)) {
+	logger.error("Cannot inspect container with id %s", cntId.c_str());
+    }
+    /*
     bool ok = true;
     int iters = 0;
     do {
-	info.str(fullInfo ? "" : filter);
+	info.str(fullInfo ? "" : "'" + filter + "'");
 	ok = dckMng->getInfo(cntId, info);
 	if (!ok) { delay(10); ++iters; }
 	if (iters > 10) {
@@ -358,7 +363,7 @@ string TaskAgent::inspectContainer(string cntId, bool fullInfo, string filter)
 	    return std::string("");
 	}
     } while (! ok);
-
+    */
     return info.str();
 }
 
@@ -379,11 +384,11 @@ std::string TaskAgent::launchNewTask()
 
     string contId("");
     if (launchContainer(contId)) {
-	inspect = inspectContainer(contId);
-	string statusLowStr(TaskStatusStr[TASK_RUNNING]);
-	str::toLower(statusLowStr);
+	//inspect = inspectContainer(contId);
+	//string statusLowStr(TaskStatusStr[TASK_RUNNING]);
+	//str::toLower(statusLowStr);
 	for (auto & s : vector<string> {"true", taskId, contId,
-                                            inspect, "1", statusLowStr}) {
+                                            inspect, "1", "scheduled"}) {
 	    tq->push(std::move(s));
 	}
 	taskId = ntaskId;
@@ -422,8 +427,11 @@ void TaskAgent::removeOldContainers()
 
     for (auto & c: containersToRemoveNow) {
 	// remove container
-	// dckMng.???
-	logger.debug("Removing container %s", c.c_str());
+	if (dckMng->remove(c)) {
+	    logger.debug("Removing container " + c);
+	} else {
+	    logger.warn("Couldn't remove container " + c);
+	}
     }
 
     containersToRemove.erase(containersToRemove.begin(),
@@ -441,6 +449,9 @@ void TaskAgent::prepareOutputs()
 
     vector<string> logFiles = FileTools::filesInFolder(taskFolder + "/log", "log");
     vector<string> outFiles = FileTools::filesInFolder(taskFolder + "/out");
+
+    logger.debug("logs: " + str::join(logFiles, ","));
+    logger.debug("outputs: " + str::join(outFiles, ","));
 
     // Move the outputs to the outbox folder, so they are sent to the archive
     for (auto & f: logFiles) {
@@ -491,15 +502,18 @@ void TaskAgent::monitorTasks()
 	    return;
 	} else {
 	    // Send information of new container
+	    logger.info("New task launched in container: " + contId);
 	    containerId = contId;
 	    containerSpectrum.append(contId, "scheduled");
+	    delay(200);
 	}
+    } else {
+	contId = containerId;
     }
-
-    contId = containerId;
 
     inspect = inspectContainer(contId, false, inspectSelection);
     if (! inspect.empty()) {
+	logger.debug("INSPECT>> " + inspect);
 	jso jinspect;
 	parser.parse(inspect, jinspect);
 
@@ -508,6 +522,8 @@ void TaskAgent::monitorTasks()
 	status = stateToTaskStatus(inspStatus, inspCode);
 	string statusLowStr(TaskStatusStr[status]);
 	str::toLower(statusLowStr);
+	logger.debug("         Current status: %s (%s, %d)", 
+		     statusLowStr.c_str(), inspStatus.c_str(), inspCode); 
 	for (auto & s : vector<string> {"false", taskId, contId,
                                             inspect, "1", statusLowStr}) {
 	    tq->push(std::move(s));
