@@ -74,6 +74,7 @@ Master::Master(string _cfg, string _id, int _port, string _wa, int _bMode)
 	logger.fatal("Cannot open config. file '" + cfgFileName + "'. Exiting.");
     }
     cfg = jFile.getData();
+    logger.debug(cfg.str());
 
     // Initialize processing network variables
     net = new ProcessingNetwork(cfg, id, balanceMode);
@@ -128,7 +129,7 @@ Master::Master(string _cfg, string _id, int _port, string _wa, int _bMode)
     default:
 	selectNodeFn = [](Master * m){ return 0; };
     }
-    selectNodeFn = [](Master * m){ return 1; };
+    //selectNodeFn = [](Master * m){ return 1; };
 
     // Launch server
     httpServer->launch();

@@ -199,7 +199,7 @@ std::tuple<int, int> TaskManager::selectAgent()
     int ntasks = jNumOfTasks[0].asInt();
     int nidx = 0;
     for (int i = 1; i < jNumOfTasks.size(); ++i) {
-	int ntasksi = jNumOfTasks[0].asInt();
+	int ntasksi = jNumOfTasks[i].asInt();
 	if (ntasks > ntasksi) { ntasksi = ntasks, nidx = i; }
     }
     return std::tuple<int, int>(nidx, ntasks);
