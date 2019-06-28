@@ -116,6 +116,8 @@ namespace json {
         Object(std::string key, Array & avalue);    
         Object(std::string key, Object & ovalue);   
 
+	//Object & operator=(Object & other);
+
         ~Object();
 
         void append(std::string key, bool bvalue);
@@ -126,6 +128,8 @@ namespace json {
         void append(std::string key, Object ovalue);
 
         void append(std::string key, Value & ovalue);
+
+	void update(std::string key, Value v);
 
         int size();
 

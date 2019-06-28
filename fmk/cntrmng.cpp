@@ -182,7 +182,7 @@ bool ContainerMng::getInfo(std::string id, std::stringstream & info)
     }
     std::string completeInfo = info.str().substr(1);
     completeInfo.pop_back();
-    info.str(completeInfo);
+    info.str(completeInfo.substr(0, completeInfo.find_last_of("'")));
 
     std::cerr << "CONTAINER RETURN: " << info.str() << '\n';
 

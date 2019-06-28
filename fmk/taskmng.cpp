@@ -254,7 +254,7 @@ void TaskManager::updateContainer(string & agName, string contId,
     string newStatusLowStr = contStatus.lstr();
     count = agInfoSpec[newStatusLowStr].asInt();
     agInfoSpec[newStatusLowStr] = count + 1;
-    agInfo["spectrum"] = agInfoSpec;
+    agInfo.update("spectrum", js(agInfoSpec));
     agentsInfo["agents"][agName] = agInfo;
 }
 

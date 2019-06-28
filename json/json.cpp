@@ -156,6 +156,13 @@ namespace json {
         return std::pair<std::string, Value>(k, obj[k]);
     }
 
+    void Object::update(std::string key, Value v) {
+	std::map<std::string, Value>::iterator it = obj.find(key);
+	if (it != obj.end()) { obj.erase(it); }
+	else { keys.push_back(key); }
+	obj[key] = v;
+    }
+        
     Value & Object::operator[](std::string s)
     {
         std::map<std::string, Value>::iterator it = obj.find(s);
@@ -177,6 +184,14 @@ namespace json {
     {
         return (obj.find(s) != obj.end());
     }
+
+    // Object & Object::operator=(Object & other) {
+    // 	obj.clear();
+    // 	keys.clear();
+    // 	std::copy(other.obj.begin(), other.obj.end(), obj);
+    // 	std::copy(other.keys.begin(), other.keys.end(), keys);
+    // 	return *this;
+    // }
 
     //======================================================================
     
