@@ -85,26 +85,23 @@ using std::make_shared;
 //------------------------------------------------------------
 // Topic: Project headers
 //------------------------------------------------------------
-#include "json.h"
+#include "json.hpp"
+using json = nlohmann::json;
+
 template <class T> class Queue;
 
 typedef const char *   cstr;
 
-typedef json::Value    js;
-typedef json::Array    jsa;
-typedef json::Object   jso;
-
-typedef json::Object   dict;
-
-typedef dict           Config;
+typedef json           dict;
+typedef json           Config;
 
 typedef std::string    ProductName;
-typedef dict           ProductMeta; 
+typedef json           ProductMeta; 
 
 typedef Queue<string>  ProductList;
 typedef vector<ProductMeta> ProductMetaList;
 
-typedef json::Value    TaskInfo;
+typedef json           TaskInfo;
 
 typedef int            percent;
 
@@ -241,6 +238,56 @@ int indexOf(const std::vector<T>& v, const T& elem)
     int npos = std::find(v.begin(), v.end(), elem) - v.begin();
     if (npos >= v.size()) { return -1; } else { return npos; }
 }
+
+//== AgentsInfo
+
+typedef map<string, int> AgentSpectrum;
+
+string agentSpectrumToStr(AgentSpectrum & sp);
+
+struct AgentData {
+    int num_tasks;
+    string task_id;
+    string cont_id;
+    TaskStatus cont_status;
+    AgentSpectrum spectrum;
+
+    string str() {
+	return ("\"num_tasks\": " + std::to_string(num_tasks) + ", " +
+		"\"task_id\": \"" + task_id + "\", " +
+		"\"cont_id\": \"" + cont_id + "\", " +
+		"\"cont_status\": \"" + TaskStatusStr[cont_status] + "\", " +
+		"\"spectrum\": " + agentSpectrumToStr(spectrum) + "}");
+    }
+};
+
+typedef map<string, AgentData> AgentsData;
+typedef vector<string> AgentNames;
+typedef vector<int> AgentTasks;
+
+struct AgentsInfo {
+    AgentsData agents;
+    AgentNames agent_names;
+    AgentTasks agent_num_tasks;
+
+    string str() {
+	string s1("");
+	string s2("");
+	string s3("");
+	int n = agent_names.size();
+	for (int i = 0; i < n; ++i) {
+	    string comma((i < (n-1)) ? ", " : "");
+	    string const & agName = agent_names.at(i);
+	    auto const & agit = agents.find(agName);
+	    s1 += "\"" + agName + "\": " + agit->second.str() + comma;
+	    s2 += "\"" + agName + "\"" + comma;
+	    s3 += std::to_string(agent_num_tasks.at(i)) + comma;
+	}
+	return ("{\"agents\": {" + s1 + "}, " +
+		"\"agent_names\": [" + s2 + "], " +
+		"\"agent_num_tasks\": [" + s3 + "]}");		
+    }
+};
 
 //== UNUSED ================================
 #define UNUSED(x) (void)(x)

@@ -60,7 +60,8 @@
 //   none
 //------------------------------------------------------------
 #include "genfhdl.h"
-#include "json.h"
+#include "json.hpp"
+using json = nlohmann::json;
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -112,16 +113,16 @@ public:
     // Method: setData
     // Sets the value of the internal data container
     //----------------------------------------------------------------------
-    void setData(json::Object & v);
+    void setData(json & v);
 
     //----------------------------------------------------------------------
     // Method: getData
     // Return handler for internal data
     //----------------------------------------------------------------------
-    json::Object & getData();
+    json & getData();
 
 protected:
-    json::Object data;
+    json data;
 };
 
 // }

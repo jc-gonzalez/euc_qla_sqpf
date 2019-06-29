@@ -120,3 +120,17 @@ void BalancingMode::fromStr(std::string & s)
 {
     value = BalancingModeEnum(BalancingModeVal[s]);
 }
+
+string agentSpectrumToStr(AgentSpectrum & sp) {
+    std::stringstream ss;
+    ss << "{" 
+       << "\"aborted\": " << sp["aborted"] << ", " 
+       << "\"archived\": " << sp["archived"] << ", " 
+       << "\"failed\": " << sp["failed"] << ", " 
+       << "\"finished\": " << sp["finished"] << ", " 
+       << "\"paused\": " << sp["paused"] << ", " 
+       << "\"running\": " << sp["running"] << ", " 
+       << "\"scheduled\": " << sp["scheduled"] << ", " 
+       << "\"stopped\": " << sp["stopped"] << "}";
+    return ss.str();
+}

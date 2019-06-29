@@ -27,6 +27,7 @@ set (libtools_src
   alert.cpp
   dwatcher.cpp
   launcher.cpp
+  metadatareader.cpp
   sm.cpp
   timer.cpp
   tools.cpp
@@ -42,7 +43,11 @@ target_include_directories (tools PUBLIC .
   ${JSON_ROOT_DIR}
 #  ${NNCOMM_ROOT_DIR}
   ${TOOLS_ROOT_DIR})
-target_link_libraries (tools str json filetools pthread curl)
+target_link_libraries (tools 
+  str
+  # json
+  filetools 
+  pthread curl)
 set_target_properties (tools PROPERTIES LINKER_LANGUAGE CXX)
 install (TARGETS tools
          RUNTIME DESTINATION bin

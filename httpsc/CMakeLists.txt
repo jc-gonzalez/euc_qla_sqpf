@@ -33,10 +33,12 @@ target_include_directories (httpsc PUBLIC .
 #  ${NNCOMM_ROOT_DIR}
   ${TOOLS_ROOT_DIR})
 target_link_libraries (httpsc
-  tools str json filetools
-  pthread
+  tools 
+  str 
+#  json 
+  filetools
   httpserver
-  curl)
+  pthread curl)
 set_target_properties (httpsc PROPERTIES LINKER_LANGUAGE CXX)
 install (TARGETS httpsc
          RUNTIME DESTINATION bin

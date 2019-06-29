@@ -74,7 +74,9 @@ Master::Master(string _cfg, string _id, int _port, string _wa, int _bMode)
 	logger.fatal("Cannot open config. file '" + cfgFileName + "'. Exiting.");
     }
     cfg = jFile.getData();
-    logger.debug(cfg.str());
+    logger.debug(cfg.dump());
+
+    cfg["general"]["workArea"] = workArea;
 
     // Initialize processing network variables
     net = new ProcessingNetwork(cfg, id, balanceMode);
@@ -83,7 +85,7 @@ Master::Master(string _cfg, string _id, int _port, string _wa, int _bMode)
 
     dist = new std::uniform_int_distribution<int>(0, net->numOfNodes - 1);
 
-    masterLoopSleep_ms = cfg["general"]["masterHeartBeat"].asInt();
+    masterLoopSleep_ms = cfg["general"]["masterHeartBeat"].get<int>();
 
     // Create task orchestrator and manager
     tskOrc = new TaskOrchestrator(cfg, id);
@@ -280,7 +282,7 @@ bool Master::getNewEntriesFromDirWatcher(DirWatcher * dw, Queue<string> & q)
 string Master::getHostInfo()
 {
     if (nodeInfoIsAvailable) {
-	return nodeInfo.asObject().str(); //nodeInfo.asObject().str();
+	return nodeInfo.dump(); //nodeInfo.dump();
     } else {
 	return "{}";
     }
@@ -304,11 +306,11 @@ void Master::distributeProducts()
 {
     if (nodeInfoIsAvailable) {
 	for (int i = 0; i < nodeStatus.size(); ++i) {
-	    jsa jloads = nodeStatus[i]["machine"]["load"].asArray();
+	    json jloads = nodeStatus[i]["machine"]["load"];
 	    std::stringstream ss;
 	    ss << "LOADS: " << jloads;
 	    logger.debug(ss.str());
-	    loads[i] = jloads[0].asFloat();
+	    loads[i] = jloads[0].get<double>();
 	}
     }
 
@@ -359,12 +361,12 @@ void Master::scheduleProductsForProcessing()
     ProductMeta meta;
     while (productsForProcessing.get(prod)) {
 	if (! checkIfProduct(prod, meta)) {
-	    logger.debug(meta.str());
+	    logger.debug(meta.dump());
 	    logger.warn("File '" + prod + "' doesn't seem to be a valid product");
 	    continue;
 	}
 	logger.info("Product '" + prod + "' will be processed");
-	//logger.debug("Meta: " + meta.str());
+	//logger.debug("Meta: " + meta.dump());
 
 	if (!ProductLocator::toLocalArchive(meta, wa)) {
 	    logger.error("Move (link) to archive of %s failed", prod.c_str());
@@ -415,9 +417,6 @@ void Master::transferOutputsToCommander()
 //----------------------------------------------------------------------
 void Master::gatherNodesInfo()
 {
-    //if (nodeStatus.size() < net->numOfNodes) {
-    //	nodeStatus.reserve(net->numOfNodes);
-    //}
     nodeStatus.clear();
     for (auto & node: net->nodesButComm) {
 	auto it = std::find(net->nodeName.begin(),
@@ -428,21 +427,21 @@ void Master::gatherNodesInfo()
 	if (!httpRqstr->requestData("/status", resp)) {
 	    logger.warn("Couldn't get node '%s' information from "
 			"master commander", node.c_str());
-	    nodeStatus.push_back(js(-1));
+	    nodeStatus.push_back(json{-1});
 	    continue;
 	}
-	jso respObj;
 	logger.debug("Response from %s: %s", node.c_str(), resp.c_str());
-	json::Parser jParser;
-	if (!jParser.parse(resp, respObj)) {
+	json respObj;
+	try {
+	    respObj = json::parse(resp);
+	} catch(...) {
 	    logger.warn("Problems in the translation of node '%s' "
 			"information", node.c_str());
-	    nodeStatus.push_back(js(-1));
+	    nodeStatus.push_back(json{-1});
 	    continue;
 	}
-	nodeStatus.push_back(js(respObj));
+	nodeStatus.push_back(respObj);
     }
-    //nodeInfoIsAvailable = true;
 }
 
 //----------------------------------------------------------------------
@@ -475,7 +474,7 @@ void Master::runMainLoop()
 	// Retrieve agents information
 	if ((iteration == 1) || ((iteration % 10) == 0)) {
 	    nodeInfoIsAvailable = tskMng->retrieveAgentsInfo(nodeInfo);
-	    logger.debug("Node info retrieved: " + nodeInfo.asObject().str());
+	    logger.debug("Node info retrieved: " + nodeInfo.dump());
 	    tskMng->showSpectra();
 	}
 

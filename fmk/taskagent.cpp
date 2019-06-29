@@ -190,7 +190,7 @@ vector<string> TaskAgent::doRules(string item)
     } else if (from_var == "log") {
 	value = str::join(p_logs, " ");
     } else {
-	value = pcfg[from_var].asString();
+	value = pcfg[from_var].get<std::string>();
     }
 
     for (auto & rule: rules) {
@@ -245,7 +245,7 @@ bool TaskAgent::prepareNewTask(string taskId, string taskFld, string proc)
     }
     logger.debug("Moving from %s to %s", curdir, taskFld.c_str());
 
-    p_inputs = getFiles(pcfg["input"].asString());
+    p_inputs = getFiles(pcfg["input"].get<std::string>());
     if (p_inputs.size() < 1) {
         logger.error("No input files provided to the processor %s", proc.c_str());
         return false;
@@ -253,7 +253,7 @@ bool TaskAgent::prepareNewTask(string taskId, string taskFld, string proc)
     string p_input = str::join(p_inputs, ",");
     logger.debug("Processing task %s will process %s", taskId.c_str(), p_input.c_str());
 
-    string p_output = pcfg["output"].asString();
+    string p_output = pcfg["output"].get<std::string>();
     if (isSubstitutionRules(p_output)) {
 	p_outputs = doRules(p_output);
     } else {
@@ -262,7 +262,7 @@ bool TaskAgent::prepareNewTask(string taskId, string taskFld, string proc)
     p_output = str::join(p_outputs, ",");
     logger.debug("Output: %s", p_output.c_str());
 
-    string p_log    = pcfg["log"].asString();
+    string p_log    = pcfg["log"].get<std::string>();
     if (isSubstitutionRules(p_log)) {
 	p_logs = doRules(p_log);
     } else {
@@ -275,22 +275,22 @@ bool TaskAgent::prepareNewTask(string taskId, string taskFld, string proc)
     logger.debug("Back in %s", curdir);
     
     // 2. Processor subfolder name (folder under QPF_WA/bin/"
-    string p_processor = pcfg["processor"].asString();
+    string p_processor = pcfg["processor"].get<std::string>();
     // 3. Processor entire subfolder name
     //string p_proc_dir = wa.procArea;  // + "/" + p_processor
     // 4. Main script to invoke processor (something like driver.py)
-    string p_script = pcfg["script"].asString();
+    string p_script = pcfg["script"].get<std::string>();
 
     // 5. Arguments
-    string p_args = pcfg["args"].asString();
+    string p_args = pcfg["args"].get<std::string>();
 
     pcfg["input"]  = p_input;
     pcfg["output"] = p_output;
     pcfg["log"]    = p_log;
-    logger.debug(">>> " + pcfg.str());
+    logger.debug(">>> " + pcfg.dump());
 
-    for (auto & kv: pcfg) {
-	p_args = str::replaceAll(p_args, "{" + kv.first + "}", kv.second.asString());
+    for (auto & kv: pcfg.items()) {
+	p_args = str::replaceAll(p_args, "{" + kv.key() + "}", kv.value().get<std::string>());
     }
 
     logger.debug("Arguments: %s", p_args.c_str());
@@ -300,10 +300,10 @@ bool TaskAgent::prepareNewTask(string taskId, string taskFld, string proc)
     string p_proc_dir_img = TaskAgent::QPFDckImageProcPath;  // + "/" + processor
 
     // Prepare Docker launch variables
-    dck_image   = pcfg["image"].asString();  // Processor.QPFDckImageDefault
-    dck_exe     = pcfg["exe"].asString(); 
+    dck_image   = pcfg["image"].get<std::string>();  // Processor.QPFDckImageDefault
+    dck_exe     = pcfg["exe"].get<std::string>(); 
     p_args.insert(0, (p_proc_dir_img + "/" + p_processor + "/" +
-		      pcfg["script"].asString() + " "));
+		      pcfg["script"].get<std::string>() + " "));
     dck_args    = str::split(p_args, ' ');
     dck_workdir = taskFld_img;
     dck_mapping = { {taskFld, taskFld_img + ":rw"},
@@ -490,7 +490,6 @@ void TaskAgent::monitorTasks()
                                    "\"Path\":{{json .Path}},"
                                    "\"Args\":{{json .Args}}}");
 
-    static json::Parser parser;
     string contId;
 
     // Check status of current container
@@ -514,11 +513,10 @@ void TaskAgent::monitorTasks()
     inspect = inspectContainer(contId, false, inspectSelection);
     if (! inspect.empty()) {
 	logger.debug("INSPECT>> " + inspect);
-	jso jinspect;
-	parser.parse(inspect, jinspect);
+	json jinspect = json::parse(inspect);
 
-	string inspStatus = jinspect["State"]["Status"].asString();
-	int inspCode      = jinspect["State"]["ExitCode"].asInt();
+	string inspStatus = jinspect["State"]["Status"].get<std::string>();
+	int inspCode      = jinspect["State"]["ExitCode"].get<int>();
 	status = stateToTaskStatus(inspStatus, inspCode);
 	string statusLowStr(TaskStatusStr[status]);
 	str::toLower(statusLowStr);

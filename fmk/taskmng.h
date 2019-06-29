@@ -93,7 +93,7 @@ public:
     //----------------------------------------------------------------------
     // Method: retrieveAgentsInfo
     //----------------------------------------------------------------------
-    bool retrieveAgentsInfo(js & hi);
+    bool retrieveAgentsInfo(json & hi);
 
     //----------------------------------------------------------------------
     // Method: showSpectra
@@ -186,10 +186,11 @@ private:
     vector<Queue<string>*> agentsOutQueue;
     vector<Queue<string>*> agentsTskQueue;
 
-    map< string,
-	 std::tuple<string, int> > agentsContainer;
+    map< string, std::tuple<string, int> > agentsContainer;
 	
-    jso agentsInfo;
+    json agentsInfo;
+
+    AgentsInfo ai;
 
     string defaultProcCfg;
     

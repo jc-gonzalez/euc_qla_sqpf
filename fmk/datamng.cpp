@@ -67,16 +67,16 @@ void DataManager::initializeDB()
 {
     std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL(net, logger));
 
-    dbHdl->setConnectionParams(cfg["db"]["host"].asString(),
-			       cfg["db"]["port"].asInt(),
-			       cfg["db"]["name"].asString(),
-			       cfg["db"]["user"].asString(),
-			       cfg["db"]["pwd"].asString());
+    dbHdl->setConnectionParams(cfg["db"]["host"].get<std::string>(),
+			       std::stod(cfg["db"]["port"].get<std::string>()),
+			       cfg["db"]["name"].get<std::string>(),
+			       cfg["db"]["user"].get<std::string>(),
+			       cfg["db"]["pwd"].get<std::string>());
     
     // Check that connection with the DB is possible
     if (dbHdl->openConnection()) {
-	logger.info("Connection params. initialized for DB %s",
-		    cfg["db"]["name"].asString().c_str());
+	logger.info("Connection params. initialized for DB " +
+		    cfg["db"]["name"].get<std::string>());
 	dbHdl->closeConnection();
     }
 }

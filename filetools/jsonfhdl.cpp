@@ -56,8 +56,9 @@
 //----------------------------------------------------------------------
 bool JsonFileHandler::read()
 {
-    json::Parser parser;
-    return parser.parseFile(fileName, data);
+    std::ifstream jsonFile(fileName);
+    jsonFile >> data;
+    return true;
 }
 
 //----------------------------------------------------------------------
@@ -69,9 +70,7 @@ bool JsonFileHandler::write()
     std::ofstream jsonFile;
     jsonFile.open(fileName, std::ofstream::out);
     if (!jsonFile) { return false; }
-    json::enableFormattedOutput("    ");
     jsonFile << data << '\n';
-    json::disableFormattedOutput();
     return true;
 }
 
@@ -79,7 +78,7 @@ bool JsonFileHandler::write()
 // Method: setData
 // Sets the value of the internal data container
 //----------------------------------------------------------------------
-void JsonFileHandler::setData(json::Object & v)
+void JsonFileHandler::setData(json & v)
 {
     data = v;
 }
@@ -88,7 +87,7 @@ void JsonFileHandler::setData(json::Object & v)
 // Method: getData
 // Return handler for internal data
 //----------------------------------------------------------------------
-json::Object & JsonFileHandler::getData()
+json & JsonFileHandler::getData()
 {
     return data;
 }

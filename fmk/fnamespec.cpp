@@ -43,6 +43,9 @@
 #include "filetools.h"
 #include "metadatareader.h"
 
+#define USE_CXX11_REGEX
+#undef  USE_CXX11_REGEX
+
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
@@ -81,31 +84,31 @@ bool FileNameSpec::parse(string & fullFileName, ProductMeta & meta)
     std::tie(dname, bname, name,
 	     suffix, sname, ext) = FileTools::fileinfo(fullFileName);
 
-    meta.append("id", bname);
+    meta["id"] = bname;
     dict fs;
-    fs.append("full", fullFileName);
-    fs.append("path", dname);
-    fs.append("base", bname);
-    fs.append("name", name);
-    fs.append("sname", sname);
-    fs.append("suffix", suffix);
-    fs.append("ext", ext);
-    meta.append("fileinfo", fs);
-    meta.append("url", "file://" + fullFileName);
-    meta.append("format", genProdFormat(ext));
+    fs["full"] = fullFileName;
+    fs["path"] = dname;
+    fs["base"] = bname;
+    fs["name"] = name;
+    fs["sname"] = sname;
+    fs["suffix"] = suffix;
+    fs["ext"] = ext;
+    meta["fileinfo"] = fs;
+    meta["url"] = "file://" + fullFileName;
+    meta["format"] = genProdFormat(ext);
 
 #ifdef USE_CXX11_REGEX
     std::regex re(BnameRe);
     std::smatch matches;
     if (!std::regex_search(sname, matches, re)) { return false; }
 
-    meta.append("mission",    matches[Mission].str());
-    meta.append("proc_func",  matches[ProcFunc].str());
-    meta.append("creator",    matches[ProcFunc].str());
-    meta.append("instance",   matches[Instance].str());
-    meta.append("start_time", matches[Date].str());
-    meta.append("end_time",   matches[Date].str());
-    meta.append("version",    matches[Version].str());
+    meta["mission"] =    matches[Mission].str();
+    meta["proc_func"] =  matches[ProcFunc].str();
+    meta["creator"] =    matches[ProcFunc].str();
+    meta["instance"] =   matches[Instance].str();
+    meta["start_time"] = matches[Date].str();
+    meta["end_time"] =   matches[Date].str();
+    meta["version"] =    matches[Version].str();
 
     parseInstance(matches[Instance].str(), meta);
 #else
@@ -114,20 +117,20 @@ bool FileNameSpec::parse(string & fullFileName, ProductMeta & meta)
     parseSnameNoRE(sname, mission, proc_func, instance,
                    datetime, version);
         
-    meta.append("mission",    mission);
-    meta.append("proc_func",  proc_func);
-    meta.append("creator",    proc_func);
-    meta.append("instance",   instance);
-    meta.append("start_time", datetime);
-    meta.append("end_time",   datetime);
-    meta.append("version",    version);
+    meta["mission"] =    mission;
+    meta["proc_func"] =  proc_func;
+    meta["creator"] =    proc_func;
+    meta["instance"] =   instance;
+    meta["start_time"] = datetime;
+    meta["end_time"] =   datetime;
+    meta["version"] =    version;
 
     parseInstance(instance, meta);
 #endif // USE_CXX11_REGEX
     
     bool fileExists = FileTools::exists(fullFileName);
-    meta.append("exists", fileExists ? "yes" : "no");
-    meta.append("size", FileTools::fileSize(fullFileName));
+    meta["exists"] = fileExists ? "yes" : "no";
+    meta["size"] = FileTools::fileSize(fullFileName);
     if (fileExists) {
 	retrieveInternalMetadata(fullFileName, meta);
     }
@@ -229,35 +232,35 @@ void FileNameSpec::parseInstance(string inst, ProductMeta & meta)
     for (auto & token: insTokens) {
 	if (token.length() == 1) {
 	    if (SpectralBands.find(token) != string::npos) {
-		meta.append("spectral_band", token);
+		meta["spectral_band"] = token;
 	    } else if (str::isDigits(token)) {
 		expo = token;
-		meta.append("exposure", stoi(expo));
+		meta["exposure"] = stoi(expo);
 	    } else {
 		obsm = token;
-		meta.append("obs_mode", obsm);
+		meta["obs_mode"] = obsm;
 	    }
 	} else if (str::isDigits(token)) {
 	    obsid = token;
-	    meta.append("obs_id", obsid);
+	    meta["obs_id"] = obsid;
 	} else if (Creators.find("-" + token + "-") != string::npos) {
 	    creator = token;
-	    meta.append("creator", creator);
+	    meta["creator"] = creator;
 	} else if (DataTypes.find("-" + token + "-") != string::npos) {
-	    meta.append("data_type", token);
+	    meta["data_type"] = token;
 	} else {
 	    additional.push_back(token);
 	}
     }
     
-    meta.append("additional", str::join(additional, "-"));
+    meta["additional"] = str::join(additional, "-");
 
-    string pf(meta["proc_func"].asString());
+    string pf(meta["proc_func"].get<std::string>());
     string typ(pf + ((creator == pf) ? "" : ("_" + creator)));
-    meta.append("type", typ);
-    meta.append("instrument", typ.substr(typ.length() - 3));
+    meta["type"] = typ;
+    meta["instrument"] = typ.substr(typ.length() - 3);
     
-    meta.append("signature", obsid + "-" + expo + "-" + obsm);
+    meta["signature"] = obsid + "-" + expo + "-" + obsm;
 }
 
 //----------------------------------------------------------------------
@@ -265,13 +268,13 @@ void FileNameSpec::parseInstance(string inst, ProductMeta & meta)
 //----------------------------------------------------------------------
 void FileNameSpec::retrieveInternalMetadata(string fileName, ProductMeta & meta)
 {
-    if (meta["format"].asString() == "FITS") {
+    if (meta["format"] == "FITS") {
 	FitsMetadataReader fitsMD(fileName);
 	string hdrMetaData;
 	if (fitsMD.getMetadataInfoStr(hdrMetaData)) {
-	    meta.append("meta", hdrMetaData);
+	    meta["meta"] = hdrMetaData;
 	} else {
-	    meta.append("meta", "<none>");
+	    meta["meta"] = "<none>";
 	}
     }
 }

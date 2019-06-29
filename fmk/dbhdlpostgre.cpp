@@ -45,8 +45,9 @@
 #include "dbhdlpostgre.h"
 
 #include "tools.h"
-#include "json/json.h"
 #include "str.h"
+#include "json.hpp"
+using json = nlohmann::json;
 
 //----------------------------------------------------------------------
 // Constructor: DBHdlPostgreSQL
@@ -113,7 +114,7 @@ int DBHdlPostgreSQL::storeProducts(ProductMetaList & prodList)
 
     for (auto & m : prodList) {
         // Get report content
-        std::string prodUrl(m["url"].asString());
+        std::string prodUrl(m["url"]);
         std::string repFile(str::mid(prodUrl, 7));
         std::string repContent("{}");
         if (str::right(repFile, 4) == "json") {
@@ -132,19 +133,19 @@ int DBHdlPostgreSQL::storeProducts(ProductMetaList & prodList)
            << "instrument_id, obsmode_id, signature, start_time, "
             "end_time, registration_time, url, report) "
            << "VALUES ("
-           << str::quoted(m["productId"].asString()) << ", "
-           << str::quoted(m["productType"].asString()) << ", "
+           << str::quoted(m["productId"]) << ", "
+           << str::quoted(m["productType"]) << ", "
            << str::quoted("OK") << ", "
-           << str::quoted(m["productVersion"].asString()) << ", "
+           << str::quoted(m["productVersion"]) << ", "
            << m["size"] << ", "
            << str::quoted("SOC_QLA_TEST") << ", "
-           << str::quoted(m["obsIdStr"].asString()) << ", "
-           << str::quoted(m["obsIdStr"].asString()) << ", "
-           << str::quoted(m["instrument"].asString()) << ", "
-           << str::quoted(m["obsMode"].asString()) << ", "
-           << str::quoted(m["signature"].asString()) << ", "
-           << str::quoted(str::tagToTimestamp(m["startTime"].asString())) << ", "
-           << str::quoted(str::tagToTimestamp(m["endTime"].asString())) << ", "
+           << str::quoted(m["obsIdStr"]) << ", "
+           << str::quoted(m["obsIdStr"]) << ", "
+           << str::quoted(m["instrument"]) << ", "
+           << str::quoted(m["obsMode"]) << ", "
+           << str::quoted(m["signature"]) << ", "
+           << str::quoted(str::tagToTimestamp(m["startTime"])) << ", "
+           << str::quoted(str::tagToTimestamp(m["endTime"])) << ", "
            << str::quoted(str::tagToTimestamp(timeTag())) << ", "
            << str::quoted(prodUrl) << ", "
            << str::quoted(repContent) << "::json) "
@@ -196,18 +197,18 @@ int  DBHdlPostgreSQL::retrieveProducts(ProductMetaList & prodList,
     ProductMeta m;
     int nRows = PQntuples(res);
     for (int i = 0; i < nRows; ++i) {
-        m.append("productId",      std::string(PQgetvalue(res, i, 0)));
-        m.append("productType",    std::string(PQgetvalue(res, i, 1)));
-        m.append("productStatus",  std::string(PQgetvalue(res, i, 2)));
-        m.append("productVersion", std::string(PQgetvalue(res, i, 3)));
-        m.append("productSize",    *((int*)(PQgetvalue(res, i, 4))));
-        m.append("creator",        std::string(PQgetvalue(res, i, 5)));
-        m.append("instrument",     std::string(PQgetvalue(res, i, 6)));
-        m.append("signature",      std::string(PQgetvalue(res, i, 7)));
-        m.append("startTime",      std::string(PQgetvalue(res, i, 8)));
-        m.append("endTime",        std::string(PQgetvalue(res, i, 9)));
-        m.append("regTime",        std::string(PQgetvalue(res, i, 10)));
-        m.append("url",            std::string(PQgetvalue(res, i, 11)));
+        m["productId"]      = std::string(PQgetvalue(res, i, 0));
+        m["productType"]    = std::string(PQgetvalue(res, i, 1));
+        m["productStatus"]  = std::string(PQgetvalue(res, i, 2));
+        m["productVersion"] = std::string(PQgetvalue(res, i, 3));
+        m["productSize"]    = *((int*)(PQgetvalue(res, i, 4)));
+        m["creator"]        = std::string(PQgetvalue(res, i, 5));
+        m["instrument"]     = std::string(PQgetvalue(res, i, 6));
+        m["signature"]      = std::string(PQgetvalue(res, i, 7));
+        m["startTime"]      = std::string(PQgetvalue(res, i, 8));
+        m["endTime"]        = std::string(PQgetvalue(res, i, 9));
+        m["regTime"]        = std::string(PQgetvalue(res, i, 10));
+        m["url"]            = std::string(PQgetvalue(res, i, 11));
         prodList.push_back(m);
     }
     PQclear(res);
@@ -227,23 +228,23 @@ bool DBHdlPostgreSQL::storeTask(TaskInfo & task)
 
     std::string registrationTime(tagToTimestamp(preciseTimeTag()));
     std::stringstream ss;
-    std::string taskPath = task["taskPath"].asString();
-    std::string taskData( task["taskData"].asObject().str() );
+    std::string taskPath = task["taskPath"];
+    std::string taskData( task["taskData"].dump() );
 
     ss.str("");
     ss << "INSERT INTO tasks_info "
        << "(task_id, task_status_id, task_progress, task_exitcode, "
        << "task_path, task_size, registration_time, start_time, task_info, task_data) "
        << "VALUES ("
-       << str::quoted(task["taskName"].asString()) << ", "
-       << task["taskStatus"].asString() << ", "
+       << str::quoted(task["taskName"]) << ", "
+       << task["taskStatus"] << ", "
        << 0 << ", "
-       << task["taskExitCode"].asString() << ", "
+       << task["taskExitCode"] << ", "
        << str::quoted(taskPath) << ", "
        << 0 << ", "
        << str::quoted(registrationTime) << ", "
-       << str::quoted(task["taskStart"].asString()) << ", "
-       << str::quoted(task.asObject().str()) << ", "
+       << str::quoted(task["taskStart"]) << ", "
+       << str::quoted(task.dump()) << ", "
        << str::quoted(taskData) << ");";
         
     try { result = runCmd(ss.str()); } catch(...) { throw; }
@@ -280,9 +281,9 @@ bool DBHdlPostgreSQL::updateTask(TaskInfo & task)
     bool result = true;
     bool mustUpdate = true;
 
-    std::string taskName = task["taskName"].asString().substr(15);
-    js taskData = task["taskData"];
-    std::string id = taskData["Id"].asString();
+    std::string taskName = task["taskName"].get<std::string>().substr(15);
+    json taskData = task["taskData"];
+    std::string id = taskData["Id"];
 
     std::vector<std::string> updates {eqKeyValue("task_id", id)};
         
@@ -296,24 +297,24 @@ bool DBHdlPostgreSQL::updateTask(TaskInfo & task)
     }
 
     if (result) {
-        TaskStatus taskStatus(TaskStatusVal[task["taskStatus"].asString()]);
+        TaskStatus taskStatus(TaskStatusVal[task["taskStatus"]]);
         updates.clear();
         updates.push_back(eqKeyValue("task_status_id", (int)(taskStatus)));
         updates.push_back(eqKeyValue("task_progress", 
-                                     taskData["State"]["Progress"].asString()));
+                                     taskData["State"]["Progress"]));
         
         bool isFinished = ((taskStatus == TASK_STOPPED) ||
                            (taskStatus == TASK_FAILED) ||
                            (taskStatus == TASK_FINISHED) ||
                            (taskStatus == TASK_UNKNOWN_STATE));
         //if (isFinished) {
-            updates.push_back(eqKeyValue("start_time", task["taskStart"].asString()));
-            if (!task["taskEnd"].asString().empty()) {
-                updates.push_back(eqKeyValue("end_time", task["taskEnd"].asString()));
+            updates.push_back(eqKeyValue("start_time", task["taskStart"]));
+            if (!task["taskEnd"].empty()) {
+                updates.push_back(eqKeyValue("end_time", task["taskEnd"]));
             }
-            updates.push_back(eqKeyValue("task_path", task["taskPath"].asString())); 
+            updates.push_back(eqKeyValue("task_path", task["taskPath"])); 
             updates.push_back(eqKeyValue("task_data", task["taskData"]));
-            updates.push_back(eqKeyValue("task_info", task.asObject().str())); 
+            updates.push_back(eqKeyValue("task_info", task.dump())); 
             //}
         result &= updateTable("tasks_info",
                               eqKeyValue("task_id", id),
@@ -553,8 +554,8 @@ bool DBHdlPostgreSQL::storeMsg(std::string from,
                     "VALUES (" +
                     str::quoted(str::tagToTimestamp(timeTag())) + ", " +
                     str::quoted(from) + ", " +
-                    str::quoted(m["header.target"].asString()) + ", " +
-                    str::quoted(m["header.type"].asString()) + ", " +
+                    str::quoted(m["header.target"]) + ", " +
+                    str::quoted(m["header.type"]) + ", " +
                     str::quoted(isBroadcast ? "Y" : "N") + ", " +
                     str::quoted(msg) + ")");
 
@@ -684,8 +685,8 @@ std::string DBHdlPostgreSQL::eqKeyValue(std::string k, double x)
 std::string DBHdlPostgreSQL::eqKeyValue(std::string k, std::string x) 
 { return k + " = " + str::quoted(x); }
 
-std::string DBHdlPostgreSQL::eqKeyValue(std::string k, json::Value x) 
-{ return x.asObject().str(); }
+std::string DBHdlPostgreSQL::eqKeyValue(std::string k, json x) 
+{ return x.dump(); }
 
 //----------------------------------------------------------------------
 // Method: updateTable

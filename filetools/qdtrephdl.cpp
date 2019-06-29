@@ -58,38 +58,38 @@
 bool QDTReportHandler::getIssues(std::vector<Alert*> & issues)
 {
     // Loop on all the products in the report (normally, only 1)
-    json::Object::iterator prodIt = data.begin();
+    json::iterator prodIt = data.begin();
     while (prodIt != data.end()) {
 
-        json::Object && p = prodIt->second.asObject();
-        std::string product = prodIt->first;
+        json &  p = prodIt.value();
+        std::string product = prodIt.key();
         //std::cerr << product << '\n';
 
         // Loop on all the CCDs
-        json::Object::iterator ccdIt = p.begin();
+        json::iterator ccdIt = p.begin();
         while (ccdIt != p.end()) {
 
-            json::Object && c = ccdIt->second.asObject();
-            std::string ccdSet = ccdIt->first;
+            json &  c = ccdIt.value();
+            std::string ccdSet = ccdIt.key();
             //std::cerr << '\t' << ccdSet << '\n';
 
             if (ccdSet.compare(0, 3, "CCD") == 0) {
                 // Loop on all the quadrant
-                json::Object::iterator quadIt = c.begin();
-                json::Object::iterator quadItEnd = c.end();
+                json::iterator quadIt = c.begin();
+                json::iterator quadItEnd = c.end();
                 quadItEnd--;
                 while (quadIt != quadItEnd) {
 
-                    json::Object && q = quadIt->second.asObject();
-                    std::string quadrant = quadIt->first;
+                    json &  q = quadIt.value();
+                    std::string quadrant = quadIt.key();
                     //std::cerr << "\t\t" << quadrant << '\n';
 
                     // Loop on all the diagnostics for the quadrant
-                    json::Object && qDiagIt = q["diagnostics"].asObject();
-                    json::Object::iterator diagIt = qDiagIt.begin();
+                    json &  qDiagIt = q["diagnostics"];
+                    json::iterator diagIt = qDiagIt.begin();
                     while (diagIt != qDiagIt.end()) {
 
-                        std::string diagnostic = diagIt->first;
+                        std::string diagnostic = diagIt.key();
                         //std::cerr << "\t\t\t" << diagnostic << '\n';
 
                         std::string location = (product + "." + ccdSet + "." +
@@ -105,11 +105,11 @@ bool QDTReportHandler::getIssues(std::vector<Alert*> & issues)
             }
 
             // Loop on all the diagnostics for the entire CCD or Detector
-            json::Object && cDiagIt = c["diagnostics"].asObject();
-            json::Object::iterator diagIt = cDiagIt.begin();
+            json &  cDiagIt = c["diagnostics"];
+            json::iterator diagIt = cDiagIt.begin();
             while (diagIt != cDiagIt.end()) {
 
-                std::string diagnostic = diagIt->first;
+                std::string diagnostic = diagIt.key();
                 //std::cerr << "\t\t\t" << diagnostic << '\n';
 
                 std::string location = (product + "." + ccdSet + "." +
@@ -129,23 +129,23 @@ bool QDTReportHandler::getIssues(std::vector<Alert*> & issues)
     return true;
 }
 
-void QDTReportHandler::checkDiagnostic(json::Object::iterator it,
+void QDTReportHandler::checkDiagnostic(json::iterator it,
                                        std::string & location,
                                        std::vector<Alert*> & issues)
 {
     Alert::Messages msgs;
 
-    json::Object && d = it->second.asObject();
-    std::cerr << d["outcome"].asString();
-    if (d["result"]["outcome"].asString() == "Warning") {
+    json &  d = it.value();
+    std::cerr << d["outcome"];
+    if (d["result"]["outcome"] == "Warning") {
         msgs.push_back("Messsages:");
-        json::Object::iterator mIt;
-        for (auto & v : d["result"]["messages"].asArray()) {
-            msgs.push_back(v.asString());
+        json::iterator mIt;
+        for (auto & v : d["result"]["messages"]) {
+            msgs.push_back(v);
         }
 
         msgs.push_back("Values:");
-        msgs.push_back(d["values"].asString());
+        msgs.push_back(d["values"]);
 
         Alert * alert = new Alert(Alert::Diagnostics,
                                   Alert::Warning,

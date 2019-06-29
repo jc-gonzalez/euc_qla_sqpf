@@ -47,18 +47,18 @@ TaskOrchestrator::TaskOrchestrator(Config & _cfg, string _id)
     : cfg(_cfg), id(_id),
       logger(Log::getLogger("tskorc"))
 {
-    workArea = cfg["general"]["workArea"].asString();
-    js jrules = cfg["orchestration"]["rules"];
-    for (auto & r: jrules.asArray()) {
-        string rname(r["name"].asString());
-	rules[rname] = map<string, string>({{"inputs", r["inputs"].asString()},
-		    {"processing", r["processing"].asString()}});
+    workArea = cfg["general"]["workArea"];
+    json & jrules = cfg["orchestration"]["rules"];
+    for (auto & r: jrules) {
+        string rname(r["name"]);
+	rules[rname] = map<string, string>({{"inputs", r["inputs"]},
+		                            {"processing", r["processing"]}});
     }
 
-    js jprocs =  cfg["orchestration"]["processors"];
-    for (auto & kv: jprocs.asObject()) {
-	string k(kv.first);
-	string v(kv.second.asString());
+    json & jprocs =  cfg["orchestration"]["processors"];
+    for (auto & kv: jprocs.items()) {
+	string const & k = kv.key();
+	string const & v = kv.value();
 	processors[k] = v;
 	logger.debug("Storing proc.: %s => %s", k.c_str(), v.c_str());
     }
@@ -78,7 +78,7 @@ bool TaskOrchestrator::checkRules(ProductMeta & prod)
 {
     firedRules.clear();
 
-    string pType = prod["type"].asString();
+    string const & pType = prod["type"];
 
     for (auto & kv: rules) {
 	auto rname = kv.first;
@@ -112,8 +112,8 @@ bool TaskOrchestrator::schedule(ProductMeta & meta, TaskManager & manager)
 {
     if (!checkRules(meta)) {
 	logger.warn("No rule found for %s product %s",
-		    meta["type"].asString().c_str(),
-		    meta["fileinfo"]["base"].asString().c_str());
+		    meta["type"].get<std::string>().c_str(),
+		    meta["fileinfo"]["base"].get<std::string>().c_str());
 	return false;
     }
 

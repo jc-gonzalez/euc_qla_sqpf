@@ -300,7 +300,7 @@ private:
     std::string eqKeyValue(std::string k, int x);
     std::string eqKeyValue(std::string k, double x);
     std::string eqKeyValue(std::string k, std::string x);
-    std::string eqKeyValue(std::string k, json::Value x);
+    std::string eqKeyValue(std::string k, json x);
 
     //----------------------------------------------------------------------
     // Method: updateTable

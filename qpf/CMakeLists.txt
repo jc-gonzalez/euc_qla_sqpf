@@ -32,8 +32,14 @@ target_include_directories (qpf PUBLIC . ..
 #  ${PSQLLIBDIR}
   )
 target_link_libraries (qpf
-  fmk json infix str filetools tools httpsc
+  fmk 
+  infix 
+  str 
+  filetools 
+  tools 
+  httpsc
   httpserver
+  # json 
   # nncomm nanomsg
   # uuidxx
   # ${UUIDLIB}

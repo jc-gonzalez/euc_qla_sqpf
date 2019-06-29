@@ -48,28 +48,23 @@ ProcessingNetwork::ProcessingNetwork(Config & _cfg, string & _name, int _bMode)
 {
     string tplTaskAgId = "TskAgent_{:02d}_{:02d}";
 
-    js n = cfg["network"];
-
-    //std::cerr << n.asObject().str() << '\n';
+    json n = cfg["network"];
     
     thisNode = id;
-    commander = n["commander"].asString();
+    commander = n["commander"];
     thisIsCommander = (id == commander);
 
-    //std::cerr << "thisNode: " << thisNode << '\n';
-    //std::cerr << "commmander: " << commander << '\n';
-
-    js n_p = n["processingNodes"];
-    for (auto x : n_p.asObject()) {
-	js xo = x.second; 
-	std::string name = x.first;
+    json n_p = n["processingNodes"];
+    for (auto const & x : n_p.items()) {
+	json & xo = x.value(); 
+	std::string const & name = x.key();
 	nodeName.push_back(name);
 	if (name != commander) { nodesButComm.push_back(name); }
-	nodeAddress.push_back(xo["address"].asString());
-	nodePort.push_back(xo["port"].asInt());
-	nodeServerUrl.push_back("http://" + xo["address"].asString() +
-				":" + xo["port"].asString());
-	nodeNumOfAgents.push_back(xo["agents"].asInt());
+	nodeAddress.push_back(xo["address"]);
+	nodePort.push_back(xo["port"].get<int>());
+	nodeServerUrl.push_back("http://" + xo["address"].get<std::string>() +
+				":" + std::to_string(xo["port"].get<int>()));
+	nodeNumOfAgents.push_back(xo["agents"].get<int>());
     }
     numOfNodes = nodeName.size();
 

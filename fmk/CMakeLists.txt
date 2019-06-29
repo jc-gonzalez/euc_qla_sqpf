@@ -80,7 +80,7 @@ target_include_directories (fmk PUBLIC . ../httpsc
 )
 
 target_link_libraries (fmk
-  json
+#  json
   httpsc
   filetools
   tools

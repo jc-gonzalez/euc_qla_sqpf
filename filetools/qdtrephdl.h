@@ -107,7 +107,7 @@ public:
     // Method: checkDiagnostic
     // Checks the results of a given diagnostic
     //----------------------------------------------------------------------
-    void checkDiagnostic(json::Object::iterator it,
+    void checkDiagnostic(json::iterator it,
                          std::string & location,
                          std::vector<Alert*> & issues);
 

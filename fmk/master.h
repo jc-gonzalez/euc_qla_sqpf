@@ -236,13 +236,13 @@ private:
 
     Queue<string> outputProducts;
 
-    js nodeInfo;
+    json nodeInfo;
 
     typedef int(*SelectNodeFn)(Master*);
     SelectNodeFn selectNodeFn;
 
     bool nodeInfoIsAvailable;
-    vector<js> nodeStatus;
+    vector<json> nodeStatus;
 
     Logger logger;
     

@@ -6,6 +6,7 @@
         "lastAccess": "20190705T121212",
         "userAreaType": "user",
         "userArea": "",
+        "workArea": "/home/eucops/sqpf",
         "logLevel": "INFO",
         "masterHeartBeat": 500,
         "agentsHeartBeat": 300,

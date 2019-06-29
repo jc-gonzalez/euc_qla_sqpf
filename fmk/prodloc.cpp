@@ -66,9 +66,9 @@ bool ProductLocator::isRemote = false;
 bool ProductLocator::toLocalArchive(ProductMeta & m, WorkArea & wa,
 				    ProductLocatorMethod method)
 {
-    //std::string origPath = m["fileinfo"]["path"].asString();
-    std::string origBaseName = m["fileinfo"]["base"].asString();
-    std::string origFile = m["fileinfo"]["full"].asString();
+    //std::string origPath = m["fileinfo"]["path"];
+    std::string origBaseName = m["fileinfo"]["base"];
+    std::string origFile = m["fileinfo"]["full"];
     std::string newFile = wa.archive + "/" + origBaseName;
     bool result = relocate(origFile, newFile, method) == 0;
     if (result) {
@@ -85,8 +85,8 @@ bool ProductLocator::toTaskInput(ProductMeta & m, WorkArea & wa,
 				 std::string & taskId,
 				 ProductLocatorMethod method)
 {
-    std::string origBaseName = m["fileinfo"]["base"].asString();
-    std::string origFile = m["fileinfo"]["full"].asString();
+    std::string origBaseName = m["fileinfo"]["base"];
+    std::string origFile = m["fileinfo"]["full"];
     std::string newPath = wa.tasks + "/" + taskId + "/in";
     std::string newFile = newPath + "/" + origBaseName;
     bool result = relocate(origFile, newFile, method) == 0;
@@ -103,8 +103,8 @@ bool ProductLocator::toTaskInput(ProductMeta & m, WorkArea & wa,
 bool ProductLocator::toLocalOutputs(ProductMeta & m, WorkArea & wa,
 				    ProductLocatorMethod method)
 {
-    std::string origBaseName = m["fileinfo"]["base"].asString();
-    std::string origFile = m["fileinfo"]["full"].asString();
+    std::string origBaseName = m["fileinfo"]["base"];
+    std::string origFile = m["fileinfo"]["full"];
     std::string newFile = wa.localOutputs + "/" + origBaseName;
     bool result = relocate(origFile, newFile, method) == 0;
     if (result) {
@@ -120,8 +120,8 @@ bool ProductLocator::toLocalOutputs(ProductMeta & m, WorkArea & wa,
 bool ProductLocator::toLocalInbox(ProductMeta & m, WorkArea & wa,
 				  ProductLocatorMethod method)
 {
-    std::string origBaseName = m["fileinfo"]["base"].asString();
-    std::string origFile = m["fileinfo"]["full"].asString();
+    std::string origBaseName = m["fileinfo"]["base"];
+    std::string origFile = m["fileinfo"]["full"];
     std::string newFile = wa.localInbox + "/" + origBaseName;
     bool result = relocate(origFile, newFile, method) == 0;
     if (result) {
