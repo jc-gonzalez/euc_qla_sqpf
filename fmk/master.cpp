@@ -71,7 +71,7 @@ Master::Master(string _cfg, string _id, int _port, string _wa, int _bMode)
     // Read configuration
     JsonFileHandler jFile(cfgFileName);
     if (!jFile.read()) {
-	logger.fatal("Cannot open config. file '" + cfgFileName + "'. Exiting.");
+        logger.fatal("Cannot open config. file '" + cfgFileName + "'. Exiting.");
     }
     cfg = jFile.getData();
     logger.debug(cfg.dump());
@@ -81,7 +81,7 @@ Master::Master(string _cfg, string _id, int _port, string _wa, int _bMode)
     // Initialize processing network variables
     net = new ProcessingNetwork(cfg, id, balanceMode);
     logger.info("Node " + id + " has " + std::to_string(net->thisNodeNumOfAgents) +
-	    " processing agents");
+            " processing agents");
 
     dist = new std::uniform_int_distribution<int>(0, net->numOfNodes - 1);
 
@@ -93,10 +93,10 @@ Master::Master(string _cfg, string _id, int _port, string _wa, int _bMode)
 
     // Create Data Manager
     if (net->thisIsCommander) {
-	dataMng = new DataManager(cfg, *net);
-	dataMng->initializeDB();
+        dataMng = new DataManager(cfg, *net);
+        dataMng->initializeDB();
     } else {
-	dataMng = nullptr;
+        dataMng = nullptr;
     }
 
     // Create HTTP server and requester object
@@ -104,7 +104,7 @@ Master::Master(string _cfg, string _id, int _port, string _wa, int _bMode)
     httpRqstr = new MasterRequester;
 
     logger.info("HTTP Server started at port " + std::to_string(port) +
-		" (" + wa.serverBase + ")");
+                " (" + wa.serverBase + ")");
 
     // Initialize loads
     loads = VFOR(1.0, x, net->nodeName);
@@ -112,24 +112,24 @@ Master::Master(string _cfg, string _id, int _port, string _wa, int _bMode)
     // Create node selection function
     switch (balanceMode) {
     case BalancingModeEnum::BALANCE_Sequential:
-	selectNodeFn = [](Master * m){
-	    return (m->lastNodeUsed + 1) % m->net->numOfNodes; };
-	break;
+        selectNodeFn = [](Master * m){
+            return (m->lastNodeUsed + 1) % m->net->numOfNodes; };
+        break;
     case BalancingModeEnum::BALANCE_LoadBalance:
-	selectNodeFn = [](Master * m){
-	    int i = 0, imin = 0;
-	    double minLoad = 999.;
-	    for (auto x : m->loads) {
-		if (x < minLoad) { imin = i, minLoad = x; }
-		++i;
-	    }
-	    return imin; };
-	break;
+        selectNodeFn = [](Master * m){
+            int i = 0, imin = 0;
+            double minLoad = 999.;
+            for (auto x : m->loads) {
+                if (x < minLoad) { imin = i, minLoad = x; }
+                ++i;
+            }
+            return imin; };
+        break;
     case BalancingModeEnum::BALANCE_Random:
-	selectNodeFn = [](Master * m){ return m->genRandomNode(); };
-	break;
+        selectNodeFn = [](Master * m){ return m->genRandomNode(); };
+        break;
     default:
-	selectNodeFn = [](Master * m){ return 0; };
+        selectNodeFn = [](Master * m){ return 0; };
     }
     //selectNodeFn = [](Master * m){ return 1; };
 
@@ -227,9 +227,9 @@ void Master::appendProdsToQueue(Queue<string> & prods)
 void Master::setDirectoryWatchers()
 {
     dirWatchers.push_back(DirWatchedAndQueue(new DirWatcher(wa.reproc),
-					     reprocProdQueue));
+                                             reprocProdQueue));
     dirWatchers.push_back(DirWatchedAndQueue(new DirWatcher(wa.localInbox),
-					     inboxProdQueue));
+                                             inboxProdQueue));
 }
 
 //----------------------------------------------------------------------
@@ -241,9 +241,9 @@ bool Master::getNewEntries()
     DirWatcher * dw;
     Queue<string> q;
     for (DirWatchedAndQueue grp : dirWatchers) {
-	DirWatcher * dw = std::get<0>(grp);
-	Queue<string> & q = std::get<1>(grp);
-	weHaveNewEntries |= getNewEntriesFromDirWatcher(dw, q);
+        DirWatcher * dw = std::get<0>(grp);
+        Queue<string> & q = std::get<1>(grp);
+        weHaveNewEntries |= getNewEntriesFromDirWatcher(dw, q);
     }
     return weHaveNewEntries;
 }
@@ -260,16 +260,16 @@ bool Master::getNewEntriesFromDirWatcher(DirWatcher * dw, Queue<string> & q)
     int numEvents = 0;
     while ((dw->nextEvent(e)) && (numEvents < numMaxEventsPerIter)) {
         logger.info("New DirWatchEvent: " + e.path + "/" + e.name
-		+ (e.isDir ? " DIR " : " ") + std::to_string(e.mask));
+                + (e.isDir ? " DIR " : " ") + std::to_string(e.mask));
 
         // Process only files
         // TODO: Process directories that appear at inbox
         if (! e.isDir) {
             // Build full file name and add it to the queue
-	    // q.push(std::string(e.path) + "/" +
-	    // 	   std::string(e.name));
-	    q.push(fmt("$/$", e.path, e.name));
-	    ++numEvents;
+            // q.push(std::string(e.path) + "/" +
+            //            std::string(e.name));
+            q.push(fmt("$/$", e.path, e.name));
+            ++numEvents;
         }
     }
     return (numEvents > 0);
@@ -282,9 +282,9 @@ bool Master::getNewEntriesFromDirWatcher(DirWatcher * dw, Queue<string> & q)
 string Master::getHostInfo()
 {
     if (nodeInfoIsAvailable) {
-	return nodeInfo.dump(); //nodeInfo.dump();
+        return nodeInfo.dump(); //nodeInfo.dump();
     } else {
-	return "{}";
+        return "{}";
     }
 }
 
@@ -305,40 +305,40 @@ bool Master::checkIfProduct(string & fileName, ProductMeta & meta)
 void Master::distributeProducts()
 {
     if (nodeInfoIsAvailable) {
-	for (int i = 0; i < nodeStatus.size(); ++i) {
-	    json jloads = nodeStatus[i]["machine"]["load"];
-	    std::stringstream ss;
-	    ss << "LOADS: " << jloads;
-	    logger.debug(ss.str());
-	    loads[i] = jloads[0].get<double>();
-	}
+        for (int i = 0; i < nodeStatus.size(); ++i) {
+            json jloads = nodeStatus[i]["machine"]["load"];
+            std::stringstream ss;
+            ss << "LOADS: " << jloads;
+            logger.debug(ss.str());
+            loads[i] = jloads[0].get<double>();
+        }
     }
 
     ProductName prod;
     while (productList.get(prod)) {
-	int numOfNodeToUse = selectNodeFn(this);
-	string nodeToUse = net->nodeName[numOfNodeToUse];
+        int numOfNodeToUse = selectNodeFn(this);
+        string nodeToUse = net->nodeName[numOfNodeToUse];
 
-	logger.debug("Processing of " + prod + " will be done by node " + nodeToUse);
+        logger.debug("Processing of " + prod + " will be done by node " + nodeToUse);
 
-	if (nodeToUse != id) {
-	    // If the node is not the commander (I'm the commander in
-	    // this function), dispatch it to the selected node, and
-	    // save it to remove it from the list
+        if (nodeToUse != id) {
+            // If the node is not the commander (I'm the commander in
+            // this function), dispatch it to the selected node, and
+            // save it to remove it from the list
             httpRqstr->setServerUrl(net->nodeServerUrl[numOfNodeToUse]);
-	    if (!httpRqstr->postFile("/inbox", prod,
-				     "application/octet-stream")) {
-		logger.error("Cannot send file %s to node %s",
-			     prod.c_str(), nodeToUse.c_str());
-		continue;
-	    } else {
+            if (!httpRqstr->postFile("/inbox", prod,
+                                     "application/octet-stream")) {
+                logger.error("Cannot send file %s to node %s",
+                             prod.c_str(), nodeToUse.c_str());
+                continue;
+            } else {
                 productsForArchival.push(std::move(prod));
-	    }
-	} else {
-	    productsForProcessing.push(std::move(prod));
-	}
+            }
+        } else {
+            productsForProcessing.push(std::move(prod));
+        }
 
-	lastNodeUsed = numOfNodeToUse;
+        lastNodeUsed = numOfNodeToUse;
     }
 }
 
@@ -349,41 +349,41 @@ void Master::distributeProducts()
 void Master::scheduleProductsForProcessing()
 {
     if (net->thisIsCommander) {
-	// Commander: Distribute among all the nodes
-	distributeProducts();
+        // Commander: Distribute among all the nodes
+        distributeProducts();
     } else {
-	// Proc.node: Process all the products in the list
-	productsForProcessing.append(productList);
+        // Proc.node: Process all the products in the list
+        productsForProcessing.append(productList);
     }
 
     // Process the products in one list
     ProductName prod;
     ProductMeta meta;
     while (productsForProcessing.get(prod)) {
-	if (! checkIfProduct(prod, meta)) {
-	    logger.debug(meta.dump());
-	    logger.warn("File '" + prod + "' doesn't seem to be a valid product");
-	    continue;
-	}
-	logger.info("Product '" + prod + "' will be processed");
-	//logger.debug("Meta: " + meta.dump());
+        if (! checkIfProduct(prod, meta)) {
+            logger.debug(meta.dump());
+            logger.warn("File '" + prod + "' doesn't seem to be a valid product");
+            continue;
+        }
+        logger.info("Product '" + prod + "' will be processed");
+        //logger.debug("Meta: " + meta.dump());
 
-	if (!ProductLocator::toLocalArchive(meta, wa)) {
-	    logger.error("Move (link) to archive of %s failed", prod.c_str());
-	    continue;
-	}
+        if (!ProductLocator::toLocalArchive(meta, wa)) {
+            logger.error("Move (link) to archive of %s failed", prod.c_str());
+            continue;
+        }
 
-	if (! tskOrc->schedule(meta, *tskMng)) {
-	    (void)unlink(prod.c_str());
-	}
+        if (! tskOrc->schedule(meta, *tskMng)) {
+            (void)unlink(prod.c_str());
+        }
     }
 
     // The inputs products dispatched to other nodes only have to be
     // then archived in the local archive (in case this is the commander)
     if (net->thisIsCommander) {
-	while (productsForArchival.get(prod)) {
-	    (void)unlink(prod.c_str());
-	}
+        while (productsForArchival.get(prod)) {
+            (void)unlink(prod.c_str());
+        }
     }
 }
 
@@ -419,28 +419,28 @@ void Master::gatherNodesInfo()
 {
     nodeStatus.clear();
     for (auto & node: net->nodesButComm) {
-	auto it = std::find(net->nodeName.begin(),
-			    net->nodeName.end(), node);
-	int i = it - net->nodeName.begin();
-	httpRqstr->setServerUrl(net->nodeServerUrl.at(i));
-	string resp;
-	if (!httpRqstr->requestData("/status", resp)) {
-	    logger.warn("Couldn't get node '%s' information from "
-			"master commander", node.c_str());
-	    nodeStatus.push_back(json{-1});
-	    continue;
-	}
-	logger.debug("Response from %s: %s", node.c_str(), resp.c_str());
-	json respObj;
-	try {
-	    respObj = json::parse(resp);
-	} catch(...) {
-	    logger.warn("Problems in the translation of node '%s' "
-			"information", node.c_str());
-	    nodeStatus.push_back(json{-1});
-	    continue;
-	}
-	nodeStatus.push_back(respObj);
+        auto it = std::find(net->nodeName.begin(),
+                            net->nodeName.end(), node);
+        int i = it - net->nodeName.begin();
+        httpRqstr->setServerUrl(net->nodeServerUrl.at(i));
+        string resp;
+        if (!httpRqstr->requestData("/status", resp)) {
+            logger.warn("Couldn't get node '%s' information from "
+                        "master commander", node.c_str());
+            nodeStatus.push_back(json{-1});
+            continue;
+        }
+        logger.debug("Response from %s: %s", node.c_str(), resp.c_str());
+        json respObj;
+        try {
+            respObj = json::parse(resp);
+        } catch(...) {
+            logger.warn("Problems in the translation of node '%s' "
+                        "information", node.c_str());
+            nodeStatus.push_back(json{-1});
+            continue;
+        }
+        nodeStatus.push_back(respObj);
     }
 }
 
@@ -457,49 +457,49 @@ void Master::runMainLoop()
 
     forever {
 
-	++iteration;
-	logger.debug("Iteration " + std::to_string(iteration));
+        ++iteration;
+        logger.debug("Iteration " + std::to_string(iteration));
 
-	// Collect new products to process
-	if (getNewEntries()) {
-	    appendProdsToQueue(reprocProdQueue);
-	    appendProdsToQueue(inboxProdQueue);
-	}
+        // Collect new products to process
+        if (getNewEntries()) {
+            appendProdsToQueue(reprocProdQueue);
+            appendProdsToQueue(inboxProdQueue);
+        }
 
-	// Schedule the processing
-	if (!productList.empty()) {
-	    scheduleProductsForProcessing();
-	}
+        // Schedule the processing
+        if (!productList.empty()) {
+            scheduleProductsForProcessing();
+        }
 
-	// Retrieve agents information
-	if ((iteration == 1) || ((iteration % 10) == 0)) {
-	    nodeInfoIsAvailable = tskMng->retrieveAgentsInfo(nodeInfo);
-	    logger.debug("Node info retrieved: " + nodeInfo.dump());
-	    tskMng->showSpectra();
-	}
+        // Retrieve agents information
+        if ((iteration == 1) || ((iteration % 10) == 0)) {
+            nodeInfoIsAvailable = tskMng->retrieveAgentsInfo(nodeInfo);
+            logger.debug("Node info retrieved: " + nodeInfo.dump());
+            tskMng->showSpectra();
+        }
 
-	// Retrieve pending outputs
-	tskMng->retrieveOutputs(outputProducts);
-	if (net->thisIsCommander) {
-	    archiveOutputs();
-	} else {
-	    transferRemoteLocalArchiveToCommander();
-	    transferOutputsToCommander();
-	}
+        // Retrieve pending outputs
+        tskMng->retrieveOutputs(outputProducts);
+        if (net->thisIsCommander) {
+            archiveOutputs();
+        } else {
+            transferRemoteLocalArchiveToCommander();
+            transferOutputsToCommander();
+        }
 
-	// Update tasks information
-	if (net->thisIsCommander) {
-	    tskMng->updateTasksInfo(*dataMng);
-	}
+        // Update tasks information
+        if (net->thisIsCommander) {
+            tskMng->updateTasksInfo(*dataMng);
+        }
 
-	// Retrieve nodes information
-	if ((net->thisIsCommander) &&
-	    ((iteration == 1) || ((iteration % 20) == 0))) {
-	    gatherNodesInfo();
-	}
+        // Retrieve nodes information
+        if ((net->thisIsCommander) &&
+            ((iteration == 1) || ((iteration % 20) == 0))) {
+            gatherNodesInfo();
+        }
 
-	// Wait a little bit until next loop
-	delay(masterLoopSleep_ms);
+        // Wait a little bit until next loop
+        delay(masterLoopSleep_ms);
 
     }
 }

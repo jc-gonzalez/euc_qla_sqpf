@@ -85,39 +85,39 @@ public:
     // Method: toLocalArchive
     //----------------------------------------------------------------------
     static bool toLocalArchive(ProductMeta & m, WorkArea & wa,
-			       ProductLocatorMethod method = LINK);
+                               ProductLocatorMethod method = LINK);
  
     //----------------------------------------------------------------------
     // Method: toTaskInput
     //----------------------------------------------------------------------
     static bool toTaskInput(ProductMeta & m, WorkArea & wa,
-			    std::string & taskId,
-			    ProductLocatorMethod method = LINK);
+                            std::string & taskId,
+                            ProductLocatorMethod method = LINK);
  
     //----------------------------------------------------------------------
     // Method: toLocalOutputs
     //----------------------------------------------------------------------
     static bool toLocalOutputs(ProductMeta & m, WorkArea & wa,
-			       ProductLocatorMethod method = MOVE);
+                               ProductLocatorMethod method = MOVE);
  
     //----------------------------------------------------------------------
     // Method: toLocalInbox
     //----------------------------------------------------------------------
     static bool toLocalInbox(ProductMeta & m, WorkArea & wa,
-			     ProductLocatorMethod method = MOVE);
+                             ProductLocatorMethod method = MOVE);
  
     //----------------------------------------------------------------------
     // Method: sendToVOSpace
     //----------------------------------------------------------------------
     static bool sendToVOSpace(std::string user, std::string pwd,
-			      std::string vosURL, std::string folder,
-			      std::string oFile);
+                              std::string vosURL, std::string folder,
+                              std::string oFile);
     
     //----------------------------------------------------------------------
     // Method: relocate
     //----------------------------------------------------------------------
     static int relocate(std::string & sFrom, std::string & sTo,
-			ProductLocatorMethod method = LINK, int msTimeOut = 0);
+                        ProductLocatorMethod method = LINK, int msTimeOut = 0);
 
     //----------------------------------------------------------------------
     // Method: setRemote

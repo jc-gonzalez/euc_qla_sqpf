@@ -642,7 +642,7 @@ bool DBHdlPostgreSQL::runCmd(std::string cmd, bool clear)
     if ((PQresultStatus(res) != PGRES_COMMAND_OK) &&
             (PQresultStatus(res) != PGRES_TUPLES_OK)) {
         logger.error("Failed cmd '" + cmd + "': " +
-		     std::string(PQerrorMessage(conn)));
+                     std::string(PQerrorMessage(conn)));
         PQclear(res);
         PQfinish(conn);
     }
@@ -790,8 +790,8 @@ bool DBHdlPostgreSQL::retrieveRestartableTasks(std::map<int,TaskInfo> & tasks)
         int id = atoi(PQgetvalue(res, i, 0));
         std::string content(PQgetvalue(res, i, 1));
         logger.debug("TaskInfo content is: " + content);
-	std::string scontent(PQgetvalue(res, i, 1));
-	json::Value tiv(scontent);
+        std::string scontent(PQgetvalue(res, i, 1));
+        json::Value tiv(scontent);
         TaskInfo * ti = new TaskInfo(tiv);
         tasks[id] = *ti;
         logger.debug("#########>>>>>> FOUND task with id = " + std::to_string(id));// +

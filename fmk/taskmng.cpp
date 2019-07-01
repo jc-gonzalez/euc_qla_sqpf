@@ -83,8 +83,8 @@ void TaskManager::setDirectoryWatchers()
 // Method: createAgent
 //----------------------------------------------------------------------
 void TaskManager::createAgent(string id, WorkArea wa,
-		 Queue<string> * iq, Queue<string> * oq, Queue<string> * tq,
-		 bool isComm)
+                 Queue<string> * iq, Queue<string> * oq, Queue<string> * tq,
+                 bool isComm)
 {
     TaskAgent * agent = new TaskAgent(wa, id, iq, oq, tq, isComm);
     agents.push_back(agent);
@@ -100,59 +100,59 @@ void TaskManager::createAgents()
     numOfAgents = net.nodeNumOfAgents[thisNodeNum];
 
     logger.info("Creating processing %d agents for node %s. . .",
-		numOfAgents, id.c_str());
+                numOfAgents, id.c_str());
 
      json agentData = {{"num_tasks", 0},
-		       {"task_id", std::string("")},
-		       {"cont_id", std::string("")},
-		       {"cont_status", -99},
-		       {"spectrum", {{"aborted", 0},
-				     {"archived", 0},
-				     {"failed", 0},
-				     {"finished", 0},
-				     {"paused", 0},
-				     {"running", 0},
-				     {"scheduled", 0},
-				     {"stopped", 0}}}};
+                       {"task_id", std::string("")},
+                       {"cont_id", std::string("")},
+                       {"cont_status", -99},
+                       {"spectrum", {{"aborted", 0},
+                                     {"archived", 0},
+                                     {"failed", 0},
+                                     {"finished", 0},
+                                     {"paused", 0},
+                                     {"running", 0},
+                                     {"scheduled", 0},
+                                     {"stopped", 0}}}};
     
     json agentsData;
     json agentsNames;
     json agentsTasks;
 
     for (int i = 0; i < numOfAgents; ++i) {
-	Queue<string> * iq = new Queue<string>;
-	Queue<string> * oq = new Queue<string>;
-	Queue<string> * tq = new Queue<string>;
-	string agName = thisNodeAgentNames.at(i);
-	createAgent(agName, wa, iq, oq, tq, net.thisIsCommander);
-	logger.debug("Creating agent " + std::to_string(i + 1) + " of " +
-		     std::to_string(numOfAgents) + " :  " + agName);
-	agentsInQueue.push_back(iq);
-	agentsOutQueue.push_back(oq);
-	agentsTskQueue.push_back(tq);
-	agentsContainer[agName] = std::make_tuple(std::string(""), 
-						  int(TaskStatus(TASK_UNKNOWN_STATE)));
+        Queue<string> * iq = new Queue<string>;
+        Queue<string> * oq = new Queue<string>;
+        Queue<string> * tq = new Queue<string>;
+        string agName = thisNodeAgentNames.at(i);
+        createAgent(agName, wa, iq, oq, tq, net.thisIsCommander);
+        logger.debug("Creating agent " + std::to_string(i + 1) + " of " +
+                     std::to_string(numOfAgents) + " :  " + agName);
+        agentsInQueue.push_back(iq);
+        agentsOutQueue.push_back(oq);
+        agentsTskQueue.push_back(tq);
+        agentsContainer[agName] = std::make_tuple(std::string(""), 
+                                                  int(TaskStatus(TASK_UNKNOWN_STATE)));
 
-	agentsData[agName] = agentData;
+        agentsData[agName] = agentData;
 
-	agentsNames.push_back(agName);
-	agentsTasks.push_back(0);
+        agentsNames.push_back(agName);
+        agentsTasks.push_back(0);
 
-	AgentSpectrum sp;
-	sp["aborted"]	= 0;
-	sp["archived"]	= 0;
-	sp["failed"]	= 0;
-	sp["finished"]	= 0;
-	sp["paused"]	= 0;
-	sp["running"]	= 0;
-	sp["scheduled"]	= 0;
-	sp["stopped"]	= 0;
+        AgentSpectrum sp;
+        sp["aborted"]        = 0;
+        sp["archived"]        = 0;
+        sp["failed"]        = 0;
+        sp["finished"]        = 0;
+        sp["paused"]        = 0;
+        sp["running"]        = 0;
+        sp["scheduled"]        = 0;
+        sp["stopped"]        = 0;
 
-	//	AgentData ad({0, std::string(""), std::string(""), TASK_UNKNOWN_STATE, sp});
-	ai.agents.emplace(agName, AgentData({0, std::string(""), std::string(""), 
-			TASK_UNKNOWN_STATE, sp}));
-	ai.agent_names.push_back(agName);
-	ai.agent_num_tasks.push_back(0);
+        //        AgentData ad({0, std::string(""), std::string(""), TASK_UNKNOWN_STATE, sp});
+        ai.agents.emplace(agName, AgentData({0, std::string(""), std::string(""), 
+                        TASK_UNKNOWN_STATE, sp}));
+        ai.agent_names.push_back(agName);
+        ai.agent_num_tasks.push_back(0);
     }
 
     std::cerr << ai.str() << '\n';
@@ -182,10 +182,10 @@ void TaskManager::createTaskFolders(string & tskWkDir)
     vector<string> pths ;
     for (auto & p: {tskWkDir, tskWkDir + "/in", tskWkDir + "/out", tskWkDir + "/log"}) {
         if (mkdir(p.c_str(), PathMode) < 0) {
-	    logger.error("Couldn't create folder %s: %s",
-			 p.c_str(), strerror(errno));
-	}
-    }	
+            logger.error("Couldn't create folder %s: %s",
+                         p.c_str(), strerror(errno));
+        }
+    }        
 }
 
 //----------------------------------------------------------------------
@@ -193,7 +193,7 @@ void TaskManager::createTaskFolders(string & tskWkDir)
 // Create task for a given product
 //----------------------------------------------------------------------
 std::tuple<string, string> TaskManager::createTask(ProductMeta & meta, string & tskAgId,
-						   int n, string & processor)
+                                                   int n, string & processor)
 {
     // Create task id. and folder
     string taskId = createTaskId(tskAgId, n);
@@ -221,8 +221,8 @@ std::tuple<int, int> TaskManager::selectAgent()
     int ntasks = jNumOfTasks[0].get<int>();
     int nidx = 0;
     for (int i = 1; i < jNumOfTasks.size(); ++i) {
-	int ntasksi = jNumOfTasks[i].get<int>();
-	if (ntasks > ntasksi) { ntasksi = ntasks, nidx = i; }
+        int ntasksi = jNumOfTasks[i].get<int>();
+        if (ntasks > ntasksi) { ntasksi = ntasks, nidx = i; }
     }
     return std::tuple<int, int>(nidx, ntasks);
 }
@@ -232,7 +232,7 @@ std::tuple<int, int> TaskManager::selectAgent()
 // Update agents information structure
 //----------------------------------------------------------------------
 void TaskManager::updateAgent(string & taskId, int agNum,
-			      string & agName, int agNumTsk)
+                              string & agName, int agNumTsk)
 {
     agentsInfo["agent_num_tasks"][agNum] = agNumTsk;
     json & agInfo = agentsInfo["agents"][agName];
@@ -246,7 +246,7 @@ void TaskManager::updateAgent(string & taskId, int agNum,
 // Update container status in agent information structure
 //----------------------------------------------------------------------
 void TaskManager::updateContainer(string & agName, string contId,
-				  TaskStatus contStatus)
+                                  TaskStatus contStatus)
 {
     json & agInfo = agentsInfo["agents"][agName];
     agInfo["cont_id"] = contId;
@@ -266,14 +266,14 @@ void TaskManager::updateContainer(string & agName, string contId,
     bool newCont = storedContId.empty();
 
     if (newCont) {
-	logger.info("Container %s launched, current status is %s",
-		    contId.c_str(), contStatus.str().c_str());
+        logger.info("Container %s launched, current status is %s",
+                    contId.c_str(), contStatus.str().c_str());
     } else {
-	count = agInfoSpec[storedContStatusLowStr].get<int>();
-	agInfoSpec[storedContStatusLowStr] = count - 1;
-	logger.debug("Container %s changed from %s to %s",
+        count = agInfoSpec[storedContStatusLowStr].get<int>();
+        agInfoSpec[storedContStatusLowStr] = count - 1;
+        logger.debug("Container %s changed from %s to %s",
                      contId.c_str(), storedContStatus.str().c_str(),
-		     contStatus.str().c_str());
+                     contStatus.str().c_str());
     }
     
     agentsContainer[agName] = std::make_tuple(contId, int(contStatus));
@@ -290,19 +290,19 @@ void TaskManager::updateTasksInfo(DataManager & datmng)
 {
     int numOfAgents = net.thisNodeNumOfAgents;
     for (int agNum = 0; agNum < numOfAgents; ++agNum) {
-	Queue<string> * tq = agentsTskQueue.at(agNum);
+        Queue<string> * tq = agentsTskQueue.at(agNum);
         string agName = agentsInfo["agent_names"][agNum];
-	string justCreated, taskId, contId, inspect, percent, status;
-	while (tq->get(justCreated)) {
-	    tq->get(taskId);
-	    tq->get(contId);
-	    tq->get(inspect);
-	    tq->get(percent);
-	    tq->get(status);
+        string justCreated, taskId, contId, inspect, percent, status;
+        while (tq->get(justCreated)) {
+            tq->get(taskId);
+            tq->get(contId);
+            tq->get(inspect);
+            tq->get(percent);
+            tq->get(status);
             updateContainer(agName, contId, TaskStatusDowncaseVal(status));
-	    datmng.storeTaskInfo(taskId, TaskStatusDowncaseVal(status),
-				 inspect, justCreated == "true");
-	}
+            datmng.storeTaskInfo(taskId, TaskStatusDowncaseVal(status),
+                                 inspect, justCreated == "true");
+        }
     }
 }
 
@@ -320,7 +320,7 @@ void TaskManager::schedule(ProductMeta & meta, string & processor)
     // Create task id and environment
     string taskId, taskFolder;
     std::tie<string, string>(taskId, taskFolder) =
-	createTask(meta, agName, numTasks, processor);
+        createTask(meta, agName, numTasks, processor);
 
     // Pass task id to selected agent
     Queue<string> * iq = agentsInQueue.at(agNum);
@@ -351,20 +351,20 @@ bool TaskManager::retrieveAgentsInfo(json & hi)
     
     for (int agNum = 0; agNum < numOfAgents; ++agNum) {
         string serialAgName = nodeAgNames.at(agNum);
-	Queue<string> * oq = agentsOutQueue.at(agNum);
+        Queue<string> * oq = agentsOutQueue.at(agNum);
         string agName;
-	string msg;
-	while (oq->get(agName)) {
+        string msg;
+        while (oq->get(agName)) {
             oq->get(msg);
-	    json & ags = agentsInfo["agents"];
-	    json & agThis = ags[agName];
+            json & ags = agentsInfo["agents"];
+            json & agThis = ags[agName];
             for (auto & el: str::split(msg, ' ')) {
                 vector<string> parts = str::split(el, ':');
                 agThis["spectrum"][parts.at(0)] = std::stoi(parts.at(1));
             }
-	    //	    agThis["spectrum"].assign(spec);
-	    //agThis.update("spectrum", spec);
-	}
+            //            agThis["spectrum"].assign(spec);
+            //agThis.update("spectrum", spec);
+        }
     }
 
     vector<double> loadavgs = getLoadAvgs();
@@ -394,11 +394,11 @@ void TaskManager::showSpectra()
 {
     int numOfAgents = net.thisNodeNumOfAgents;
     for (int agNum = 0; agNum < numOfAgents; ++agNum) {
-	string agName = agentsInfo["agent_names"][agNum];
-	json & agInfo = agentsInfo["agents"][agName];
-	string spectrum = agInfo["spectrum"].dump();
-	logger.debug("Agent %d of %d - %s: %s", agNum + 1, numOfAgents,
-		     agName.c_str(), spectrum.c_str());
+        string agName = agentsInfo["agent_names"][agNum];
+        json & agInfo = agentsInfo["agents"][agName];
+        string spectrum = agInfo["spectrum"].dump();
+        logger.debug("Agent %d of %d - %s: %s", agNum + 1, numOfAgents,
+                     agName.c_str(), spectrum.c_str());
     }
 }
 

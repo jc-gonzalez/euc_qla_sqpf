@@ -257,7 +257,7 @@ void RWC::post(std::string url, std::string localFile,
 // Function to POST the content of a file
 //------------------------------------------------------------
 void RWC::postFile(std::string url, std::string localFile,
-		   std::string & result, std::string contentType)
+                   std::string & result, std::string contentType)
 {
     // Get a curl object
     CURL *curl = curl_easy_init();
@@ -290,8 +290,8 @@ void RWC::postFile(std::string url, std::string localFile,
     const char * pLocalFile = localFile.c_str();
     FILE * fp = fopen(pLocalFile, "rb");
     if (fp == 0) {
-	fprintf(stderr, "RWC cannot open file '%s' to post it to '%s'\n",
-		pLocalFile, url.c_str());
+        fprintf(stderr, "RWC cannot open file '%s' to post it to '%s'\n",
+                pLocalFile, url.c_str());
         return;
     }
     ScopeExit file_close([fp] { fclose(fp); });

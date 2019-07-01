@@ -98,7 +98,7 @@ public:
     // Method: storeTaskInfo
     //----------------------------------------------------------------------
     void storeTaskInfo(string & taskId, int taskStatus,
-		       string & taskInfo, bool initial);
+                       string & taskInfo, bool initial);
 
     //----------------------------------------------------------------------
     // Method: storeProductQueue

@@ -82,7 +82,7 @@ public:
     // Constructor: DBHdlPostgreSQL
     //----------------------------------------------------------------------
     DBHandler() : connectionParamsSet(false),
-	logger(Log::getLogger("db")) {}
+        logger(Log::getLogger("db")) {}
 
     //----------------------------------------------------------------------
     // Destructor: ~DBHdlPostgreSQL (virtual)
@@ -103,17 +103,17 @@ public:
     // Open a connection to the database
     //----------------------------------------------------------------------
     virtual void setConnectionParams(std::string host, 
-				     int port,
-				     std::string name, 
-				     std::string user,
-				     std::string pwd) {
-	setDbHost(host);
-	setDbPort(std::to_string(port));
-	setDbName(name);
-	setDbUser(user);
-	setDbPasswd(pwd);
-	
-	connectionParamsSet = true;
+                                     int port,
+                                     std::string name, 
+                                     std::string user,
+                                     std::string pwd) {
+        setDbHost(host);
+        setDbPort(std::to_string(port));
+        setDbName(name);
+        setDbUser(user);
+        setDbPasswd(pwd);
+        
+        connectionParamsSet = true;
     }
 
     //----------------------------------------------------------------------
@@ -294,34 +294,34 @@ public:
     // Stores the state of a node in the database
     //----------------------------------------------------------------------
     virtual bool storeNodeState(std::string node,
-				std::string new_state)=0;
+                                std::string new_state)=0;
     
     //----------------------------------------------------------------------
     // Method: retrieveNodeState
     // Retrieves the state of a node from the database
     //----------------------------------------------------------------------
     virtual bool retrieveNodeState(std::string node,
-				   std::string & state)=0;
+                                   std::string & state)=0;
 
     //----------------------------------------------------------------------
     // Method: storeVar
     // Stores a variable in the database
     //----------------------------------------------------------------------
     virtual bool storeVar(std::string var,
-			  std::string filter,
-			  std::string new_value)=0;
+                          std::string filter,
+                          std::string new_value)=0;
     
     //----------------------------------------------------------------------
     // Method: retrieveVar
     // Retrieves the value of a var from the database
     //----------------------------------------------------------------------
     virtual bool retrieveVar(std::string var,
-			     std::string filter,
-			     std::string & value)=0;
+                             std::string filter,
+                             std::string & value)=0;
 protected:
     bool connectionParamsSet;
 
-    Logger logger;	
+    Logger logger;        
 };
 
 #endif  /* DBHDL_H */

@@ -80,11 +80,11 @@ WorkArea::WorkArea(string _wa)
     logs          = sessionDir + "/log";
 
     for (auto & p: {sessionDir, tasks, logs}) {
-	if (mkdir(p.c_str(), PathMode) < 0) {
-	    std::cerr << "Couldn't create folder "
-		      << p << ": " << strerror(errno) << '\n';
-	    abort();
-	}
+        if (mkdir(p.c_str(), PathMode) < 0) {
+            std::cerr << "Couldn't create folder "
+                      << p << ": " << strerror(errno) << '\n';
+            abort();
+        }
     }
 }
 

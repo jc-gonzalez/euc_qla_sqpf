@@ -63,25 +63,25 @@
 //------------------------------------------------------------
 
 #ifdef SET_NAMED_PROPERTIES
-# define Property(c,t,p,n)					\
-    private: t p;							\
-    public:							\
-    inline t get ## n (void) const { return p; }			\
-    inline t get ## n (void) { return p; }			\
+# define Property(c,t,p,n)                                        \
+    private: t p;                                                        \
+    public:                                                        \
+    inline t get ## n (void) const { return p; }                        \
+    inline t get ## n (void) { return p; }                        \
     inline c & set ## n (t new ## n ) { p = new ## n ; return *this; }
-# define PropertyRef(c,t,p,n)					\
-    private: t p;							\
-    public:							\
-    inline t get ## n (void) const { return p; }			\
-    inline t get ## n (void) { return p; }			\
+# define PropertyRef(c,t,p,n)                                        \
+    private: t p;                                                        \
+    public:                                                        \
+    inline t get ## n (void) const { return p; }                        \
+    inline t get ## n (void) { return p; }                        \
     inline c & set ## n (t & new ## n ) { p = new ## n ; return *this; }
 # define with(s)   s
 #else
-# define Property(t,p,n)					\
-  private: t p;							\
-  public:							\
-  inline t get ## n (void) const { return p; }			\
-  inline t get ## n (void) { return p; }			\
+# define Property(t,p,n)                                        \
+  private: t p;                                                        \
+  public:                                                        \
+  inline t get ## n (void) const { return p; }                        \
+  inline t get ## n (void) { return p; }                        \
   inline void set ## n (t new ## n ) { p = new ## n ; }
 # ifdef with
 #  undef with

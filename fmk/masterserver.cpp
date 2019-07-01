@@ -89,7 +89,7 @@ class RscArgs : public http_resource {
 public:
     const HttpRespPtr render(const http_request& req) {
         return HttpRespPtr(new strResp("ARGS: " + req.get_arg("arg1") +
-				       " and " + req.get_arg("arg2")));
+                                       " and " + req.get_arg("arg2")));
     }
 };
 
@@ -99,7 +99,7 @@ public:
     
     const HttpRespPtr render_GET(const http_request&) {
         return HttpRespPtr(new strResp(mhdl->getHostInfo(), 200,
-				       "application/json"));
+                                       "application/json"));
     }
 
     const HttpRespPtr render(const http_request&) {
@@ -114,23 +114,23 @@ public:
     void setWorkArea(WorkArea * _wa) { wa = _wa; }
     
     const HttpRespPtr render_POST(const http_request&rqst) {
-	std::vector<std::string> pathItems = rqst.get_path_pieces();
-	std::cerr << rqst.content_too_large() << '\n';
-	std::cerr << rqst << "\n\n";
-	for (auto & p : pathItems) { std::cerr << p << " | "; }
-	std::cerr << '\n';
+        std::vector<std::string> pathItems = rqst.get_path_pieces();
+        std::cerr << rqst.content_too_large() << '\n';
+        std::cerr << rqst << "\n\n";
+        for (auto & p : pathItems) { std::cerr << p << " | "; }
+        std::cerr << '\n';
 
-	// Save content to local file in server folder
-	string fullFileName = wa->serverBase + rqst.get_path();
-	std::ofstream fout(fullFileName);
-	fout << rqst.get_content();
-	fout.close();
-	system(("ls -l " + fullFileName).c_str());
-	// Move created file to local inbox
-	string newFullFileName = wa->localInbox + "/" + pathItems.at(1);
-	int res = ProductLocator::relocate(fullFileName, newFullFileName,
-					   ProductLocator::MOVE);
-	
+        // Save content to local file in server folder
+        string fullFileName = wa->serverBase + rqst.get_path();
+        std::ofstream fout(fullFileName);
+        fout << rqst.get_content();
+        fout.close();
+        system(("ls -l " + fullFileName).c_str());
+        // Move created file to local inbox
+        string newFullFileName = wa->localInbox + "/" + pathItems.at(1);
+        int res = ProductLocator::relocate(fullFileName, newFullFileName,
+                                           ProductLocator::MOVE);
+        
         return HttpRespPtr(new strResp("Done.", 200));
     }
 
@@ -172,7 +172,7 @@ void MasterServer::launch()
 void MasterServer::run()
 {
     webserver ws = create_webserver(port)
-	.content_size_limit(45069760); // cw;
+        .content_size_limit(45069760); // cw;
 
     RscHelloWorld rscHello;
     addRoute(ws, "/hello", &rscHello);

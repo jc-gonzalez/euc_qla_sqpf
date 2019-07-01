@@ -56,15 +56,15 @@ ProcessingNetwork::ProcessingNetwork(Config & _cfg, string & _name, int _bMode)
 
     json n_p = n["processingNodes"];
     for (auto const & x : n_p.items()) {
-	json & xo = x.value(); 
-	std::string const & name = x.key();
-	nodeName.push_back(name);
-	if (name != commander) { nodesButComm.push_back(name); }
-	nodeAddress.push_back(xo["address"]);
-	nodePort.push_back(xo["port"].get<int>());
-	nodeServerUrl.push_back("http://" + xo["address"].get<std::string>() +
-				":" + std::to_string(xo["port"].get<int>()));
-	nodeNumOfAgents.push_back(xo["agents"].get<int>());
+        json & xo = x.value(); 
+        std::string const & name = x.key();
+        nodeName.push_back(name);
+        if (name != commander) { nodesButComm.push_back(name); }
+        nodeAddress.push_back(xo["address"]);
+        nodePort.push_back(xo["port"].get<int>());
+        nodeServerUrl.push_back("http://" + xo["address"].get<std::string>() +
+                                ":" + std::to_string(xo["port"].get<int>()));
+        nodeNumOfAgents.push_back(xo["agents"].get<int>());
     }
     numOfNodes = nodeName.size();
 
@@ -76,12 +76,12 @@ ProcessingNetwork::ProcessingNetwork(Config & _cfg, string & _name, int _bMode)
 
     char buff[40];
     for (int k = 0; k < numOfNodes; ++k) {
-	vector<string> arr;
-	for (int i = 0; i < nodeNumOfAgents.at(k); ++i) {
-	    sprintf(buff, "TskAgent_%02d_%02d", k + 1, i + 1);
-	    arr.push_back(std::string(buff));
-	}
-	nodeAgents[nodeName.at(k)] = arr;
+        vector<string> arr;
+        for (int i = 0; i < nodeNumOfAgents.at(k); ++i) {
+            sprintf(buff, "TskAgent_%02d_%02d", k + 1, i + 1);
+            arr.push_back(std::string(buff));
+        }
+        nodeAgents[nodeName.at(k)] = arr;
     }
 }
 

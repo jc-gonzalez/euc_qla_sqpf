@@ -148,20 +148,20 @@ std::vector<std::string> filesInFolder(std::string folder, std::string ext)
     DIR *dir;
     struct dirent *ent;
     if ((dir = opendir(folder.c_str())) != NULL) {
-	/* print all the files and directories within directory */
-	while ((ent = readdir(dir)) != NULL) {
-	    if (ent->d_name[0] == '.') continue; // Skip dot files
-	    std::string filename(ent->d_name);
-	    if (!ext.empty()) {
-		std::string entext(str::getExtension(filename));
-		if (entext != ext) continue;		    
-	    }
-	    v.push_back(folder + "/" + filename);
-	}
-	closedir(dir);
+        /* print all the files and directories within directory */
+        while ((ent = readdir(dir)) != NULL) {
+            if (ent->d_name[0] == '.') continue; // Skip dot files
+            std::string filename(ent->d_name);
+            if (!ext.empty()) {
+                std::string entext(str::getExtension(filename));
+                if (entext != ext) continue;                    
+            }
+            v.push_back(folder + "/" + filename);
+        }
+        closedir(dir);
     } else {
-	/* could not open directory */
-	perror("filesInFolder");
+        /* could not open directory */
+        perror("filesInFolder");
     }
     return v;
 }
@@ -229,8 +229,8 @@ int runlink(std::string & f, std::string & remoteHost)
 // Method: fileinfo
 //----------------------------------------------------------------------
 std::tuple<std::string, std::string,
-	   std::string, std::string,
-	   std::string, std::string> fileinfo(std::string fname)
+           std::string, std::string,
+           std::string, std::string> fileinfo(std::string fname)
 {
     size_t ibn = fname.find_last_of("/\\");
     std::string bname = fname.substr(ibn + 1);

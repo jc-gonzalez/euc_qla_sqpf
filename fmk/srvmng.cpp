@@ -51,7 +51,7 @@
 // Constructor
 //----------------------------------------------------------------------
 ServiceMng::ServiceMng(WorkArea & _wa,
-		       std::string mngAddr, std::vector<std::string> wrkAddrs)
+                       std::string mngAddr, std::vector<std::string> wrkAddrs)
     : DockerMng(_wa)
 {
     managerAddr = mngAddr;
@@ -60,7 +60,7 @@ ServiceMng::ServiceMng(WorkArea & _wa,
     // Initialize Swarm manager and workers
     assert(initSwarmManager(managerAddr));
     if (workerAddrs.size() > 0) {
-	for (auto & wrkAddr : workerAddrs) { assert(initSwarmWorker(wrkAddr)); }
+        for (auto & wrkAddr : workerAddrs) { assert(initSwarmWorker(wrkAddr)); }
     }
 }
 

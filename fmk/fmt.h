@@ -72,9 +72,9 @@ std::string fmt( const char *format, const Type& value, Args... args)
     if ( format ) {
         do {
             if ('$' == *format) {
-		strm << value;
-		strm << fmt(format+1, args...);
-		return strm.str();
+                strm << value;
+                strm << fmt(format+1, args...);
+                return strm.str();
             }
             strm << *format++;
         } while (*format);

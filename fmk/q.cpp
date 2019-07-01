@@ -74,8 +74,8 @@ template<typename T>
 void Queue<T>::push(T && obj)
 {
     {
-	std::lock_guard<std::mutex> lock(queueMutex);
-	objects.push(std::move(obj));
+        std::lock_guard<std::mutex> lock(queueMutex);
+        objects.push(std::move(obj));
     }
     cv.notify_one();
 }
@@ -90,7 +90,7 @@ bool Queue<T>::get(T & obj, int msTimeout)
     std::unique_lock<std::mutex> lock(queueMutex);
     //std::lock_guard<std::mutex> lock(queueMutex);
     if (!cv.wait_for(lock, msTimeout * ms,
-		     [this](){return !objects.empty();})) return false;
+                     [this](){return !objects.empty();})) return false;
     obj = std::move(objects.front());
     objects.pop();
     return true;
@@ -104,8 +104,8 @@ bool Queue<T>::empty()
 {
     bool isEmpty;
     {
-	std::lock_guard<std::mutex> lock(queueMutex);
-	isEmpty = objects.empty();
+        std::lock_guard<std::mutex> lock(queueMutex);
+        isEmpty = objects.empty();
     }
     return isEmpty;
 }

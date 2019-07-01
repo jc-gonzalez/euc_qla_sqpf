@@ -46,13 +46,13 @@
 //----------------------------------------------------------------------
 ContainerSpectrum::ContainerSpectrum()
     : savedSpec({{"aborted", 0},
-		  {"archived", 0},
-		  {"failed", 0},
-		  {"finished", 0},
-		  {"paused", 0},
-		  {"running", 0},
-		  {"scheduled", 0},
-		  {"stopped", 0}})
+                  {"archived", 0},
+                  {"failed", 0},
+                  {"finished", 0},
+                  {"paused", 0},
+                  {"running", 0},
+                  {"scheduled", 0},
+                  {"stopped", 0}})
 {
     cnts.setSize(40);
 }
@@ -71,15 +71,15 @@ ContainerSpectrum::~ContainerSpectrum()
 void ContainerSpectrum::append(string cont, string status)
 {
     if (! cnts.find(cont)) {
-	string oldCont = cnts.put(string(cont));
-	if (!oldCont.empty()) {
-	    std::cerr << "Appending " << cont
-		      << ", returned " << oldCont << '\n';
-	    auto cntIt = cntStatus.find(oldCont);
-	    string oldStatus = cntIt->second;
-	    savedSpec[oldStatus] = savedSpec[oldStatus] + 1;
-	    cntStatus.erase(cntIt);
-	}
+        string oldCont = cnts.put(string(cont));
+        if (!oldCont.empty()) {
+            std::cerr << "Appending " << cont
+                      << ", returned " << oldCont << '\n';
+            auto cntIt = cntStatus.find(oldCont);
+            string oldStatus = cntIt->second;
+            savedSpec[oldStatus] = savedSpec[oldStatus] + 1;
+            cntStatus.erase(cntIt);
+        }
     }
     cntStatus[cont] = status;
 }
@@ -91,7 +91,7 @@ CntrSpectrum ContainerSpectrum::spectrum()
 {
     CntrSpectrum spec(savedSpec);
     for (auto & kv: cntStatus) {
-	spec[kv.second] = spec[kv.second] + 1;
+        spec[kv.second] = spec[kv.second] + 1;
     }
     return spec;
 }

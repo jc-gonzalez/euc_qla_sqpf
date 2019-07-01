@@ -63,10 +63,10 @@ void signalCatcher(int s)
 {
     switch (s) {
     case SIGTERM:
-	deployerCatcher->actionOnClosingSignal();
-	break;
+        deployerCatcher->actionOnClosingSignal();
+        break;
     default:     // Do nothing for other signals trapped (if any)
-	break;
+        break;
     }
 }
 
@@ -111,7 +111,7 @@ int Deployer::run()
 
     Master master(cfgFileName, currentHostAddr, port, workArea, balanceMode);
     master.run();
-	
+        
     // Bye, bye
     logger.info("Done.");
     return EXIT_SUCCESS;
@@ -124,18 +124,18 @@ int Deployer::run()
 bool Deployer::usage(int code)
 {
     std::cout << "Usage: " << exeName << "  -c configFile "
-	      << "[ -p initialPort ] [-i id ] [ -v ] [ -h ]\n"
-	      << "where:\n"
-	      << "\t-c cfgFile          System is reconfigured with configuration in\n"
-	      << "\t                    file cfgFile (configuration is then saved to DB).\n"
-	      << "\t-i id               Set the host identifier (name.domain or IP), it should\n"
-	      << "\t                    be one of the specified in the cfg. file.\n"
-	      << "\t-p portNum          Port number to use for server\n"
-	      << "\t-w workAreaDir      Sets the work area root folder\n"
-	      << "\t-b balanceMode      Sets the balancing mode between nodes\n"
-	      << "\t                    0:Sequential; 1:Load balance (default), 2:Random\n"
+              << "[ -p initialPort ] [-i id ] [ -v ] [ -h ]\n"
+              << "where:\n"
+              << "\t-c cfgFile          System is reconfigured with configuration in\n"
+              << "\t                    file cfgFile (configuration is then saved to DB).\n"
+              << "\t-i id               Set the host identifier (name.domain or IP), it should\n"
+              << "\t                    be one of the specified in the cfg. file.\n"
+              << "\t-p portNum          Port number to use for server\n"
+              << "\t-w workAreaDir      Sets the work area root folder\n"
+              << "\t-b balanceMode      Sets the balancing mode between nodes\n"
+              << "\t                    0:Sequential; 1:Load balance (default), 2:Random\n"
               << "\t-v                  Increases verbosity (default:silent operation).\n\n"
-	      << "\t-h                  Shows this help message.\n";
+              << "\t-h                  Shows this help message.\n";
 
     exit(code);
 }
@@ -170,7 +170,7 @@ bool Deployer::processCmdLineOpts(int argc, char * argv[])
             setWorkArea(string(optarg));
             break;
         case 'b':
-	    setBalanceMode(atoi(optarg));
+            setBalanceMode(atoi(optarg));
             break;
         case 'h':
             exitCode = EXIT_SUCCESS;
@@ -254,17 +254,17 @@ void Deployer::sayHello()
     std::time_t the_time = std::chrono::system_clock::to_time_t(now);
 
     const string hline("----------------------------------------"
-		       "--------------------------------------");
+                       "--------------------------------------");
 
     logger << log4cpp::Priority::INFO << hline;
     logger << log4cpp::Priority::INFO << APP_NAME << " - " << APP_LONG_NAME;
     logger << log4cpp::Priority::INFO << APP_DATE << " - " << APP_RELEASE
-	   << " Build " << buildId ;
+           << " Build " << buildId ;
     logger << log4cpp::Priority::INFO << "Running at " << currentHostAddr
-	   << ", HTTP server listening at port " << port;
+           << ", HTTP server listening at port " << port;
     logger << log4cpp::Priority::INFO << "Working area located at " << workArea;
     logger << log4cpp::Priority::INFO << "Node balancing mode is set to '"
-	   << BalancingModeStr[balanceMode] << "'";
+           << BalancingModeStr[balanceMode] << "'";
     logger << log4cpp::Priority::INFO << hline;
 }
 

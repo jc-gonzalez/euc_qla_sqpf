@@ -78,13 +78,13 @@ T FiFo<T>::put(T && obj)
 {
     std::lock_guard<std::mutex> lock(queueMutex);
     if (ln == sz) {
-	T first = std::move(objects.front());
-	objects.pop(); objects.push(std::move(obj));
-	return first;
+        T first = std::move(objects.front());
+        objects.pop(); objects.push(std::move(obj));
+        return first;
     } else {
-	objects.push(std::move(obj));
-	++ln;
-	return null;
+        objects.push(std::move(obj));
+        ++ln;
+        return null;
     }
 }
 
@@ -98,8 +98,8 @@ bool FiFo<T>::find(T obj)
     bool isIn = false;
     for (int i = 0; i < ln; ++i) {
         T elem = std::move(objects.front());
-	isIn |= (elem == obj);
-	objects.pop(); objects.push(elem);
+        isIn |= (elem == obj);
+        objects.pop(); objects.push(elem);
     }
     return isIn;
 }
@@ -112,8 +112,8 @@ bool FiFo<T>::empty()
 {
     bool isEmpty;
     {
-	std::lock_guard<std::mutex> lock(queueMutex);
-	isEmpty = objects.empty();
+        std::lock_guard<std::mutex> lock(queueMutex);
+        isEmpty = objects.empty();
     }
     return isEmpty;
 }
@@ -126,8 +126,8 @@ size_t FiFo<T>::size()
 {
     size_t _sz;
     {
-	std::lock_guard<std::mutex> lock(queueMutex);
-	_sz = sz;
+        std::lock_guard<std::mutex> lock(queueMutex);
+        _sz = sz;
     }
     return _sz;
 }
@@ -140,8 +140,8 @@ size_t FiFo<T>::len()
 {
     size_t _ln;
     {
-	std::lock_guard<std::mutex> lock(queueMutex);
-	_ln = ln;
+        std::lock_guard<std::mutex> lock(queueMutex);
+        _ln = ln;
     }
     return _ln;
 }

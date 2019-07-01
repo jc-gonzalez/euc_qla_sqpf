@@ -127,8 +127,8 @@ private:
     // Method: createAgents
     //----------------------------------------------------------------------
     void createAgent(string id, WorkArea wa,
-		     Queue<string> * iq, Queue<string> * oq, Queue<string> * tq,
-		     bool isComm);
+                     Queue<string> * iq, Queue<string> * oq, Queue<string> * tq,
+                     bool isComm);
     
     //----------------------------------------------------------------------
     // Method: createTaskId
@@ -144,7 +144,7 @@ private:
     // Method: createTask
     //----------------------------------------------------------------------
     std::tuple<string, string> createTask(ProductMeta & meta, string & tskAgId,
-					  int n, string & processor);
+                                          int n, string & processor);
 
     //----------------------------------------------------------------------
     // Method: selectAgent
@@ -160,7 +160,7 @@ private:
     // Method: updateContainer
     //----------------------------------------------------------------------
     void updateContainer(string & agName, string contId = string(""),
-			 TaskStatus contStatus = TaskStatus(TASK_SCHEDULED));
+                         TaskStatus contStatus = TaskStatus(TASK_SCHEDULED));
 
     //----------------------------------------------------------------------
     // Method: terminate
@@ -187,7 +187,7 @@ private:
     vector<Queue<string>*> agentsTskQueue;
 
     map< string, std::tuple<string, int> > agentsContainer;
-	
+        
     json agentsInfo;
 
     AgentsInfo ai;

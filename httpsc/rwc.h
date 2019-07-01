@@ -85,7 +85,7 @@ public:
     // a string
     //------------------------------------------------------------
     void getContent(std::string url, std::string & content,
-		    std::string & result);
+                    std::string & result);
     
     //------------------------------------------------------------
     // Method: get
@@ -93,32 +93,32 @@ public:
     // the form of an output file
     //------------------------------------------------------------
     void get(std::string url, std::string localFile,
-	     std::string & result);
+             std::string & result);
 
     //------------------------------------------------------------
     // Mwthod: post_
     // Function to POST the content of a file
     //------------------------------------------------------------
     void post(std::string url, std::string localFile,
-	      std::string & result,
-	      std::string contentType =
-	      std::string("application/xml"));
+              std::string & result,
+              std::string contentType =
+              std::string("application/xml"));
     
     //------------------------------------------------------------
     // Method: post
     // Function to POST the content of a file
     //------------------------------------------------------------
     void postFile(std::string url, std::string localFile,
-		  std::string & result, std::string contentType);
+                  std::string & result, std::string contentType);
  
     //------------------------------------------------------------
     // Mwthod: postContent
     // Function to POST a string
     //------------------------------------------------------------
     void postContent(std::string url, std::string & content,
-		     std::string & result,
-		     std::string contentType =
-		     std::string("application/xml"));
+                     std::string & result,
+                     std::string contentType =
+                     std::string("application/xml"));
 
     //------------------------------------------------------------
     // Method: setAuth

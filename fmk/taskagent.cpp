@@ -98,7 +98,7 @@ void TaskAgent::init()
 vector<string> TaskAgent::getFiles(string item)
 {
     return FileTools::filesInFolder(str::getDirName(item.c_str()),
-				    str::getExtension(item.c_str()));
+                                    str::getExtension(item.c_str()));
 }
 
 //----------------------------------------------------------------------
@@ -140,23 +140,23 @@ bool TaskAgent::isSubstitutionRules(string item)
 TaskStatus TaskAgent::stateToTaskStatus(string inspStatus, int inspCode)
 {
     if        (inspStatus == "running") {
-	return TASK_RUNNING;
+        return TASK_RUNNING;
     } else if (inspStatus == "paused") {
-	return TASK_PAUSED;
+        return TASK_PAUSED;
     } else if (inspStatus == "created") {
-	return TASK_ABORTED;
+        return TASK_ABORTED;
     } else if (inspStatus == "dead") {
-	return TASK_STOPPED;
+        return TASK_STOPPED;
     } else if (inspStatus == "exited") {
-	if (inspCode == 0) {
-	    return TASK_FINISHED;
-	} else if ((inspCode > 128) && (inspCode < 160)) {
-	    return iAmQuitting ? TASK_RUNNING : TASK_STOPPED;
-	} else {
-	    return TASK_FAILED;
-	}
+        if (inspCode == 0) {
+            return TASK_FINISHED;
+        } else if ((inspCode > 128) && (inspCode < 160)) {
+            return iAmQuitting ? TASK_RUNNING : TASK_STOPPED;
+        } else {
+            return TASK_FAILED;
+        }
     } else {
-	return TASK_UNKNOWN_STATE;
+        return TASK_UNKNOWN_STATE;
     }
 }
 
@@ -166,8 +166,8 @@ TaskStatus TaskAgent::stateToTaskStatus(string inspStatus, int inspCode)
 bool TaskAgent::isEnded(TaskStatus st)
 {
     return ((st == TASK_STOPPED) ||
-	    (st == TASK_FAILED) ||
-	    (st == TASK_FINISHED));
+            (st == TASK_FAILED) ||
+            (st == TASK_FINISHED));
 }
 
 //----------------------------------------------------------------------
@@ -184,17 +184,17 @@ vector<string> TaskAgent::doRules(string item)
                  str::join(rules, "} and {").c_str());
     string value;
     if (from_var == "input") {
-	value = str::join(p_inputs, " ");
+        value = str::join(p_inputs, " ");
     } else if (from_var == "output") {
-	value = str::join(p_outputs, " ");
+        value = str::join(p_outputs, " ");
     } else if (from_var == "log") {
-	value = str::join(p_logs, " ");
+        value = str::join(p_logs, " ");
     } else {
-	value = pcfg[from_var].get<std::string>();
+        value = pcfg[from_var].get<std::string>();
     }
 
     for (auto & rule: rules) {
-	value = substitute(value, rule);
+        value = substitute(value, rule);
     }
 
     logger.error("Final result: '%s'", value.c_str());
@@ -210,7 +210,7 @@ void TaskAgent::sendSpectrumToMng()
     // Send information of the container
     string msgSpec;
     for (auto & kv: containerSpectrum.spectrum()) {
-	msgSpec += kv.first + ":" + std::to_string(kv.second) + " ";
+        msgSpec += kv.first + ":" + std::to_string(kv.second) + " ";
     }
     msgSpec.pop_back();
     oq->push(string(id));
@@ -231,7 +231,7 @@ bool TaskAgent::prepareNewTask(string taskId, string taskFld, string proc)
     // Read configuration
     JsonFileHandler jFile(cfgFile);
     if (!jFile.read()) {
-	logger.fatal("Cannot open processor config. file '" + cfgFile + "'. Exiting.");
+        logger.fatal("Cannot open processor config. file '" + cfgFile + "'. Exiting.");
     }
     pcfg = jFile.getData();
 
@@ -240,8 +240,8 @@ bool TaskAgent::prepareNewTask(string taskId, string taskFld, string proc)
     char curdir[200];
     getcwd(curdir, 200);
     if (chdir(taskFld.c_str()) < 0) {
-	logger.error("Cannot change to task folder " + taskFld);
-	return false;
+        logger.error("Cannot change to task folder " + taskFld);
+        return false;
     }
     logger.debug("Moving from %s to %s", curdir, taskFld.c_str());
 
@@ -255,18 +255,18 @@ bool TaskAgent::prepareNewTask(string taskId, string taskFld, string proc)
 
     string p_output = pcfg["output"].get<std::string>();
     if (isSubstitutionRules(p_output)) {
-	p_outputs = doRules(p_output);
+        p_outputs = doRules(p_output);
     } else {
-	p_outputs = getFiles(p_output);
+        p_outputs = getFiles(p_output);
     }
     p_output = str::join(p_outputs, ",");
     logger.debug("Output: %s", p_output.c_str());
 
     string p_log    = pcfg["log"].get<std::string>();
     if (isSubstitutionRules(p_log)) {
-	p_logs = doRules(p_log);
+        p_logs = doRules(p_log);
     } else {
-	p_logs = getFiles(p_log);
+        p_logs = getFiles(p_log);
     }
     p_log = str::join(p_logs, ",");
     logger.debug("Log: %s", p_log.c_str());
@@ -290,7 +290,7 @@ bool TaskAgent::prepareNewTask(string taskId, string taskFld, string proc)
     logger.debug(">>> " + pcfg.dump());
 
     for (auto & kv: pcfg.items()) {
-	p_args = str::replaceAll(p_args, "{" + kv.key() + "}", kv.value().get<std::string>());
+        p_args = str::replaceAll(p_args, "{" + kv.key() + "}", kv.value().get<std::string>());
     }
 
     logger.debug("Arguments: %s", p_args.c_str());
@@ -303,7 +303,7 @@ bool TaskAgent::prepareNewTask(string taskId, string taskFld, string proc)
     dck_image   = pcfg["image"].get<std::string>();  // Processor.QPFDckImageDefault
     dck_exe     = pcfg["exe"].get<std::string>(); 
     p_args.insert(0, (p_proc_dir_img + "/" + p_processor + "/" +
-		      pcfg["script"].get<std::string>() + " "));
+                      pcfg["script"].get<std::string>() + " "));
     dck_args    = str::split(p_args, ' ');
     dck_workdir = taskFld_img;
     dck_mapping = { {taskFld, taskFld_img + ":rw"},
@@ -319,19 +319,19 @@ bool TaskAgent::prepareNewTask(string taskId, string taskFld, string proc)
 bool TaskAgent::launchContainer(string & contId)
 {
     vector<string> opts {"--workdir", dck_workdir,
-	    "--env", "UID=" + uid,
-	    "--env", "UNAME=" + uname,
-	    "--env", "WDIR=" + dck_workdir};
+            "--env", "UID=" + uid,
+            "--env", "UNAME=" + uname,
+            "--env", "WDIR=" + dck_workdir};
 
     string cmd_line;
     
     if (! dckMng->createContainer(dck_image, opts, dck_mapping,
-				  dck_exe, dck_args,
+                                  dck_exe, dck_args,
                                   containerId, cmd_line)) {
         containerId = "";
-	logger.error("Cannot launch container as follows: ");
-	logger.fatal(cmd_line);
-	return false;
+        logger.error("Cannot launch container as follows: ");
+        logger.fatal(cmd_line);
+        return false;
     }
 
     logger.debug("CMD: " + cmd_line);
@@ -349,19 +349,19 @@ string TaskAgent::inspectContainer(string cntId, bool fullInfo, string filter)
     std::stringstream info;
     info.str(fullInfo ? "" : "'" + filter + "'");
     if (!dckMng->getInfo(cntId, info)) {
-	logger.error("Cannot inspect container with id %s", cntId.c_str());
+        logger.error("Cannot inspect container with id %s", cntId.c_str());
     }
     /*
     bool ok = true;
     int iters = 0;
     do {
-	info.str(fullInfo ? "" : "'" + filter + "'");
-	ok = dckMng->getInfo(cntId, info);
-	if (!ok) { delay(10); ++iters; }
-	if (iters > 10) {
-	    logger.error("Cannot inspect container with id %s", cntId.c_str());
-	    return std::string("");
-	}
+        info.str(fullInfo ? "" : "'" + filter + "'");
+        ok = dckMng->getInfo(cntId, info);
+        if (!ok) { delay(10); ++iters; }
+        if (iters > 10) {
+            logger.error("Cannot inspect container with id %s", cntId.c_str());
+            return std::string("");
+        }
     } while (! ok);
     */
     return info.str();
@@ -379,21 +379,21 @@ std::string TaskAgent::launchNewTask()
     taskQueue.get(nprocessor);
 
     if (! prepareNewTask(ntaskId, ntaskFolder, nprocessor)) {
-	return std::string("");
+        return std::string("");
     }
 
     string contId("");
     if (launchContainer(contId)) {
-	//inspect = inspectContainer(contId);
-	//string statusLowStr(TaskStatusStr[TASK_RUNNING]);
-	//str::toLower(statusLowStr);
-	for (auto & s : vector<string> {"true", taskId, contId,
+        //inspect = inspectContainer(contId);
+        //string statusLowStr(TaskStatusStr[TASK_RUNNING]);
+        //str::toLower(statusLowStr);
+        for (auto & s : vector<string> {"true", taskId, contId,
                                             inspect, "1", "scheduled"}) {
-	    tq->push(std::move(s));
-	}
-	taskId = ntaskId;
-	taskFolder = ntaskFolder;
-	processor = nprocessor;
+            tq->push(std::move(s));
+        }
+        taskId = ntaskId;
+        taskFolder = ntaskFolder;
+        processor = nprocessor;
     }
     return contId;
 }
@@ -421,21 +421,21 @@ void TaskAgent::removeOldContainers()
 
     clock_t now = clock();
     for (auto & p: containersToRemove) {
-	clock_t clk = p.first;
-	if ((now - clk) > tOffset) { containersToRemoveNow.push_back(p.second); }
+        clock_t clk = p.first;
+        if ((now - clk) > tOffset) { containersToRemoveNow.push_back(p.second); }
     }
 
     for (auto & c: containersToRemoveNow) {
-	// remove container
-	if (dckMng->remove(c)) {
-	    logger.debug("Removing container " + c);
-	} else {
-	    logger.warn("Couldn't remove container " + c);
-	}
+        // remove container
+        if (dckMng->remove(c)) {
+            logger.debug("Removing container " + c);
+        } else {
+            logger.warn("Couldn't remove container " + c);
+        }
     }
 
     containersToRemove.erase(containersToRemove.begin(),
-			     containersToRemove.begin() + containersToRemoveNow.size());
+                             containersToRemove.begin() + containersToRemoveNow.size());
 }
 
 //----------------------------------------------------------------------
@@ -455,27 +455,27 @@ void TaskAgent::prepareOutputs()
 
     // Move the outputs to the outbox folder, so they are sent to the archive
     for (auto & f: logFiles) {
-	ProductMeta meta;
-	if (! fns.parse(f, meta)) {
-	    logger.error("Cannot parse file name for product %s", f.c_str());
-	    continue;
-	}
-	if (! ProductLocator::toLocalOutputs(meta, wa)) {
-	    logger.error("Cannot move %s to local outputs folder", f.c_str());
-	}
+        ProductMeta meta;
+        if (! fns.parse(f, meta)) {
+            logger.error("Cannot parse file name for product %s", f.c_str());
+            continue;
+        }
+        if (! ProductLocator::toLocalOutputs(meta, wa)) {
+            logger.error("Cannot move %s to local outputs folder", f.c_str());
+        }
     }
 
     // Move, instead, the output files to the inbox, so they are checked
     // if they trigger a new rule
     for (auto & f: outFiles) {
-	ProductMeta meta;
-	if (! fns.parse(f, meta)) {
-	    logger.error("Cannot parse file name for product %s", f.c_str());
-	    continue;
-	}
-	if (! ProductLocator::toLocalInbox(meta, wa)) {
-	    logger.error("Cannot move %s to local inbox folder", f.c_str());
-	}
+        ProductMeta meta;
+        if (! fns.parse(f, meta)) {
+            logger.error("Cannot parse file name for product %s", f.c_str());
+            continue;
+        }
+        if (! ProductLocator::toLocalInbox(meta, wa)) {
+            logger.error("Cannot move %s to local inbox folder", f.c_str());
+        }
     }
 }
 
@@ -494,40 +494,40 @@ void TaskAgent::monitorTasks()
 
     // Check status of current container
     if (containerId.empty()) {
-	if (taskQueue.empty()) { return; }
+        if (taskQueue.empty()) { return; }
 
-	contId = launchNewTask();
-	if (contId.empty()) {
-	    return;
-	} else {
-	    // Send information of new container
-	    logger.info("New task launched in container: " + contId);
-	    containerId = contId;
-	    containerSpectrum.append(contId, "scheduled");
-	    delay(200);
-	}
+        contId = launchNewTask();
+        if (contId.empty()) {
+            return;
+        } else {
+            // Send information of new container
+            logger.info("New task launched in container: " + contId);
+            containerId = contId;
+            containerSpectrum.append(contId, "scheduled");
+            delay(200);
+        }
     } else {
-	contId = containerId;
+        contId = containerId;
     }
 
     inspect = inspectContainer(contId, false, inspectSelection);
     if (! inspect.empty()) {
-	logger.debug("INSPECT>> " + inspect);
-	json jinspect = json::parse(inspect);
+        logger.debug("INSPECT>> " + inspect);
+        json jinspect = json::parse(inspect);
 
-	string inspStatus = jinspect["State"]["Status"].get<std::string>();
-	int inspCode      = jinspect["State"]["ExitCode"].get<int>();
-	status = stateToTaskStatus(inspStatus, inspCode);
-	string statusLowStr(TaskStatusStr[status]);
-	str::toLower(statusLowStr);
-	logger.debug("         Current status: %s (%s, %d)", 
-		     statusLowStr.c_str(), inspStatus.c_str(), inspCode); 
-	for (auto & s : vector<string> {"false", taskId, contId,
+        string inspStatus = jinspect["State"]["Status"].get<std::string>();
+        int inspCode      = jinspect["State"]["ExitCode"].get<int>();
+        status = stateToTaskStatus(inspStatus, inspCode);
+        string statusLowStr(TaskStatusStr[status]);
+        str::toLower(statusLowStr);
+        logger.debug("         Current status: %s (%s, %d)", 
+                     statusLowStr.c_str(), inspStatus.c_str(), inspCode); 
+        for (auto & s : vector<string> {"false", taskId, contId,
                                             inspect, "1", statusLowStr}) {
-	    tq->push(std::move(s));
-	}
+            tq->push(std::move(s));
+        }
 
-	containerSpectrum.append(contId, statusLowStr);
+        containerSpectrum.append(contId, statusLowStr);
     }
 
     sendSpectrumToMng();
@@ -535,9 +535,9 @@ void TaskAgent::monitorTasks()
     // If finished, set current container to None
     // (TBD: and remove info from internal lists and dicts)
     if (isEnded(status)) {
-	prepareOutputs();
-	scheduleContainerForRemoval();
-	containerId = "";
+        prepareOutputs();
+        scheduleContainerForRemoval();
+        containerId = "";
     }
 }
 
@@ -558,32 +558,32 @@ void TaskAgent::run()
 {
     forever {
 
-	// Check if new task data available
-	if (! iq->empty()) {
-	    // Gather new task info from input queue, and store in internal queue
-	    string itaskId, itaskFolder, iprocessor;
-	    iq->get(itaskId);
-	    iq->get(itaskFolder);
-	    iq->get(iprocessor);
+        // Check if new task data available
+        if (! iq->empty()) {
+            // Gather new task info from input queue, and store in internal queue
+            string itaskId, itaskFolder, iprocessor;
+            iq->get(itaskId);
+            iq->get(itaskFolder);
+            iq->get(iprocessor);
 
-	    logger.debug("New task id queued at Task Agent %s: %s",
-			 id.c_str(), itaskId.c_str());
-	    logger.debug("Execution to be done in work. dir. %s",
-			 itaskFolder.c_str());
-	    logger.debug("Processor to use: %s", iprocessor.c_str());
-	    taskQueue.push(std::move(itaskId));
-	    taskQueue.push(std::move(itaskFolder));
-	    taskQueue.push(std::move(iprocessor));
-	}
+            logger.debug("New task id queued at Task Agent %s: %s",
+                         id.c_str(), itaskId.c_str());
+            logger.debug("Execution to be done in work. dir. %s",
+                         itaskFolder.c_str());
+            logger.debug("Processor to use: %s", iprocessor.c_str());
+            taskQueue.push(std::move(itaskId));
+            taskQueue.push(std::move(itaskFolder));
+            taskQueue.push(std::move(iprocessor));
+        }
 
-	// Monitor running container
-	monitorTasks();
+        // Monitor running container
+        monitorTasks();
 
-	// Remove old containers
-	removeOldContainers();
+        // Remove old containers
+        removeOldContainers();
 
-	// Minor sleep
-	delay(333);
+        // Minor sleep
+        delay(333);
     }
 }
 

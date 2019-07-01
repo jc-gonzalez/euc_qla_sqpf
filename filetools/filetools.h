@@ -85,7 +85,7 @@ namespace FileTools {
     // Method: filesInFolder
     //----------------------------------------------------------------------
     std::vector<std::string> filesInFolder(std::string folder,
-					   std::string ext = std::string(""));
+                                           std::string ext = std::string(""));
     
     //----------------------------------------------------------------------
     // Method: copyfile
@@ -107,8 +107,8 @@ namespace FileTools {
     // Method: fileinfo
     //----------------------------------------------------------------------
     std::tuple<std::string, std::string,
-	std::string, std::string,
-	std::string, std::string> fileinfo(std::string fname);
+        std::string, std::string,
+        std::string, std::string> fileinfo(std::string fname);
 }
 
 #endif // FILETOOLS_H

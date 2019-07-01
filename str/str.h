@@ -133,7 +133,7 @@ inline T strTo(const std::string & s)
 //   The vector with a set of tokens
 //----------------------------------------------------------------------
 std::vector<std::string> &split(const std::string &s, char delim,
-				std::vector<std::string> &elems);
+                                std::vector<std::string> &elems);
 
 //----------------------------------------------------------------------
 // Function: split

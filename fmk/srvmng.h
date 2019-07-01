@@ -74,7 +74,7 @@ public:
     // Constructor
     //----------------------------------------------------------------------
     ServiceMng(WorkArea & _wa,
-	       std::string mngAddr, std::vector<std::string> wrkAddrs);
+               std::string mngAddr, std::vector<std::string> wrkAddrs);
 
     //----------------------------------------------------------------------
     // Method: createService

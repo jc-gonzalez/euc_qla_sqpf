@@ -64,7 +64,7 @@ bool ProductLocator::isRemote = false;
 // Method: toLocalArchive
 //----------------------------------------------------------------------
 bool ProductLocator::toLocalArchive(ProductMeta & m, WorkArea & wa,
-				    ProductLocatorMethod method)
+                                    ProductLocatorMethod method)
 {
     //std::string origPath = m["fileinfo"]["path"];
     std::string origBaseName = m["fileinfo"]["base"];
@@ -72,8 +72,8 @@ bool ProductLocator::toLocalArchive(ProductMeta & m, WorkArea & wa,
     std::string newFile = wa.archive + "/" + origBaseName;
     bool result = relocate(origFile, newFile, method) == 0;
     if (result) {
-	m["fileinfo"]["full"] = newFile;
-	m["fileinfo"]["path"] = wa.archive;
+        m["fileinfo"]["full"] = newFile;
+        m["fileinfo"]["path"] = wa.archive;
     }
     return result;
 }
@@ -82,8 +82,8 @@ bool ProductLocator::toLocalArchive(ProductMeta & m, WorkArea & wa,
 // Method: toTaskInput
 //----------------------------------------------------------------------
 bool ProductLocator::toTaskInput(ProductMeta & m, WorkArea & wa,
-				 std::string & taskId,
-				 ProductLocatorMethod method)
+                                 std::string & taskId,
+                                 ProductLocatorMethod method)
 {
     std::string origBaseName = m["fileinfo"]["base"];
     std::string origFile = m["fileinfo"]["full"];
@@ -91,8 +91,8 @@ bool ProductLocator::toTaskInput(ProductMeta & m, WorkArea & wa,
     std::string newFile = newPath + "/" + origBaseName;
     bool result = relocate(origFile, newFile, method) == 0;
     if (result) {
-	m["fileinfo"]["full"] = newFile;
-	m["fileinfo"]["path"] = newPath;
+        m["fileinfo"]["full"] = newFile;
+        m["fileinfo"]["path"] = newPath;
     }
     return result;
 }
@@ -101,15 +101,15 @@ bool ProductLocator::toTaskInput(ProductMeta & m, WorkArea & wa,
 // Method: toLocalOutputs
 //----------------------------------------------------------------------
 bool ProductLocator::toLocalOutputs(ProductMeta & m, WorkArea & wa,
-				    ProductLocatorMethod method)
+                                    ProductLocatorMethod method)
 {
     std::string origBaseName = m["fileinfo"]["base"];
     std::string origFile = m["fileinfo"]["full"];
     std::string newFile = wa.localOutputs + "/" + origBaseName;
     bool result = relocate(origFile, newFile, method) == 0;
     if (result) {
-	m["fileinfo"]["full"] = newFile;
-	m["fileinfo"]["path"] = wa.localOutputs;
+        m["fileinfo"]["full"] = newFile;
+        m["fileinfo"]["path"] = wa.localOutputs;
     }
     return result;
 }
@@ -118,15 +118,15 @@ bool ProductLocator::toLocalOutputs(ProductMeta & m, WorkArea & wa,
 // Method: toLocalInbox
 //----------------------------------------------------------------------
 bool ProductLocator::toLocalInbox(ProductMeta & m, WorkArea & wa,
-				  ProductLocatorMethod method)
+                                  ProductLocatorMethod method)
 {
     std::string origBaseName = m["fileinfo"]["base"];
     std::string origFile = m["fileinfo"]["full"];
     std::string newFile = wa.localInbox + "/" + origBaseName;
     bool result = relocate(origFile, newFile, method) == 0;
     if (result) {
-	m["fileinfo"]["full"] = newFile;
-	m["fileinfo"]["path"] = wa.localInbox;
+        m["fileinfo"]["full"] = newFile;
+        m["fileinfo"]["path"] = wa.localInbox;
     }
     return result;
 }
@@ -135,8 +135,8 @@ bool ProductLocator::toLocalInbox(ProductMeta & m, WorkArea & wa,
 // Method: sendToVOSpace
 //----------------------------------------------------------------------
 bool ProductLocator::sendToVOSpace(std::string user, std::string pwd,
-				   std::string vosURL, std::string folder,
-				   std::string oFile)
+                                   std::string vosURL, std::string folder,
+                                   std::string oFile)
 {
     VOSpaceHandler vos(new RWC, vosURL);
     vos.setAuth(user, pwd);
@@ -151,7 +151,7 @@ bool ProductLocator::sendToVOSpace(std::string user, std::string pwd,
 // Method: relocate
 //----------------------------------------------------------------------
 int ProductLocator::relocate(std::string & sFrom, std::string & sTo,
-			     ProductLocatorMethod method, int msTimeOut)
+                             ProductLocatorMethod method, int msTimeOut)
 {
     // Wait for the file to appear
     if (msTimeOut != 0) {
@@ -193,7 +193,7 @@ int ProductLocator::relocate(std::string & sFrom, std::string & sTo,
     case MOVE:
         retVal = rename(sFrom.c_str(), sTo.c_str());
         TRC("MOVE: Moving file from " << sFrom << " to " << sTo
-	    << "   retVal=" << retVal);
+            << "   retVal=" << retVal);
         if (retVal != 0) {
             TRC("MOVE: errno=" << errno << "  (EXDEV:" << EXDEV
                 << ",EEXIST:" << EEXIST << ")");
@@ -233,7 +233,7 @@ int ProductLocator::relocate(std::string & sFrom, std::string & sTo,
         perror(("ERROR (" + std::to_string(retVal) + "/" + std::to_string(errno) +
                 ") relocating product:\n\t" +
                 sFrom + std::string(" => ") + sTo).c_str());
-	abort();
+        abort();
         //showBacktrace();
     }
     return retVal;

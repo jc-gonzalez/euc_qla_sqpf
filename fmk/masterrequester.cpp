@@ -75,7 +75,7 @@ void MasterRequester::setServerUrl(string srvUrl)
 // Sets the server URL
 //----------------------------------------------------------------------
 bool MasterRequester::requestData(string route, string & resp,
-				  string contentType)
+                                  string contentType)
 {
     // rwcHdl->setAuth(user, pwd);
     std::string downloadUrl = serverUrl + route;
@@ -89,7 +89,7 @@ bool MasterRequester::requestData(string route, string & resp,
 // Uses POST to send a file to a server
 //----------------------------------------------------------------------
 bool MasterRequester::postFile(string route, string fileName,
-			       string contentType)
+                               string contentType)
 {
     string baseName = str::getBaseName(fileName);
     

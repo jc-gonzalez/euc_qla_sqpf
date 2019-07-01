@@ -266,30 +266,30 @@ public:
     // Stores the state of a node in the database
     //----------------------------------------------------------------------
     bool storeNodeState(std::string node,
-			std::string new_state);
+                        std::string new_state);
     
     //----------------------------------------------------------------------
     // Method: retrieveNodeState
     // Retrieves the state of a node from the database
     //----------------------------------------------------------------------
     bool retrieveNodeState(std::string node,
-			   std::string & state);
+                           std::string & state);
 
     //----------------------------------------------------------------------
     // Method: storeVar
     // Stores a variable in the database
     //----------------------------------------------------------------------
     bool storeVar(std::string var,
-		  std::string filter,
-		  std::string new_value);
+                  std::string filter,
+                  std::string new_value);
     
     //----------------------------------------------------------------------
     // Method: retrieveVar
     // Retrieves the value of a var from the database
     //----------------------------------------------------------------------
     bool retrieveVar(std::string var,
-		     std::string filter,
-		     std::string & value);
+                     std::string filter,
+                     std::string & value);
     
 private:
 

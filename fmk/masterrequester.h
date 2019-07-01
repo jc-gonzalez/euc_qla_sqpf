@@ -89,14 +89,14 @@ public:
     // Sets the server URL
     //----------------------------------------------------------------------
     bool requestData(string srvUrl, string & resp,
-		     string contentType = string("application/octet-stream"));
+                     string contentType = string("application/octet-stream"));
 
     //----------------------------------------------------------------------
     // Method: postFile
     // Sets the server URL
     //----------------------------------------------------------------------
     bool postFile(string route, string fileName,
-		  string contentType = string("application/octet-stream"));
+                  string contentType = string("application/octet-stream"));
 
 private:
     string serverUrl;

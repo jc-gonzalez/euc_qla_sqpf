@@ -66,11 +66,11 @@ FileNameSpec::~FileNameSpec()
 bool FileNameSpec::parse(string & fullFileName, ProductMeta & meta)
 {
     static const int
-	Mission = 1,
-	ProcFunc = 2,
-	Instance = 3,
-	Date = 4,
-	Version = 5;
+        Mission = 1,
+        ProcFunc = 2,
+        Instance = 3,
+        Date = 4,
+        Version = 5;
     
     // Get basic path, name, etc. info
     // For a file like /this/is/a/dir/myfile.1.0.0.fits
@@ -82,7 +82,7 @@ bool FileNameSpec::parse(string & fullFileName, ProductMeta & meta)
     // ext    => fits
     string dname, bname, name, suffix, sname, ext;
     std::tie(dname, bname, name,
-	     suffix, sname, ext) = FileTools::fileinfo(fullFileName);
+             suffix, sname, ext) = FileTools::fileinfo(fullFileName);
 
     meta["id"] = bname;
     dict fs;
@@ -132,7 +132,7 @@ bool FileNameSpec::parse(string & fullFileName, ProductMeta & meta)
     meta["exists"] = fileExists ? "yes" : "no";
     meta["size"] = FileTools::fileSize(fullFileName);
     if (fileExists) {
-	retrieveInternalMetadata(fullFileName, meta);
+        retrieveInternalMetadata(fullFileName, meta);
     }
 
     return true;
@@ -230,27 +230,27 @@ void FileNameSpec::parseInstance(string inst, ProductMeta & meta)
     string creator, expo, obsm, obsid;
     
     for (auto & token: insTokens) {
-	if (token.length() == 1) {
-	    if (SpectralBands.find(token) != string::npos) {
-		meta["spectral_band"] = token;
-	    } else if (str::isDigits(token)) {
-		expo = token;
-		meta["exposure"] = stoi(expo);
-	    } else {
-		obsm = token;
-		meta["obs_mode"] = obsm;
-	    }
-	} else if (str::isDigits(token)) {
-	    obsid = token;
-	    meta["obs_id"] = obsid;
-	} else if (Creators.find("-" + token + "-") != string::npos) {
-	    creator = token;
-	    meta["creator"] = creator;
-	} else if (DataTypes.find("-" + token + "-") != string::npos) {
-	    meta["data_type"] = token;
-	} else {
-	    additional.push_back(token);
-	}
+        if (token.length() == 1) {
+            if (SpectralBands.find(token) != string::npos) {
+                meta["spectral_band"] = token;
+            } else if (str::isDigits(token)) {
+                expo = token;
+                meta["exposure"] = stoi(expo);
+            } else {
+                obsm = token;
+                meta["obs_mode"] = obsm;
+            }
+        } else if (str::isDigits(token)) {
+            obsid = token;
+            meta["obs_id"] = obsid;
+        } else if (Creators.find("-" + token + "-") != string::npos) {
+            creator = token;
+            meta["creator"] = creator;
+        } else if (DataTypes.find("-" + token + "-") != string::npos) {
+            meta["data_type"] = token;
+        } else {
+            additional.push_back(token);
+        }
     }
     
     meta["additional"] = str::join(additional, "-");
@@ -269,23 +269,23 @@ void FileNameSpec::parseInstance(string inst, ProductMeta & meta)
 void FileNameSpec::retrieveInternalMetadata(string fileName, ProductMeta & meta)
 {
     if (meta["format"] == "FITS") {
-	FitsMetadataReader fitsMD(fileName);
-	string hdrMetaData;
-	if (fitsMD.getMetadataInfoStr(hdrMetaData)) {
-	    meta["meta"] = hdrMetaData;
-	} else {
-	    meta["meta"] = "<none>";
-	}
+        FitsMetadataReader fitsMD(fileName);
+        string hdrMetaData;
+        if (fitsMD.getMetadataInfoStr(hdrMetaData)) {
+            meta["meta"] = hdrMetaData;
+        } else {
+            meta["meta"] = "<none>";
+        }
     }
 }
 
 const string FileNameSpec::BnameRe("([A-Z]{3,3})_"              // mission
-				   "([A-Z0-9]{3,3})_"           // procfunc
-				   "([^_]+)_"                   // instance
-				   "(20[0-9]+T[\\.0-9]+Z)"      // date
-				   "_*(([0-9]+\\.[0-9]+)*)");   // version
+                                   "([A-Z0-9]{3,3})_"           // procfunc
+                                   "([^_]+)_"                   // instance
+                                   "(20[0-9]+T[\\.0-9]+Z)"      // date
+                                   "_*(([0-9]+\\.[0-9]+)*)");   // version
 const string FileNameSpec::SpectralBands("UBVRIJHKLMNQGZY");
 const string FileNameSpec::Creators("-NIR-SIR-VIS-");
 const string FileNameSpec::DataTypes("-CAT-TRANS-STACK-MASK-MAP-"
-				     "PSF-SPE1D-MAP2DCOR-TIPS-");
+                                     "PSF-SPE1D-MAP2DCOR-TIPS-");
 

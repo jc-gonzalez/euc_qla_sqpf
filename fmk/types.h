@@ -253,11 +253,11 @@ struct AgentData {
     AgentSpectrum spectrum;
 
     string str() {
-	return ("\"num_tasks\": " + std::to_string(num_tasks) + ", " +
-		"\"task_id\": \"" + task_id + "\", " +
-		"\"cont_id\": \"" + cont_id + "\", " +
-		"\"cont_status\": \"" + TaskStatusStr[cont_status] + "\", " +
-		"\"spectrum\": " + agentSpectrumToStr(spectrum) + "}");
+        return ("\"num_tasks\": " + std::to_string(num_tasks) + ", " +
+                "\"task_id\": \"" + task_id + "\", " +
+                "\"cont_id\": \"" + cont_id + "\", " +
+                "\"cont_status\": \"" + TaskStatusStr[cont_status] + "\", " +
+                "\"spectrum\": " + agentSpectrumToStr(spectrum) + "}");
     }
 };
 
@@ -271,21 +271,21 @@ struct AgentsInfo {
     AgentTasks agent_num_tasks;
 
     string str() {
-	string s1("");
-	string s2("");
-	string s3("");
-	int n = agent_names.size();
-	for (int i = 0; i < n; ++i) {
-	    string comma((i < (n-1)) ? ", " : "");
-	    string const & agName = agent_names.at(i);
-	    auto const & agit = agents.find(agName);
-	    s1 += "\"" + agName + "\": " + agit->second.str() + comma;
-	    s2 += "\"" + agName + "\"" + comma;
-	    s3 += std::to_string(agent_num_tasks.at(i)) + comma;
-	}
-	return ("{\"agents\": {" + s1 + "}, " +
-		"\"agent_names\": [" + s2 + "], " +
-		"\"agent_num_tasks\": [" + s3 + "]}");		
+        string s1("");
+        string s2("");
+        string s3("");
+        int n = agent_names.size();
+        for (int i = 0; i < n; ++i) {
+            string comma((i < (n-1)) ? ", " : "");
+            string const & agName = agent_names.at(i);
+            auto const & agit = agents.find(agName);
+            s1 += "\"" + agName + "\": " + agit->second.str() + comma;
+            s2 += "\"" + agName + "\"" + comma;
+            s3 += std::to_string(agent_num_tasks.at(i)) + comma;
+        }
+        return ("{\"agents\": {" + s1 + "}, " +
+                "\"agent_names\": [" + s2 + "], " +
+                "\"agent_num_tasks\": [" + s3 + "]}");                
     }
 };
 

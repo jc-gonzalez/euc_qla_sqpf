@@ -76,7 +76,7 @@ public:
     // Method: TaskAgent
     //----------------------------------------------------------------------
     TaskAgent(WorkArea _wa, string _ident,
-	      Queue<string> * _iq, Queue<string> * _oq, Queue<string> * _tq,
+              Queue<string> * _iq, Queue<string> * _oq, Queue<string> * _tq,
               bool _isCommander);
 
     //----------------------------------------------------------------------
@@ -152,7 +152,7 @@ private:
     // Method: inspectContainer
     //----------------------------------------------------------------------
     string inspectContainer(string cntId, bool fullInfo = true,
-			    string filter = string(""));
+                            string filter = string(""));
     
     //----------------------------------------------------------------------
     // Method: launchNewTask
