@@ -287,7 +287,7 @@ bool TaskAgent::prepareNewTask(string taskId, string taskFld, string proc)
     pcfg["input"]  = p_input;
     pcfg["output"] = p_output;
     pcfg["log"]    = p_log;
-    logger.debug(">>> " + pcfg.dump());
+    //logger.debug(">>> " + pcfg.dump());
 
     for (auto & kv: pcfg.items()) {
         p_args = str::replaceAll(p_args, "{" + kv.key() + "}", kv.value().get<std::string>());
@@ -412,8 +412,6 @@ void TaskAgent::removeOldContainers()
     vector<string> containersToRemoveNow;
 
     hires_time now = timeNow();
-    logger.debug("Removing containers older than %lf ms",
-                 minElapsedMsec);
     for (auto & p: containersToRemove) {
         hires_time clk = p.first;
         if (elapsed_ms(now, clk) > minElapsedMsec) {
@@ -509,7 +507,7 @@ void TaskAgent::monitorTasks()
 
     inspect = inspectContainer(contId, false, inspectSelection);
     if (! inspect.empty()) {
-        logger.debug("INSPECT>> " + inspect);
+        //logger.debug("INSPECT>> " + inspect);
         json jinspect = json::parse(inspect);
 
         string inspStatus = jinspect["State"]["Status"].get<std::string>();

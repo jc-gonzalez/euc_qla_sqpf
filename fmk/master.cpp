@@ -52,7 +52,6 @@
 #include "filetools.h"
 #include "fnamespec.h"
 #include "prodloc.h"
-#include "fmt.h"
 
 //----------------------------------------------------------------------
 // Constructor
@@ -409,18 +408,45 @@ void Master::archiveOutputs()
 
 //----------------------------------------------------------------------
 // Method: transferRemoteLocalArchiveToCommander
-//
+// Transfer (POST) outputs to server/outputs end of commander server
 //----------------------------------------------------------------------
 void Master::transferRemoteLocalArchiveToCommander()
 {
+    Queue<string> archProducts;
+    for (auto & s: FileTools::filesInFolder(wa.archive)) {
+        string prod(s);
+        archProducts.push(std::move(prod));
+    }
+    transferFilesToCommander(archProducts, "/outputs");
 }
 
 //----------------------------------------------------------------------
 // Method: transferOutputsToCommander
-//
+// Transfer (POST) outputs to server/outputs end of commander server
 //----------------------------------------------------------------------
 void Master::transferOutputsToCommander()
 {
+    transferFilesToCommander(outputProducts, "/outputs");
+}
+
+//----------------------------------------------------------------------
+// Method: transferFilesToCommander
+// Transfer (POST) outputs to server/XXX end of commander server
+//----------------------------------------------------------------------
+void Master::transferFilesToCommander(Queue<string> & prodQueue,
+                                      string route)
+{
+    ProductName prod;
+    while (prodQueue.get(prod)) {
+        httpRqstr->setServerUrl(net->commanderUrl);
+        if (!httpRqstr->postFile(route, prod,
+                                 "application/octet-stream")) {
+            logger.error("Cannot send file " + prod + " to " + net->commander);
+            continue;
+        } 
+        logger.info("Transfer of product " + prod + " for archival");
+        unlink(prod.c_str());
+    }
 }
 
 //----------------------------------------------------------------------

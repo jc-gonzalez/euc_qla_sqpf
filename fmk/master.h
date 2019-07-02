@@ -164,15 +164,22 @@ private:
     void archiveOutputs();
 
     //----------------------------------------------------------------------
+    // Method: transferRemoteLocalArchiveToCommander
+    //----------------------------------------------------------------------
+    void transferRemoteLocalArchiveToCommander();
+
+    //----------------------------------------------------------------------
     // Method: transferOutputsToCommander
     //----------------------------------------------------------------------
     void transferOutputsToCommander();
 
     //----------------------------------------------------------------------
-    // Method: transferRemoteLocalArchiveToCommander
+    // Method: transferFilesToCommander
+    // Transfer (POST) outputs to server/XXX end of commander server
     //----------------------------------------------------------------------
-    void transferRemoteLocalArchiveToCommander();
-
+    void transferFilesToCommander(Queue<string> & prodQueue,
+                                  string route = string("/outputs"));
+    
     //----------------------------------------------------------------------
     // Method: gatherNodesInfo
     //----------------------------------------------------------------------

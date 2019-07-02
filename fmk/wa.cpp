@@ -100,29 +100,19 @@ WorkArea::~WorkArea()
 //----------------------------------------------------------------------
 void WorkArea::dump()
 {
-    std::cerr
-    << "wa ...............:" << wa  << '\n'
-
-    << "procArea ...............:" << procArea  << '\n'
-
-    << "localInbox ...............:" << localInbox  << '\n'
-    << "localOutputs ...............:" << localOutputs  << '\n'
-
-    << "archive ...............:" << archive  << '\n'
-
-    << "reproc ...............:" << reproc  << '\n'
-
-    << "serverBase ...............:" << serverBase  << '\n'
-
-    << "remoteOutputs ...............:" << remoteOutputs  << '\n'
-    << "remoteInbox ...............:" << remoteInbox  << '\n'
-
-    << "run ...............:" << run  << '\n'
-    << "runTools ...............:" << runTools  << '\n'
-
-    << "sessionId ...............:" << sessionId  << '\n'
-
-    << "sessionDir ...............:" << sessionDir  << '\n'
-    << "tasks ...............:" << tasks  << '\n'
-    << "logs ...............:" << logs  << '\n';
+    std::cerr << "wa ...............:" << wa  << '\n'
+              << "procArea .........:" << procArea  << '\n'
+              << "localInbox .......:" << localInbox  << '\n'
+              << "localOutputs .....:" << localOutputs  << '\n'
+              << "archive ..........:" << archive  << '\n'
+              << "reproc ...........:" << reproc  << '\n'
+              << "serverBase .......:" << serverBase  << '\n'
+              << "remoteOutputs ....:" << remoteOutputs  << '\n'
+              << "remoteInbox ......:" << remoteInbox  << '\n'
+              << "run ..............:" << run  << '\n'
+              << "runTools .........:" << runTools  << '\n'
+              << "sessionId ........:" << sessionId  << '\n'
+              << "sessionDir .......:" << sessionDir  << '\n'
+              << "tasks ............:" << tasks  << '\n'
+              << "logs .............:" << logs  << '\n';
 }

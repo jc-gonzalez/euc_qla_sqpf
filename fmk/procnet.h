@@ -83,6 +83,7 @@ public:
 
     string thisNode;
     string commander;
+    string commanderUrl;
 
     bool thisIsCommander;
 

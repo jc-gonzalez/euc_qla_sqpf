@@ -85,6 +85,49 @@ void TaskManager::setDirectoryWatchers()
 }
 
 //----------------------------------------------------------------------
+// Method: getNewEntries
+//----------------------------------------------------------------------
+bool TaskManager::getNewEntries()
+{
+    bool weHaveNewEntries = false;
+    DirWatcher * dw;
+    Queue<string> q;
+    for (DirWatchedAndQueue grp : dirWatchers) {
+        DirWatcher * dw = std::get<0>(grp);
+        Queue<string> & q = std::get<1>(grp);
+        weHaveNewEntries |= getNewEntriesFromDirWatcher(dw, q);
+    }
+    return weHaveNewEntries;
+}
+
+//----------------------------------------------------------------------
+// Method: getNewEntriesFromDirWatcher
+//----------------------------------------------------------------------
+bool TaskManager::getNewEntriesFromDirWatcher(DirWatcher * dw, Queue<string> & q)
+{
+    DirWatcher::DirWatchEvent e;
+
+    // Process new events, at most 5 per iteration
+    int numMaxEventsPerIter = 5;
+    int numEvents = 0;
+    while ((dw->nextEvent(e)) && (numEvents < numMaxEventsPerIter)) {
+        logger.info("New DirWatchEvent: " + e.path + "/" + e.name
+                + (e.isDir ? " DIR " : " ") + std::to_string(e.mask));
+
+        // Process only files
+        // TODO: Process directories that appear at inbox
+        if (! e.isDir) {
+            // Build full file name and add it to the queue
+            // q.push(std::string(e.path) + "/" +
+            //            std::string(e.name));
+            q.push(fmt("$/$", e.path, e.name));
+            ++numEvents;
+        }
+    }
+    return (numEvents > 0);
+}
+
+//----------------------------------------------------------------------
 // Method: createAgent
 //----------------------------------------------------------------------
 void TaskManager::createAgent(string id, WorkArea wa,
@@ -104,7 +147,7 @@ void TaskManager::createAgents()
     vector<string> & thisNodeAgentNames = net.nodeAgents[id];
     numOfAgents = net.nodeNumOfAgents[thisNodeNum];
 
-    logger.info("Creating processing %d agents for node %s. . .",
+    logger.info("Creating %d processing agents for node %s. . .",
                 numOfAgents, id.c_str());
 
      json agentData = {{"num_tasks", 0},
@@ -344,6 +387,9 @@ void TaskManager::schedule(ProductMeta & meta, string & processor)
 //----------------------------------------------------------------------
 void TaskManager::retrieveOutputs(Queue<string> & outputs)
 {
+    // Get new entries from Directory Watchers, and process them
+    getNewEntries();
+    
     ProductName prod;
     while (outboxProdQueue.get(prod)) {
         logger.debug("Registered output files: " + prod);

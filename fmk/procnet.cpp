@@ -62,8 +62,10 @@ ProcessingNetwork::ProcessingNetwork(Config & _cfg, string & _name, int _bMode)
         if (name != commander) { nodesButComm.push_back(name); }
         nodeAddress.push_back(xo["address"]);
         nodePort.push_back(xo["port"].get<int>());
-        nodeServerUrl.push_back("http://" + xo["address"].get<std::string>() +
+        string url("http://" + xo["address"].get<std::string>() +
                                 ":" + std::to_string(xo["port"].get<int>()));
+        nodeServerUrl.push_back(url);
+        if (name == commander) { commanderUrl = url; }
         nodeNumOfAgents.push_back(xo["agents"].get<int>());
     }
     numOfNodes = nodeName.size();
