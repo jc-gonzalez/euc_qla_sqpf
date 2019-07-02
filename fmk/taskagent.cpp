@@ -392,8 +392,10 @@ std::string TaskAgent::launchNewTask()
 //----------------------------------------------------------------------
 void TaskAgent::scheduleContainerForRemoval()
 {
-    containersToRemove.push_back(std::make_pair(clock(), containerId));
-    logger.debug("Scheduling container %s for removal", containerId.c_str());
+    hires_time now = timeNow();
+    containersToRemove.push_back(std::make_pair(now, containerId));
+    logger.debug("Scheduling container %s for removal",
+                 containerId.c_str());
 }
 
 //----------------------------------------------------------------------
@@ -402,14 +404,21 @@ void TaskAgent::scheduleContainerForRemoval()
 //----------------------------------------------------------------------
 void TaskAgent::removeOldContainers()
 {
-    static const clock_t tOffset = 5 * CLOCKS_PER_SEC; // 5 seconds
+    static const double minElapsedMsec = 5000.; // 5 seconds
+    static auto  elapsed_ms =
+        [](hires_time x, hires_time ref) {
+            return duration_cast<milliseconds>(x - ref).count(); };
 
     vector<string> containersToRemoveNow;
 
-    clock_t now = clock();
+    hires_time now = timeNow();
+    logger.debug("Removing containers older than %lf ms",
+                 minElapsedMsec);
     for (auto & p: containersToRemove) {
-        clock_t clk = p.first;
-        if ((now - clk) > tOffset) { containersToRemoveNow.push_back(p.second); }
+        hires_time clk = p.first;
+        if (elapsed_ms(now, clk) > minElapsedMsec) {
+            containersToRemoveNow.push_back(p.second);
+        }
     }
 
     for (auto & c: containersToRemoveNow) {
@@ -422,7 +431,8 @@ void TaskAgent::removeOldContainers()
     }
 
     containersToRemove.erase(containersToRemove.begin(),
-                             containersToRemove.begin() + containersToRemoveNow.size());
+                             containersToRemove.begin()
+                             + containersToRemoveNow.size());
 }
 
 //----------------------------------------------------------------------
@@ -522,6 +532,7 @@ void TaskAgent::monitorTasks()
     // If finished, set current container to None
     // (TBD: and remove info from internal lists and dicts)
     if (isEnded(status)) {
+        logger.debug("!!!!!!!!!!!!!!!! ENDED !!!!!!!!!!!!!!");
         prepareOutputs();
         scheduleContainerForRemoval();
         containerId = "";
@@ -535,6 +546,15 @@ void TaskAgent::monitorTasks()
 void TaskAgent::delay(int ms)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(ms));
+}
+
+//----------------------------------------------------------------------
+// Method: timeNow
+// Returns a high resolution clock time stamp
+//----------------------------------------------------------------------
+TaskAgent::hires_time TaskAgent::timeNow()
+{
+    return high_resolution_clock::now();
 }
 
 //----------------------------------------------------------------------

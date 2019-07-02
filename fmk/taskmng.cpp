@@ -267,9 +267,12 @@ void TaskManager::updateContainer(string & agName, string contId,
     } else {
         count = agInfoSpec[storedContStatusLowStr].get<int>();
         agInfoSpec[storedContStatusLowStr] = count - 1;
-        logger.debug("Container %s changed from %s to %s",
-                     contId.c_str(), storedContStatus.str().c_str(),
-                     contStatus.str().c_str());
+        logger.debug("Container %s changed from (%d)%s to (%d)%s",
+                     contId.c_str(),
+                     storedStatusVal,
+                     storedContStatus.str().c_str(),
+                     int(contStatus),
+                     contStatus.lstr().c_str());
     }
     
     agentsContainer[agName] = std::make_tuple(contId, int(contStatus));
@@ -295,9 +298,9 @@ void TaskManager::updateTasksInfo(DataManager & datmng)
             tq->get(inspect);
             tq->get(percent);
             tq->get(status);
-            std::string statusLowStr = TaskStatusDowncaseVal(status);
-            updateContainer(agName, contId, statusLowStr);
-            datmng.storeTaskInfo(taskId, TstatusLowStr,
+            int statusVal = TaskStatusDowncaseVal(status);
+            updateContainer(agName, contId, statusVal);
+            datmng.storeTaskInfo(taskId, statusVal,
                                  inspect, justCreated == "true");
         }
     }

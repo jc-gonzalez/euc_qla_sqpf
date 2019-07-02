@@ -50,6 +50,8 @@
 //   - iostream
 //------------------------------------------------------------
 #include <ctime>
+#include <chrono>
+using namespace std::chrono;
 
 //------------------------------------------------------------
 // Topic: External packages
@@ -71,6 +73,8 @@
 //==========================================================================
 class TaskAgent {
 
+    typedef high_resolution_clock::time_point   hires_time;
+    
 public:
     //----------------------------------------------------------------------
     // Method: TaskAgent
@@ -185,6 +189,12 @@ private:
     //----------------------------------------------------------------------
     void delay(int ms);
     
+    //----------------------------------------------------------------------
+    // Method: timeNow
+    // Returns a high resolution clock time stamp
+    //----------------------------------------------------------------------
+    hires_time timeNow();
+    
 private:
     string id;
     WorkArea wa;
@@ -208,7 +218,7 @@ private:
     string uid;
     string uname;
     
-    vector< pair<clock_t, string> > containersToRemove;
+    vector< pair<hires_time, string> > containersToRemove;
     
     std::shared_ptr<ContainerMng> dckMng;
 
