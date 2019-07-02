@@ -115,10 +115,10 @@ public:
     
     const HttpRespPtr render_POST(const http_request&rqst) {
         std::vector<std::string> pathItems = rqst.get_path_pieces();
-        // std::cerr << rqst.content_too_large() << '\n';
-        // std::cerr << rqst << "\n\n";
-        // for (auto & p : pathItems) { std::cerr << p << " | "; }
-        // std::cerr << '\n';
+        //std::cerr << rqst.content_too_large() << '\n';
+        //std::cerr << rqst << "\n\n";
+        //for (auto & p : pathItems) { std::cerr << p << " | "; }
+        //std::cerr << '\n';
 
         // Save content to local file in server folder
         string fullFileName = wa->serverBase + rqst.get_path();
@@ -127,12 +127,7 @@ public:
         fout.close();
         system(("ls -l " + fullFileName).c_str());
         // Move created file to local inbox
-        string newFullFileName;
-        if (pathItems.at(0) == "inbox") {
-            newFullFileName = wa->localInbox + "/" + pathItems.at(1);
-        } else {
-            newFullFileName = wa->archive + "/" + pathItems.at(1);
-        }
+        string newFullFileName = wa->localInbox + "/" + pathItems.at(1);
         int res = ProductLocator::relocate(fullFileName, newFullFileName,
                                            ProductLocator::MOVE);
         
@@ -189,7 +184,6 @@ void MasterServer::run()
     RscPostReceiver rscPostRcv;
     rscPostRcv.setWorkArea(&wa);
     addRoute(ws, "/inbox/{prod}", &rscPostRcv);
-    addRoute(ws, "/outputs/{prod}", &rscPostRcv);
 
     ws.start(true);
 }

@@ -334,8 +334,6 @@ bool TaskAgent::launchContainer(string & contId)
         return false;
     }
 
-    logger.debug("CMD: " + cmd_line);
-
     contId = containerId;
     return true;
 }
@@ -515,8 +513,8 @@ void TaskAgent::monitorTasks()
         status = stateToTaskStatus(inspStatus, inspCode);
         string statusLowStr(TaskStatusStr[status]);
         str::toLower(statusLowStr);
-        logger.debug("         Current status: %s (%s, %d)", 
-                     statusLowStr.c_str(), inspStatus.c_str(), inspCode); 
+        //logger.debug("         Current status: %s (%s, %d)", 
+        //             statusLowStr.c_str(), inspStatus.c_str(), inspCode); 
         for (auto & s : vector<string> {"false", taskId, contId,
                                             inspect, "1", statusLowStr}) {
             tq->push(std::move(s));
@@ -530,7 +528,7 @@ void TaskAgent::monitorTasks()
     // If finished, set current container to None
     // (TBD: and remove info from internal lists and dicts)
     if (isEnded(status)) {
-        logger.debug("!!!!!!!!!!!!!!!! ENDED !!!!!!!!!!!!!!");
+        //logger.debug("!!!!!!!!!!!!!!!! ENDED !!!!!!!!!!!!!!");
         prepareOutputs();
         scheduleContainerForRemoval();
         containerId = "";

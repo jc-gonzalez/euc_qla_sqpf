@@ -73,7 +73,7 @@ Master::Master(string _cfg, string _id, int _port, string _wa, int _bMode)
         logger.fatal("Cannot open config. file '" + cfgFileName + "'. Exiting.");
     }
     cfg = jFile.getData();
-    logger.debug(cfg.dump());
+    //logger.debug(cfg.dump());
 
     cfg["general"]["workArea"] = workArea;
 
@@ -308,7 +308,7 @@ void Master::distributeProducts()
             json jloads = nodeStatus[i]["machine"]["load"];
             std::stringstream ss;
             ss << "LOADS: " << jloads;
-            logger.debug(ss.str());
+            //logger.debug(ss.str());
             loads[i] = jloads[0].get<double>();
         }
     }
@@ -365,7 +365,6 @@ void Master::scheduleProductsForProcessing()
             continue;
         }
         logger.info("Product '" + prod + "' will be processed");
-        //logger.debug("Meta: " + meta.dump());
 
         if (!ProductLocator::toLocalArchive(meta, wa)) {
             logger.error("Move (link) to archive of %s failed", prod.c_str());
@@ -468,7 +467,7 @@ void Master::gatherNodesInfo()
             nodeStatus.push_back(json{-1});
             continue;
         }
-        logger.debug("Response from %s: %s", node.c_str(), resp.c_str());
+        //logger.debug("Response from %s: %s", node.c_str(), resp.c_str());
         json respObj;
         try {
             respObj = json::parse(resp);

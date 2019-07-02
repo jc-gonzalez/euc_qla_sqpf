@@ -315,7 +315,7 @@ void TaskManager::updateContainer(string & agName, string contId,
     } else {
         count = agInfoSpec[storedContStatusLowStr].get<int>();
         agInfoSpec[storedContStatusLowStr] = count - 1;
-        logger.debug("Container %s changed from (%d)%s to (%d)%s",
+        logger.debug("Container %s changed from (%d) %s to (%d) %s",
                      contId.c_str(),
                      storedStatusVal,
                      storedContStatus.str().c_str(),

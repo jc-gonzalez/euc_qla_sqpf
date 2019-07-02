@@ -54,7 +54,14 @@
 #include <cstring>
 #include <libgen.h>
 
-#define TRC(s)  std::cerr << s << '\n'
+#define TRACES
+#undef  TRACES
+
+#ifdef TRACES
+#  define TRC(s)  std::cerr << s << '\n'
+#else
+#  define TRC(s)
+#endif
 
 std::string ProductLocator::master_address;
 std::string ProductLocator::remote_address;

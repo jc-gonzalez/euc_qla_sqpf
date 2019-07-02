@@ -73,8 +73,8 @@ void ContainerSpectrum::append(string cont, string status)
     if (! cnts.find(cont)) {
         string oldCont = cnts.put(string(cont));
         if (!oldCont.empty()) {
-            std::cerr << "Appending " << cont
-                      << ", returned " << oldCont << '\n';
+            //std::cerr << "Appending " << cont
+            //          << ", returned " << oldCont << '\n';
             auto cntIt = cntStatus.find(oldCont);
             string oldStatus = cntIt->second;
             savedSpec[oldStatus] = savedSpec[oldStatus] + 1;
