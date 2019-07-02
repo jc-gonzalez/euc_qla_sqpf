@@ -134,3 +134,13 @@ string agentSpectrumToStr(AgentSpectrum & sp) {
        << "\"stopped\": " << sp["stopped"] << "}";
     return ss.str();
 }
+
+//======================================================================
+// fmt
+//======================================================================
+
+std::string fmt(const char *format) {
+    return format ? format : "";
+}
+
+// usage: std::cout << fmt("Hello, $, this is the $-th test.", "JC", 12) << std::endl;

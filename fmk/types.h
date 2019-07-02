@@ -50,10 +50,10 @@
 //   - iostream
 //------------------------------------------------------------
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <queue>
 #include <vector>
-#include <string>
 #include <map>
 
 #include <algorithm>
@@ -291,6 +291,30 @@ struct AgentsInfo {
                 "\"agent_num_tasks\": [" + s3 + "]}");                
     }
 };
+
+//======================================================================
+// fmt
+//======================================================================
+
+std::string fmt(const char *format);
+
+template<typename Type, typename... Args>
+std::string fmt( const char *format, const Type& value, Args... args)
+{
+    std::stringstream strm;
+    if ( format ) {
+        do {
+            if ('$' == *format) {
+                strm << value;
+                strm << fmt(format+1, args...);
+                return strm.str();
+            }
+            strm << *format++;
+        } while (*format);
+    }
+    //assert(!"too many args");
+    return strm.str();
+}
 
 //== UNUSED ================================
 #define UNUSED(x) (void)(x)
