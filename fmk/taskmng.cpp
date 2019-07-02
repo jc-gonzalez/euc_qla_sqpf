@@ -253,10 +253,6 @@ void TaskManager::updateContainer(string & agName, string contId,
     agInfo["cont_status"] = int(contStatus);
     json & agInfoSpec = agInfo["spectrum"];
     
-    logger.debug(agentsInfo.dump());
-    logger.debug("----");
-    logger.debug(agInfoSpec.dump());
-
     string storedContId;
     int storedStatusVal;
     std::tie(storedContId, storedStatusVal) = agentsContainer[agName];
@@ -299,8 +295,9 @@ void TaskManager::updateTasksInfo(DataManager & datmng)
             tq->get(inspect);
             tq->get(percent);
             tq->get(status);
-            updateContainer(agName, contId, TaskStatusDowncaseVal(status));
-            datmng.storeTaskInfo(taskId, TaskStatusDowncaseVal(status),
+            std::string statusLowStr = TaskStatusDowncaseVal(status);
+            updateContainer(agName, contId, statusLowStr);
+            datmng.storeTaskInfo(taskId, TstatusLowStr,
                                  inspect, justCreated == "true");
         }
     }
@@ -362,8 +359,6 @@ bool TaskManager::retrieveAgentsInfo(json & hi)
                 vector<string> parts = str::split(el, ':');
                 agThis["spectrum"][parts.at(0)] = std::stoi(parts.at(1));
             }
-            //            agThis["spectrum"].assign(spec);
-            //agThis.update("spectrum", spec);
         }
     }
 

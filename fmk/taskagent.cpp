@@ -351,19 +351,6 @@ string TaskAgent::inspectContainer(string cntId, bool fullInfo, string filter)
     if (!dckMng->getInfo(cntId, info)) {
         logger.error("Cannot inspect container with id %s", cntId.c_str());
     }
-    /*
-    bool ok = true;
-    int iters = 0;
-    do {
-        info.str(fullInfo ? "" : "'" + filter + "'");
-        ok = dckMng->getInfo(cntId, info);
-        if (!ok) { delay(10); ++iters; }
-        if (iters > 10) {
-            logger.error("Cannot inspect container with id %s", cntId.c_str());
-            return std::string("");
-        }
-    } while (! ok);
-    */
     return info.str();
 }
 
@@ -584,6 +571,7 @@ void TaskAgent::run()
 
         // Minor sleep
         delay(333);
+        
     }
 }
 
