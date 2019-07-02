@@ -109,7 +109,7 @@ bool FitsMetadataReader::readFitsMetadata(std::string & str) {
         blockBytesLeft -= BUF_LEN;
         tbytes         += BUF_LEN;
 
-        // std::cerr << "{{" << std::string(buffer, BUF_LEN) << "}}";
+//         // std::cerr << "{{" << std::string(buffer, BUF_LEN) << "}}";
 
         // Get and cheeck tag
         std::string tag = std::string(buffer, TAG_LEN);
@@ -151,7 +151,7 @@ bool FitsMetadataReader::readFitsMetadata(std::string & str) {
                     }
                 }
             }
-            // std::cerr << "  => '" << tag << "': '" << content << "'\n";
+//             // std::cerr << "  => '" << tag << "': '" << content << "'\n";
         }
 
         isStart = false;

@@ -63,7 +63,7 @@ bool QDTReportHandler::getIssues(std::vector<Alert*> & issues)
 
         json &  p = prodIt.value();
         std::string product = prodIt.key();
-        //std::cerr << product << '\n';
+//         //std::cerr << product << '\n';
 
         // Loop on all the CCDs
         json::iterator ccdIt = p.begin();
@@ -71,7 +71,7 @@ bool QDTReportHandler::getIssues(std::vector<Alert*> & issues)
 
             json &  c = ccdIt.value();
             std::string ccdSet = ccdIt.key();
-            //std::cerr << '\t' << ccdSet << '\n';
+//             //std::cerr << '\t' << ccdSet << '\n';
 
             if (ccdSet.compare(0, 3, "CCD") == 0) {
                 // Loop on all the quadrant
@@ -82,7 +82,7 @@ bool QDTReportHandler::getIssues(std::vector<Alert*> & issues)
 
                     json &  q = quadIt.value();
                     std::string quadrant = quadIt.key();
-                    //std::cerr << "\t\t" << quadrant << '\n';
+//                     //std::cerr << "\t\t" << quadrant << '\n';
 
                     // Loop on all the diagnostics for the quadrant
                     json &  qDiagIt = q["diagnostics"];
@@ -90,7 +90,7 @@ bool QDTReportHandler::getIssues(std::vector<Alert*> & issues)
                     while (diagIt != qDiagIt.end()) {
 
                         std::string diagnostic = diagIt.key();
-                        //std::cerr << "\t\t\t" << diagnostic << '\n';
+//                         //std::cerr << "\t\t\t" << diagnostic << '\n';
 
                         std::string location = (product + "." + ccdSet + "." +
                                                 quadrant + "." + diagnostic);
@@ -110,7 +110,7 @@ bool QDTReportHandler::getIssues(std::vector<Alert*> & issues)
             while (diagIt != cDiagIt.end()) {
 
                 std::string diagnostic = diagIt.key();
-                //std::cerr << "\t\t\t" << diagnostic << '\n';
+//                 //std::cerr << "\t\t\t" << diagnostic << '\n';
 
                 std::string location = (product + "." + ccdSet + "." +
                                         diagnostic);
@@ -136,7 +136,7 @@ void QDTReportHandler::checkDiagnostic(json::iterator it,
     Alert::Messages msgs;
 
     json &  d = it.value();
-    std::cerr << d["outcome"];
+//     std::cerr << d["outcome"];
     if (d["result"]["outcome"] == "Warning") {
         msgs.push_back("Messsages:");
         json::iterator mIt;

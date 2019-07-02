@@ -126,7 +126,7 @@ bool VOSpaceHandler::uploadFile(std::string folder, std::string file,
     
     rwcHdl->post(uploadUrl, file, result, contentType);
 
-    std::cerr << "Result: [" << result << "]\n";
+//     std::cerr << "Result: [" << result << "]\n";
 
     return (result.find("200 OK") != std::string::npos);
 }
@@ -165,7 +165,7 @@ bool VOSpaceHandler::downloadFile(std::string folder, std::string file,
     std::string result;
     rwcHdl->get(downloadUrl, localFile, result);
 
-    std::cerr << "Result: [" << result << "]\n";
+//     std::cerr << "Result: [" << result << "]\n";
 
     return (result.find("200 OK") != std::string::npos);
 }
@@ -186,25 +186,25 @@ bool VOSpaceHandler::uploadJobRequest(std::string folder,
     
     std::string result;
     rwcHdl->postContent(txUrl, txData, result);
-    std::cerr << "Result: [" << result << "]\n";
+//     std::cerr << "Result: [" << result << "]\n";
     if (result.find("401 Unauthorized") != std::string::npos) { return false; }
     
     // Get redirection URL
     std::string redirection = result.substr(result.find("Location: ") + 10);
     redirection.resize(redirection.find('\n') - 1);
 
-    std::cerr << redirection << '\n';
+//     std::cerr << redirection << '\n';
 
     std::string phase("");
     do {
         std::string content;
         rwcHdl->getContent(redirection, content, result);
-        std::cerr << content << '\n' << result << '\n';
+//         std::cerr << content << '\n' << result << '\n';
         
         size_t posFrom = content.find("<uws:phase>") + 11;
         size_t posTo   = content.find("</uws:phase>");
         phase = content.substr(posFrom, posTo - posFrom);
-        std::cerr << "PHASE: " << phase << '\n';
+//         std::cerr << "PHASE: " << phase << '\n';
     } while ((phase != "COMPLETED") && (phase != "ERROR"));
 
     if (phase != "COMPLETED") { return false; }

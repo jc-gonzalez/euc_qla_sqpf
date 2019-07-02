@@ -178,6 +178,7 @@ private:
     double agentsHeartBeat;
 
     Queue<string> outboxProdQueue;
+    vector<DirWatchedAndQueue> dirWatchers;
 
     vector<TaskAgent*> agents;
     vector<std::thread> agentThreads;

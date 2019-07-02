@@ -91,7 +91,7 @@ void DirWatcher::watch(std::string pth)
     int wd = inotify_add_watch(fd, pth.c_str(),
                                IN_CLOSE_WRITE | IN_MOVED_TO | IN_CREATE);
     if (wd == -1) {
-        std::cerr << "Cannot watch '" << pth << "'\n";
+//         std::cerr << "Cannot watch '" << pth << "'\n";
         perror("inotify_add_watch");
         exit(EXIT_FAILURE);
     }
@@ -202,7 +202,7 @@ void DirWatcher::start()
                         struct stat dweStat;
                         if (stat(file.c_str(), &dweStat) != 0) {
                             perror("stat");
-                            std::cerr << file << std::endl;
+//                             std::cerr << file << std::endl;
                             exit(EXIT_FAILURE);
                         } else {
                             dwe.size = dweStat.st_size;

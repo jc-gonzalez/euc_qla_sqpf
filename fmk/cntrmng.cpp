@@ -102,7 +102,7 @@ bool ContainerMng::createContainer(std::string img, std::vector<std::string> opt
             break;
         }
     }
-    std::cerr << "CNT: " << info.str() << '\n';
+//     std::cerr << "CNT: " << info.str() << '\n';
     cnt.wait();
 
     std::ofstream dockerIdFile(tmpFileName);
@@ -112,7 +112,7 @@ bool ContainerMng::createContainer(std::string img, std::vector<std::string> opt
     containerId = info.str();
     containerId.pop_back();
 
-    std::cerr << "CONTAINER CODE: " << cnt.code() << '\n';
+//     std::cerr << "CONTAINER CODE: " << cnt.code() << '\n';
     return (cnt.code() == 0);
 }
 
@@ -123,7 +123,7 @@ bool ContainerMng::createContainer(std::string img, std::vector<std::string> opt
 bool ContainerMng::createContainer(std::string proc, std::string workDir,
                                    std::string & containerId)
 {
-    std::cerr << "CONTAINER CREATION: " << proc << ", " << workDir << '\n';
+//     std::cerr << "CONTAINER CREATION: " << proc << ", " << workDir << '\n';
 
     std::string RunProcessorApp("python");
     std::string RunProcessorScript(wa.runTools + "/RunProcessor.py");
@@ -139,7 +139,7 @@ bool ContainerMng::createContainer(std::string proc, std::string workDir,
     procxx::process cnt(RunProcessorApp, RunProcessorScript,
                         "-t", workDir, "-c", cfgFileArg);
 
-    std::cerr << "CONTAINER CMD: " << cnt.cmd_line() << '\n';
+//     std::cerr << "CONTAINER CMD: " << cnt.cmd_line() << '\n';
 
     cnt.exec();
     cnt.wait();
@@ -149,7 +149,7 @@ bool ContainerMng::createContainer(std::string proc, std::string workDir,
         std::getline(dockerIdStrm, containerId);
     }
     
-    std::cerr << "CONTAINER CODE: " << cnt.code() << '\n';
+//     std::cerr << "CONTAINER CODE: " << cnt.code() << '\n';
     return (cnt.code() == 0);
 }
 
@@ -168,7 +168,7 @@ bool ContainerMng::getInfo(std::string id, std::stringstream & info)
     }
     cntInspect.exec();
 
-    std::cerr << "CONTAINER CMD: " << cntInspect.cmd_line() << '\n';
+//     std::cerr << "CONTAINER CMD: " << cntInspect.cmd_line() << '\n';
 
     info.str("");
     std::string line;
@@ -184,10 +184,10 @@ bool ContainerMng::getInfo(std::string id, std::stringstream & info)
     completeInfo.pop_back();
     info.str(completeInfo.substr(0, completeInfo.find_last_of("'")));
 
-    std::cerr << "CONTAINER RETURN: " << info.str() << '\n';
+//     std::cerr << "CONTAINER RETURN: " << info.str() << '\n';
 
     cntInspect.wait();
-    std::cerr << "CONTAINER CODE: " << cntInspect.code() << '\n';
+//     std::cerr << "CONTAINER CODE: " << cntInspect.code() << '\n';
     return (cntInspect.code() == 0);
 }
 

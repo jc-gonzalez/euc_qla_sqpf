@@ -95,10 +95,10 @@ bool MasterRequester::postFile(string route, string fileName,
     
     std::string uploadUrl = serverUrl + route + "/" + baseName;
     std::string result;
-    //std::cerr << uploadUrl << ", " << fileName << '\n';
+//     //std::cerr << uploadUrl << ", " << fileName << '\n';
     
     rwcHdl->postFile(uploadUrl, fileName, result, contentType);
-    //std::cerr << result << '\n';
+//     //std::cerr << result << '\n';
     return (result.find("200 OK") != std::string::npos);
 }
 

@@ -107,6 +107,9 @@ typedef int            percent;
 
 typedef map<string, int> CntrSpectrum;
 
+class DirWatcher;
+typedef std::tuple<DirWatcher *, Queue<string> &> DirWatchedAndQueue;
+
 #define forever for(;;)
 
 extern mode_t PathMode;

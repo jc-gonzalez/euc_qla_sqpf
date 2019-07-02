@@ -74,10 +74,6 @@
 #include "masterserver.h"
 #include "masterrequester.h"
 
-class DirWatcher;
-
-typedef std::tuple<DirWatcher *, Queue<string> &> DirWatchedAndQueue;
-
 //==========================================================================
 // Class: Master
 //==========================================================================

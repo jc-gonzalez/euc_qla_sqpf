@@ -389,10 +389,22 @@ void Master::scheduleProductsForProcessing()
 
 //----------------------------------------------------------------------
 // Method: archiveOutputs
-//
+// Save output products to the local archive
 //----------------------------------------------------------------------
 void Master::archiveOutputs()
 {
+    static FileNameSpec fns;
+
+    ProductMeta meta;
+    ProductName prod;
+    while (outputProducts.get(prod)) {
+        if (fns.parse(prod, meta)) {
+            ProductLocator::toLocalArchive(meta, wa, ProductLocator::MOVE);
+            logger.debug("Moving output product " + prod + " to archive");
+        } else {
+            logger.warn("Found non-product file in local outputs folder: " + prod);
+        }
+    }
 }
 
 //----------------------------------------------------------------------

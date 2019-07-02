@@ -241,9 +241,9 @@ void RWC::post(std::string url, std::string localFile,
     ScopeExit hdr_clear([&headers] { curl_slist_free_all(headers); });
 
     // Execute
-    std::cerr << "CURL Performing ...\n";
+//     std::cerr << "CURL Performing ...\n";
     CURLcode res = curl_easy_perform(curl);
-    std::cerr << "CURL response code: " << res << '\n';
+//     std::cerr << "CURL response code: " << res << '\n';
     if (res != CURLE_OK) {
         fprintf(stderr, "curl_easy_perform() failed: %s\n",
                 curl_easy_strerror(res));
@@ -326,9 +326,9 @@ void RWC::postFile(std::string url, std::string localFile,
     ScopeExit hdr_clear([&headers] { curl_slist_free_all(headers); });
 
     // Execute
-    std::cerr << "CURL Performing ...\n";
+//     std::cerr << "CURL Performing ...\n";
     CURLcode res = curl_easy_perform(curl);
-    std::cerr << "CURL response code: " << res << '\n';
+//     std::cerr << "CURL response code: " << res << '\n';
     if (res != CURLE_OK) {
         fprintf(stderr, "curl_easy_perform() failed: %s\n",
                 curl_easy_strerror(res));

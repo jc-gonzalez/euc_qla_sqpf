@@ -45,6 +45,7 @@
 #include "filetools.h"
 #include "prodloc.h"
 #include "str.h"
+#include "dwatcher.h"
 
 #include <fstream>
 
@@ -62,6 +63,8 @@ TaskManager::TaskManager(Config & _cfg, string _id,
 {
     thisNodeNum = indexOf<string>(net.nodeName, id);
     logger.info("Task Manager created");
+
+    setDirectoryWatchers();
 }
 
 //----------------------------------------------------------------------
@@ -77,6 +80,8 @@ TaskManager::~TaskManager()
 //----------------------------------------------------------------------
 void TaskManager::setDirectoryWatchers()
 {
+    dirWatchers.push_back(DirWatchedAndQueue(new DirWatcher(wa.localOutputs),
+                                             outboxProdQueue));
 }
 
 //----------------------------------------------------------------------
@@ -155,8 +160,8 @@ void TaskManager::createAgents()
         ai.agent_num_tasks.push_back(0);
     }
 
-    std::cerr << ai.str() << '\n';
-    std::cerr << agentsInfo.dump() << '\n';
+//     std::cerr << ai.str() << '\n';
+//     std::cerr << agentsInfo.dump() << '\n';
 
     agentsInfo["agents"] = agentsData;
     agentsInfo["agent_names"] = agentsNames;
@@ -335,9 +340,15 @@ void TaskManager::schedule(ProductMeta & meta, string & processor)
 
 //----------------------------------------------------------------------
 // Method: retrieveOutputs
+// Returns the list of output products ready to be sent to the archive
 //----------------------------------------------------------------------
 void TaskManager::retrieveOutputs(Queue<string> & outputs)
 {
+    ProductName prod;
+    while (outboxProdQueue.get(prod)) {
+        logger.debug("Registered output files: " + prod);
+        outputs.push(std::move(prod));
+    }
 }
 
 //----------------------------------------------------------------------
@@ -345,7 +356,7 @@ void TaskManager::retrieveOutputs(Queue<string> & outputs)
 //----------------------------------------------------------------------
 bool TaskManager::retrieveAgentsInfo(json & hi)
 {
-    std::cerr << agentsInfo.dump() << '\n';
+//     std::cerr << agentsInfo.dump() << '\n';
 
     vector<string> & nodeAgNames = net.nodeAgents[id];
     
