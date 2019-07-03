@@ -402,7 +402,7 @@ void TaskAgent::scheduleContainerForRemoval()
 //----------------------------------------------------------------------
 void TaskAgent::removeOldContainers()
 {
-    static const double minElapsedMsec = 5000.; // 5 seconds
+    static const double minElapsedMsec = 60000.; // 60 seconds
     static auto  elapsed_ms =
         [](hires_time x, hires_time ref) {
             return duration_cast<milliseconds>(x - ref).count(); };
