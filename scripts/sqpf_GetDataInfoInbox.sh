@@ -41,7 +41,7 @@ usage () {
 }
 
 #-- Get options from command line
-while getopts :hd:t:Ii: OPT; do
+while getopts :hd:t:Ia:i: OPT; do
     case $OPT in
         h|+h) usage ;;
         d|+d) FOLDERS="$FOLDERS $OPTARG" ;;
