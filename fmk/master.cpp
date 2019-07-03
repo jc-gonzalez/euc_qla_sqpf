@@ -306,8 +306,8 @@ void Master::distributeProducts()
     if (nodeInfoIsAvailable) {
         for (int i = 0; i < nodeStatus.size(); ++i) {
             json jloads = nodeStatus[i]["machine"]["load"];
-            std::stringstream ss;
-            ss << "LOADS: " << jloads;
+            //std::stringstream ss;
+            //ss << "LOADS: " << jloads;
             //logger.debug(ss.str());
             loads[i] = jloads[0].get<double>();
         }
@@ -511,7 +511,7 @@ void Master::runMainLoop()
         // Retrieve agents information
         if ((iteration == 1) || ((iteration % 10) == 0)) {
             nodeInfoIsAvailable = tskMng->retrieveAgentsInfo(nodeInfo);
-            logger.debug("Node info retrieved: " + nodeInfo.dump());
+            //logger.debug("Node info retrieved: " + nodeInfo.dump());
             tskMng->showSpectra();
         }
 

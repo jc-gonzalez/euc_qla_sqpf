@@ -180,7 +180,7 @@ vector<string> TaskAgent::doRules(string item)
     vector<string> rules;
     std::tie(from_var, rules) = getSubstitutionRules(item);
 
-    logger.error("Rule: from '%s', do {%s}", from_var.c_str(),
+    logger.debug("Rule: from '%s', do {%s}", from_var.c_str(),
                  str::join(rules, "} and {").c_str());
     string value;
     if (from_var == "input") {
@@ -197,7 +197,7 @@ vector<string> TaskAgent::doRules(string item)
         value = substitute(value, rule);
     }
 
-    logger.error("Final result: '%s'", value.c_str());
+    logger.debug("Final result: '%s'", value.c_str());
     return str::split(value, ' ');
 }
 

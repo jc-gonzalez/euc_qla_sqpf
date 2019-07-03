@@ -315,12 +315,14 @@ void TaskManager::updateContainer(string & agName, string contId,
     } else {
         count = agInfoSpec[storedContStatusLowStr].get<int>();
         agInfoSpec[storedContStatusLowStr] = count - 1;
-        logger.debug("Container %s changed from (%d) %s to (%d) %s",
-                     contId.c_str(),
-                     storedStatusVal,
-                     storedContStatus.str().c_str(),
-                     int(contStatus),
-                     contStatus.lstr().c_str());
+        if (storedContStatus != contStatus) {
+            logger.debug("Container %s changed from (%d) %s to (%d) %s",
+                         contId.c_str(),
+                         storedStatusVal,
+                         storedContStatus.str().c_str(),
+                         int(contStatus),
+                         contStatus.lstr().c_str());
+        }
     }
     
     agentsContainer[agName] = std::make_tuple(contId, int(contStatus));
