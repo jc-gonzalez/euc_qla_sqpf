@@ -125,9 +125,13 @@ public:
         std::ofstream fout(fullFileName);
         fout << rqst.get_content();
         fout.close();
+
         system(("ls -l " + fullFileName).c_str());
+        
         // Move created file to local inbox
-        string newFullFileName = wa->localInbox + "/" + pathItems.at(1);
+        string newFullFileName = ((pathItems.at(0) == "inbox") ? 
+                                  wa->localInbox :
+                                  wa->archive) + "/" + pathItems.at(1);
         int res = ProductLocator::relocate(fullFileName, newFullFileName,
                                            ProductLocator::MOVE);
         
@@ -184,6 +188,7 @@ void MasterServer::run()
     RscPostReceiver rscPostRcv;
     rscPostRcv.setWorkArea(&wa);
     addRoute(ws, "/inbox/{prod}", &rscPostRcv);
+    addRoute(ws, "/outputs/{prod}", &rscPostRcv);
 
     ws.start(true);
 }
