@@ -64,7 +64,7 @@ fi
 #-- Get files
 cat /dev/null > ${DATA_LIST}.orig
 for d in $FOLDERS; do
-    ls -1 ${d}/EUC_*.fits >> ${DATA_LIST}.orig
+    ls -1 ${d}/EUC_*.fits | grep -v EUC_SOC >> ${DATA_LIST}.orig
 done
 
 #-- Shuffle the list
@@ -144,12 +144,23 @@ while [ -d . ]; do
 #    thelog=$k.log
 
     # Check Local Archive size
-    ls -1tr ${ARCHIVE}/ > $ARCH_LIST
+    for i in $(ls -1 ${ARCHIVE}/*.fits); do
+        n=$(basename $i|cut -d- -f2)
+        echo "$n $i"
+    done|sort -n|cut -d" " -f2 > $ARCH_LIST
+    
     wc -l ${ARCH_LIST} > ${ARCH_LIST}.count
+
     read lines file < ${ARCH_LIST}.count
     if [ "$lines" -gt ${MAX_FILES_IN_ARCHIVE} ]; then
+        # First remove fits
         excess=$(( lines - MAX_FILES_IN_ARCHIVE ))
         for f in $(head -${excess} $ARCH_LIST) ; do
+            ls -l $f > ${ARCHIVE}.old/$(basename $f).ls
+            rm $f
+        done
+        # Then remove the others
+        for f in $(ls -1tr ${ARCHIVE}/* | grep -v .fits | head -$(( excess + excess )) ) ; do
             ls -l $f > ${ARCHIVE}.old/$(basename $f).ls
             rm $f
         done
