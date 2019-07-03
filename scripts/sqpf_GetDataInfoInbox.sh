@@ -24,16 +24,19 @@ FOLDERS=""
 TIMEINTERVAL=30
 INTERACTIVE="no"
 INBOX="."
+ARCHIVE="../archive/"
 
 #-- Other
 DATE=$(date +"%Y%m%d%H%M%S")
 LOG_FILE=./${DATE}.log
 DATA_LIST=./${DATE}.lst
+ARCH_LIST=./${DATE}.arc
+MAX_FILES_IN_ARCHIVE=99
 
 #-- Define functions
 usage () {
     echo "Usage:"
-    echo "        ${SCRIPT_NAME} -d <folder> [ -d <folder> [..]] [ -t <secs> ] [ -i <inbox> ] [ -I ]"
+    echo "        ${SCRIPT_NAME} -i <inbox>  -a <archive>  -d <folder> [ -d <folder> [..]] [ -t <secs> ] [ -I ]"
     echo ""
 }
 
@@ -43,6 +46,7 @@ while getopts :hd:t:Ii: OPT; do
         h|+h) usage ;;
         d|+d) FOLDERS="$FOLDERS $OPTARG" ;;
         t|+t) TIMEINTERVAL=$OPTARG ;;
+        a|+a) ARCHIVE=$OPTARG ;;
         i|+i) INBOX=$OPTARG ;;
         I|+I) INTERACTIVE="yes" ;;
         *)    usage ; exit 2
@@ -73,7 +77,7 @@ numFiles=$(wc -l ${DATA_LIST}|awk '{print $1;}')
 DATE=$(date +"%Y-%m-%d %H:%M:%S")
 
 echo "==============================================================="
-echo "Automatic insertion of data files into QPF inbox"
+echo "Automatic insertion of data files into sQPF inbox"
 echo "==============================================================="
 
 echo "Starting at $DATE"
@@ -84,7 +88,7 @@ done
 echo "Interactive mode: $INTERACTIVE"
 echo "Time interval:    $TIMEINTERVAL"
 
-qpfpid=$(cat $HOME/.qpf/core.pid)
+qpfpid=$(pidof qpf)
 
 #======== MAIN LOOP
 
@@ -95,6 +99,8 @@ if [ -f "seq.dat" ]; then
 else
     seqNum=0
 fi
+
+mkdir ${ARCHIVE}.old
 
 while [ -d . ]; do
 
@@ -126,21 +132,33 @@ while [ -d . ]; do
     DATE=$(date +"%Y-%m-%d %H:%M:%S")
     echo "[${DATE}] $dataFile  ==>  ${inboxFile}"
 
-    # Rotate logs
-    k=1
-    while [ $k -lt 21 ]; do 
-        kk=$(( k + 1 ))
-        if [ -f $kk.log ]; then 
-            mv $kk.log $k.log
-        fi 
-    k=$kk 
-    done
-    thelog=$k.log
-    
+#    # Rotate logs
+#    k=1
+#    while [ $k -lt 21 ]; do 
+#        kk=$(( k + 1 ))
+#        if [ -f $kk.log ]; then 
+#            mv $kk.log $k.log
+#        fi 
+#    k=$kk 
+#    done
+#    thelog=$k.log
+
+    # Check Local Archive size
+    ls -1tr ${ARCHIVE}/ > $ARCH_LIST
+    wc -l ${ARCH_LIST} > ${ARCH_LIST}.count
+    read lines file < ${ARCH_LIST}.count
+    if [ "$lines" -gt ${MAX_FILES_IN_ARCHIVE} ]; then
+        excess=$(( lines - MAX_FILES_IN_ARCHIVE ))
+        for f in $(head -${excess} $ARCH_LIST) ; do
+            ls -l $f > ${ARCHIVE}.old/$(basename $f).ls
+            rm $f
+        done
+    fi
+        
     # Save log info
     ( ls -l /proc/$qpfpid/fd; \
       cat /proc/$qpfpid/{stat,statm,maps,smaps,io,sched}; \
-    ) > $thelog
+    ) > $LOG_FILE
 
     # Wait until next
     if [ "$INTERACTIVE" == "no" ]; then
@@ -148,7 +166,7 @@ while [ -d . ]; do
     else
         read ans
     fi
-
+    
     # Check that QPF is still running
     qpfname=$(ps -q $qpfpid -o comm=)
     if [ -z "$qpfname" ]; then
