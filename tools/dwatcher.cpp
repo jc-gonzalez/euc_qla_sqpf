@@ -160,9 +160,7 @@ void DirWatcher::start()
         if ((poll_num > 0) && (fds[0].revents & POLLIN)) {
 
             // In case of events, get them and store them into the queue
-            const struct inotify_event dummy_event;
-            dummy_event.len = 0;
-            
+            const struct inotify_event dummy_event {0, 0, 0, 0};
             const struct inotify_event * event = &dummy_event;
             ssize_t len;
             char * ptr;
