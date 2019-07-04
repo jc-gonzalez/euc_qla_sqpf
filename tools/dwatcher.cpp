@@ -139,7 +139,7 @@ void DirWatcher::start()
     nfds_t nfds;
     struct pollfd fds[1];
 
-    char buf[4096]
+    char buf[40960]
         __attribute__ ((aligned(__alignof__(struct inotify_event))));
 
     // Initialize polling variables
@@ -160,7 +160,10 @@ void DirWatcher::start()
         if ((poll_num > 0) && (fds[0].revents & POLLIN)) {
 
             // In case of events, get them and store them into the queue
-            const struct inotify_event * event;
+            const struct inotify_event dummy_event;
+            dummy_event.len = 0;
+            
+            const struct inotify_event * event = &dummy_event;
             ssize_t len;
             char * ptr;
 
@@ -184,6 +187,8 @@ void DirWatcher::start()
 
                     event = (const struct inotify_event *)(ptr);
 
+                    if (watchedDirs.find(event->wd) == watchedDirs.end()) { continue; }
+                    
                     // Store event in queue
                     DirWatchEvent dwe;
                     dwe.name = std::string(event->name);
