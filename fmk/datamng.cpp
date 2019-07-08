@@ -82,14 +82,6 @@ void DataManager::initializeDB()
 }
 
 //----------------------------------------------------------------------
-// Method: connect
-//----------------------------------------------------------------------
-void DataManager::connect()
-{
-    
-}
-
-//----------------------------------------------------------------------
 // Method: storeProductInfo
 //----------------------------------------------------------------------
 void DataManager::storeProductInfo(ProductMeta & m)
@@ -103,6 +95,33 @@ void DataManager::storeProductInfo(ProductMeta & m)
 void DataManager::storeTaskInfo(string & taskId, int taskStatus,
                                 string & taskInfo, bool initial)
 {
+    std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL(net, logger));
+
+    try {
+        // Check that connection with the DB is possible
+        if (!dbHdl->openConnection()) {
+            logger.warn("Cannot establish connection to database");
+        }
+
+        // Try to store the task data into the DB
+        if (initial) { dbHdl->storeTask(taskInfo); }
+        else         { dbHdl->updateTask(taskInfo); }
+
+    } catch (RuntimeException & e) {
+        ErrMsg(e.what());
+        return;
+    }
+
+    // Close connection
+    dbHdl->closeConnection();
+
+    // If task is not finished, we are done
+    if ((taskStatus != TASK_FINISHED) &&
+        (taskStatus == TASK_FAILED)) { return; }
+
+    // Otherwise, task is finished, save outputs metadata
+    json task = json::parse(taskInfo);
+    logger.debug(taskInfo);
 
 }
 
