@@ -42,7 +42,7 @@
 
 #include <iostream>
 #include <thread>
-
+#include <sstream>
 #include <cerrno>
 #include <poll.h>
 #include <sys/inotify.h>
@@ -139,11 +139,17 @@ void DirWatcher::start()
     nfds_t nfds;
     struct pollfd fds[1];
 
-    char buf[40960]
+#define MAX_EVENTS  1024 // Max. number of events to process at one go
+#define LEN_NAME     256 // Assuming that the length of the filename won't exceed 256 bytes
+#define EVENT_SIZE  (sizeof(struct inotify_event)) // size of one event
+#define BUF_LEN     (MAX_EVENTS * (EVENT_SIZE + LEN_NAME)) // size of buffer to store events' data
+
+    char buf[BUF_LEN]
         __attribute__ ((aligned(__alignof__(struct inotify_event))));
 
     // Initialize polling variables
     nfds = 1;
+
     fds[0].fd     = fd;
     fds[0].events = POLLIN;
 
@@ -160,8 +166,7 @@ void DirWatcher::start()
         if ((poll_num > 0) && (fds[0].revents & POLLIN)) {
 
             // In case of events, get them and store them into the queue
-            const struct inotify_event dummy_event {0, 0, 0, 0};
-            const struct inotify_event * event = &dummy_event;
+            const struct inotify_event * event = 0;
             ssize_t len;
             char * ptr;
 
@@ -174,32 +179,38 @@ void DirWatcher::start()
                     exit(EXIT_FAILURE);
                 }
 
-                // If the nonblocking read() found no events to read, then it
-                // returns -1 with errno set to EAGAIN. In that case, we exit
-                // the loop
+                // If the nonblocking read() found no events to read, then it returns -1 
+                // with errno set to EAGAIN. In that case, we exit the loop
                 if (len <= 0) break;
 
                 // Loop over all events in the buffer
-                for (ptr = buf; ptr < buf + len;
-                     ptr += sizeof(struct inotify_event) + event->len) {
+                for (ptr = buf; ptr < buf + len; ptr += EVENT_SIZE + event->len) {
 
                     event = (const struct inotify_event *)(ptr);
+                    if (! event->len) break;
 
-                    if (watchedDirs.find(event->wd) == watchedDirs.end()) { continue; }
-                    
+                    auto itWatchedDir = watchedDirs.find(event->wd);
+                    if (itWatchedDir == watchedDirs.end()) { continue; }
+
                     // Store event in queue
                     DirWatchEvent dwe;
-                    dwe.name = std::string(event->name);
-                    if (dwe.name == lastTriggerEventFileName) { continue; }
+                    std::string file;
+                    try {
+                        dwe.name = std::string(event->name);
+                        if (dwe.name == lastTriggerEventFileName) { continue; }
 
-                    dwe.path = watchedDirs[event->wd];
-                    dwe.mask = event->mask;
-                    dwe.isDir = (event->mask & IN_ISDIR);
+                        dwe.path = itWatchedDir->second;
+                        dwe.mask = event->mask;
+                        dwe.isDir = (event->mask & IN_ISDIR);
 
-                    lastTriggerEventFileName = dwe.name;
+                        lastTriggerEventFileName = dwe.name;
+                        std::stringstream ss;
+                        ss << itWatchedDir->second << '/' << event->name;
+                        file = ss.str();
+                    } catch(...) {
+                        break;
+                    }
 
-                    std::string file(dwe.path + "/" + dwe.name);
-                    
                     // Check file size
                     if (!dwe.isDir) {
                         struct stat dweStat;
