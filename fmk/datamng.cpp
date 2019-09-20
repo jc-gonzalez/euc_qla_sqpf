@@ -103,9 +103,11 @@ void DataManager::storeTaskInfo(string & taskId, int taskStatus,
             logger.warn("Cannot establish connection to database");
         }
 
+        json task = json::parse(taskInfo);
+
         // Try to store the task data into the DB
-        if (initial) { dbHdl->storeTask(taskInfo); }
-        else         { dbHdl->updateTask(taskInfo); }
+        if (initial) { dbHdl->storeTask(task); }
+        else         { dbHdl->updateTask(task); }
 
     } catch (RuntimeException & e) {
         ErrMsg(e.what());
@@ -120,7 +122,6 @@ void DataManager::storeTaskInfo(string & taskId, int taskStatus,
         (taskStatus == TASK_FAILED)) { return; }
 
     // Otherwise, task is finished, save outputs metadata
-    json task = json::parse(taskInfo);
     logger.debug(taskInfo);
 
 }
