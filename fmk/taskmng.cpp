@@ -154,14 +154,14 @@ void TaskManager::createAgents()
                        {"task_id", std::string("")},
                        {"cont_id", std::string("")},
                        {"cont_status", -99},
-                       {"spectrum", {{"aborted", 0},
-                                     {"archived", 0},
-                                     {"failed", 0},
-                                     {"finished", 0},
-                                     {"paused", 0},
-                                     {"running", 0},
-                                     {"scheduled", 0},
-                                     {"stopped", 0}}}};
+                       {"spectrum", {{"ABORTED", 0},
+                                     {"ARCHIVED", 0},
+                                     {"FAILED", 0},
+                                     {"FINISHED", 0},
+                                     {"PAUSED", 0},
+                                     {"RUNNING", 0},
+                                     {"SCHEDULED", 0},
+                                     {"STOPPED", 0}}}};
     
     json agentsData;
     json agentsNames;
@@ -187,16 +187,15 @@ void TaskManager::createAgents()
         agentsTasks.push_back(0);
 
         AgentSpectrum sp;
-        sp["aborted"]        = 0;
-        sp["archived"]        = 0;
-        sp["failed"]        = 0;
-        sp["finished"]        = 0;
-        sp["paused"]        = 0;
-        sp["running"]        = 0;
-        sp["scheduled"]        = 0;
-        sp["stopped"]        = 0;
+        sp["ABORTED"]   = 0;
+        sp["ARCHIVED"]  = 0;
+        sp["FAILED"]    = 0;
+        sp["FINISHED"]  = 0;
+        sp["PAUSED"]    = 0;
+        sp["RUNNING"]   = 0;
+        sp["SCHEDULED"] = 0;
+        sp["STOPPED"]   = 0;
 
-        //        AgentData ad({0, std::string(""), std::string(""), TASK_UNKNOWN_STATE, sp});
         ai.agents.emplace(agName, AgentData({0, std::string(""), std::string(""), 
                         TASK_UNKNOWN_STATE, sp}));
         ai.agent_names.push_back(agName);
@@ -305,7 +304,7 @@ void TaskManager::updateContainer(string & agName, string contId,
     int storedStatusVal;
     std::tie(storedContId, storedStatusVal) = agentsContainer[agName];
     TaskStatus storedContStatus(storedStatusVal);
-    string storedContStatusLowStr = storedContStatus.lstr();
+    string storedContStatusStr = storedContStatus.str();
     int count = 0;
     bool newCont = storedContId.empty();
 
@@ -313,22 +312,22 @@ void TaskManager::updateContainer(string & agName, string contId,
         logger.info("Container %s launched, current status is %s",
                     contId.c_str(), contStatus.str().c_str());
     } else {
-        count = agInfoSpec[storedContStatusLowStr].get<int>();
-        agInfoSpec[storedContStatusLowStr] = count - 1;
+        count = agInfoSpec[storedContStatusStr].get<int>();
+        agInfoSpec[storedContStatusStr] = count - 1;
         if (storedContStatus != contStatus) {
             logger.debug("Container %s changed from (%d) %s to (%d) %s",
                          contId.c_str(),
                          storedStatusVal,
                          storedContStatus.str().c_str(),
                          int(contStatus),
-                         contStatus.lstr().c_str());
+                         contStatus.str().c_str());
         }
     }
     
     agentsContainer[agName] = std::make_tuple(contId, int(contStatus));
-    string newStatusLowStr = contStatus.lstr();
-    count = agInfoSpec[newStatusLowStr].get<int>();
-    agInfoSpec[newStatusLowStr] = count + 1;
+    string newStatusStr = contStatus.str();
+    count = agInfoSpec[newStatusStr].get<int>();
+    agInfoSpec[newStatusStr] = count + 1;
 }
 
 //----------------------------------------------------------------------
@@ -348,10 +347,12 @@ void TaskManager::updateTasksInfo(DataManager & datmng)
             tq->get(inspect);
             tq->get(percent);
             tq->get(status);
-            int statusVal = TaskStatusDowncaseVal(status);
+            int statusVal = TaskStatusVal[status];
             updateContainer(agName, contId, statusVal);
-            datmng.storeTaskInfo(taskId, statusVal,
-                                 inspect, justCreated == "true");
+	    if (!inspect.empty()) {
+		datmng.storeTaskInfo(taskId, statusVal,
+				     inspect, justCreated == "true");
+	    }
         }
     }
 }

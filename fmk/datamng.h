@@ -61,6 +61,7 @@
 #include "types.h"
 #include "log.h"
 #include "procnet.h"
+#include "dbhdlpostgre.h"
 
 //==========================================================================
 // Class: DataManager
@@ -110,6 +111,8 @@ private:
     Config & cfg;
 
     Logger logger;
+
+    std::unique_ptr<DBHandler> dbHdl;
 };
 
 #endif // DATAMANAGER_H

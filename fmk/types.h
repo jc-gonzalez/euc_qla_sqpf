@@ -135,8 +135,6 @@ enum TaskStatusEnum { TTASK_STATUS_LIST };
 extern map<int, string> TaskStatusStr;
 extern map<string, int> TaskStatusVal;
 
-int TaskStatusDowncaseVal(std::string & s);
-
 class TaskStatus {
 private:
     TaskStatusEnum value;
@@ -152,7 +150,6 @@ public:
     operator std::string() const;
     operator int() const;
     std::string str() const;
-    std::string lstr() const;
     void fromStr(std::string & s);
 };
 

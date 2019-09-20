@@ -239,6 +239,7 @@ private:
     static const string QPFDckImageRunPath;
     static const string QPFDckImageProcPath;
 
+    static const string inspectSelection;
 };
 
 #endif // TASKAGENT_H

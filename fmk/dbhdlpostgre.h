@@ -294,13 +294,13 @@ public:
 private:
 
     //----------------------------------------------------------------------
-    // Method: eqKeyValue
+    // Method: eqkv
     // Returns the value used in the update string
     //----------------------------------------------------------------------
-    std::string eqKeyValue(std::string k, int x);
-    std::string eqKeyValue(std::string k, double x);
-    std::string eqKeyValue(std::string k, std::string x);
-    std::string eqKeyValue(std::string k, json x);
+    std::string eqkv(std::string k, int x);
+    std::string eqkv(std::string k, double x);
+    std::string eqkv(std::string k, std::string x);
+    std::string eqkv(std::string k, json x);
 
     //----------------------------------------------------------------------
     // Method: updateTable

@@ -68,6 +68,7 @@
 #include "propdef.h"
 #include "types.h"
 #include "log.h"
+#include "except.h"
 
 typedef std::string MessageString;
 

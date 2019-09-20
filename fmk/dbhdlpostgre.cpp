@@ -75,12 +75,13 @@ bool DBHdlPostgreSQL::openConnection(const char * data)
                                   " user=" + getDbUser() +
                                   " password=" + getDbPasswd());
             connStr = getDbConnectionParams().c_str();
-            logger.info("Connection parameters set to: %s", connStr);
+            //logger.info("Connection parameters set to: %s", connStr);
         }
     }
     if (conn != 0) {
         logger.warn("Connection will be re-open at thread %ld", pthread_self());
         PQfinish(conn);
+	conn = 0;
     }
     conn = PQconnectdb(connStr);
     if (PQstatus(conn) != CONNECTION_OK) {
@@ -99,6 +100,8 @@ bool DBHdlPostgreSQL::closeConnection(const char * data)
     UNUSED(data);
 
     PQfinish(conn);
+    conn = 0;
+
     return true;
 }
 
@@ -228,24 +231,22 @@ bool DBHdlPostgreSQL::storeTask(TaskInfo & task)
 
     std::string registrationTime(tagToTimestamp(preciseTimeTag()));
     std::stringstream ss;
-    std::string taskPath = task["taskPath"];
-    std::string taskData( task["taskData"].dump() );
 
     ss.str("");
-    ss << "INSERT INTO tasks_info "
-       << "(task_id, task_status_id, task_progress, task_exitcode, "
-       << "task_path, task_size, registration_time, start_time, task_info, task_data) "
-       << "VALUES ("
-       << str::quoted(task["taskName"]) << ", "
-       << task["taskStatus"] << ", "
-       << 0 << ", "
-       << task["taskExitCode"] << ", "
-       << str::quoted(taskPath) << ", "
-       << 0 << ", "
-       << str::quoted(registrationTime) << ", "
-       << str::quoted(task["taskStart"]) << ", "
-       << str::quoted(task.dump()) << ", "
-       << str::quoted(taskData) << ");";
+    ss << "INSERT INTO tasks_info ";
+    ss << "(task_id, task_status_id, task_progress, task_exitcode, ";
+    ss << "task_path, task_size, registration_time, start_time, task_info, task_data) ";
+    ss << "VALUES (";
+    ss << str::quoted(task["taskName"].get<std::string>()) << ", ";
+    ss << task["taskStatus"].get<int>() << ", ";
+    ss << 0 << ", ";
+    ss << task["taskExitCode"].get<int>() << ", ";
+    ss << str::quoted(task["taskPath"].get<std::string>()) << ", ";
+    ss << 0 << ", ";
+    ss << str::quoted(registrationTime) << ", ";
+    ss << str::quoted(task["taskStart"].get<std::string>()) << ", ";
+    ss << str::quoted(task.dump()) << "::json, ";
+    ss << str::quoted(task["taskData"].dump()) << "::json);";
         
     try { result = runCmd(ss.str()); } catch(...) { throw; }
 
@@ -285,40 +286,36 @@ bool DBHdlPostgreSQL::updateTask(TaskInfo & task)
     json taskData = task["taskData"];
     std::string id = taskData["Id"];
 
-    std::vector<std::string> updates {eqKeyValue("task_id", id)};
+    std::vector<std::string> updates {eqkv("task_id", id)};
         
     if (checkTask(taskName)) {
         // Present, so this is task registered with old name as ID,
         // that must change to the actual ID
         result = updateTable("tasks_info",
-                             eqKeyValue("task_id",taskName),
+                             eqkv("task_id",taskName),
                              updates);
         // Once changed the task_id, the update must still be done
     }
 
     if (result) {
-        TaskStatus taskStatus(TaskStatusVal[task["taskStatus"]]);
+	int iTaskStatus = task["taskStatus"].get<int>();
+        TaskStatus taskStatus(TaskStatusEnum(iTaskStatus));
         updates.clear();
-        updates.push_back(eqKeyValue("task_status_id", (int)(taskStatus)));
-        updates.push_back(eqKeyValue("task_progress", 
-                                     taskData["State"]["Progress"]));
+        updates.push_back(eqkv("task_status_id", iTaskStatus));
+        updates.push_back(eqkv("task_progress", task["taskProgress"].get<int>()));
         
-        bool isFinished = ((taskStatus == TASK_STOPPED) ||
-                           (taskStatus == TASK_FAILED) ||
-                           (taskStatus == TASK_FINISHED) ||
-                           (taskStatus == TASK_UNKNOWN_STATE));
+        bool isFinished = ((iTaskStatus == TASK_STOPPED) || (iTaskStatus == TASK_FINISHED) || 
+			   (iTaskStatus == TASK_FAILED) || (iTaskStatus == TASK_UNKNOWN_STATE));
+
         //if (isFinished) {
-            updates.push_back(eqKeyValue("start_time", task["taskStart"]));
-            if (!task["taskEnd"].empty()) {
-                updates.push_back(eqKeyValue("end_time", task["taskEnd"]));
-            }
-            updates.push_back(eqKeyValue("task_path", task["taskPath"])); 
-            updates.push_back(eqKeyValue("task_data", task["taskData"]));
-            updates.push_back(eqKeyValue("task_info", task.dump())); 
-            //}
-        result &= updateTable("tasks_info",
-                              eqKeyValue("task_id", id),
-                              updates);
+	updates.push_back(eqkv("start_time", task["taskStart"].get<std::string>()));
+	updates.push_back(eqkv("end_time", task["taskEnd"].get<std::string>()));
+	updates.push_back(eqkv("task_path", task["taskPath"].get<std::string>())); 
+	updates.push_back(eqkv("task_data", task["taskData"]));
+	updates.push_back(eqkv("task_info", task.dump())); 
+	//}
+
+        result &= updateTable("tasks_info", eqkv("task_id", id), updates);
     }
      
     PQclear(res);
@@ -676,17 +673,17 @@ bool DBHdlPostgreSQL::fillWithResult(std::vector< std::vector<std::string> > & t
 // Method: quotedValue
 // Returns the value used in the update string
 //----------------------------------------------------------------------
-std::string DBHdlPostgreSQL::eqKeyValue(std::string k, int x) 
+std::string DBHdlPostgreSQL::eqkv(std::string k, int x) 
 { return k + " = " + std::to_string(x); }
 
-std::string DBHdlPostgreSQL::eqKeyValue(std::string k, double x) 
+std::string DBHdlPostgreSQL::eqkv(std::string k, double x) 
 { return k + " = " + std::to_string(x); }
 
-std::string DBHdlPostgreSQL::eqKeyValue(std::string k, std::string x) 
+std::string DBHdlPostgreSQL::eqkv(std::string k, std::string x) 
 { return k + " = " + str::quoted(x); }
 
-std::string DBHdlPostgreSQL::eqKeyValue(std::string k, json x) 
-{ return x.dump(); }
+std::string DBHdlPostgreSQL::eqkv(std::string k, json x) 
+{ return k + " = " + str::quoted(x.dump()) + "::json"; }
 
 //----------------------------------------------------------------------
 // Method: updateTable

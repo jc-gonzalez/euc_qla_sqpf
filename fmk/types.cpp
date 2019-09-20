@@ -70,23 +70,9 @@ std::string TaskStatus::str() const
     return TaskStatusStr[value];
 }
 
-std::string TaskStatus::lstr() const
-{
-    string s = TaskStatusStr[value];
-    str::toLower(s);
-    return s;
-}
-
 void TaskStatus::fromStr(std::string & s)
 {
     value = TaskStatusEnum(TaskStatusVal[s]);
-}
-
-int TaskStatusDowncaseVal(std::string & s)
-{
-    std::string ss(s);
-    str::toUpper(ss);
-    return TaskStatusVal[ss];
 }
 
 //==========================================================================
@@ -124,14 +110,14 @@ void BalancingMode::fromStr(std::string & s)
 string agentSpectrumToStr(AgentSpectrum & sp) {
     std::stringstream ss;
     ss << "{" 
-       << "\"aborted\": " << sp["aborted"] << ", " 
-       << "\"archived\": " << sp["archived"] << ", " 
-       << "\"failed\": " << sp["failed"] << ", " 
-       << "\"finished\": " << sp["finished"] << ", " 
-       << "\"paused\": " << sp["paused"] << ", " 
-       << "\"running\": " << sp["running"] << ", " 
-       << "\"scheduled\": " << sp["scheduled"] << ", " 
-       << "\"stopped\": " << sp["stopped"] << "}";
+       << "\"ABORTED\": "   << sp["ABORTED"]   << ", " 
+       << "\"ARCHIVED\": "  << sp["ARCHIVED"]  << ", " 
+       << "\"FAILED\": "    << sp["FAILED"]    << ", " 
+       << "\"FINISHED\": "  << sp["FINISHED"]  << ", " 
+       << "\"PAUSED\": "    << sp["PAUSED"]    << ", " 
+       << "\"RUNNING\": "   << sp["RUNNING"]   << ", " 
+       << "\"SCHEDULED\": " << sp["SCHEDULED"] << ", " 
+       << "\"STOPPED\": "   << sp["STOPPED"]   << "}";
     return ss.str();
 }
 

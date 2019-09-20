@@ -45,14 +45,14 @@
 // Constructor
 //----------------------------------------------------------------------
 ContainerSpectrum::ContainerSpectrum()
-    : savedSpec({{"aborted", 0},
-                  {"archived", 0},
-                  {"failed", 0},
-                  {"finished", 0},
-                  {"paused", 0},
-                  {"running", 0},
-                  {"scheduled", 0},
-                  {"stopped", 0}})
+    : savedSpec({{"ABORTED", 0},
+                  {"ARCHIVED", 0},
+                  {"FAILED", 0},
+                  {"FINISHED", 0},
+                  {"PAUSED", 0},
+                  {"RUNNING", 0},
+                  {"SCHEDULED", 0},
+                  {"STOPPED", 0}})
 {
     cnts.setSize(40);
 }

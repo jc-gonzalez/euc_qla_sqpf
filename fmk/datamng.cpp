@@ -40,8 +40,6 @@
 
 #include "datamng.h"
 
-#include "dbhdlpostgre.h"
-
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
@@ -49,7 +47,6 @@ DataManager::DataManager(Config & _cfg, ProcessingNetwork & _net)
     : cfg(_cfg), net(_net),
       logger(Log::getLogger("datmng"))
 {
-    
 }
 
 //----------------------------------------------------------------------
@@ -65,7 +62,7 @@ DataManager::~DataManager()
 //----------------------------------------------------------------------
 void DataManager::initializeDB()
 {
-    std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL(net, logger));
+    dbHdl = std::unique_ptr<DBHandler>(new DBHdlPostgreSQL(net, logger));
 
     dbHdl->setConnectionParams(cfg["db"]["host"].get<std::string>(),
                                std::stod(cfg["db"]["port"].get<std::string>()),
@@ -95,21 +92,31 @@ void DataManager::storeProductInfo(ProductMeta & m)
 void DataManager::storeTaskInfo(string & taskId, int taskStatus,
                                 string & taskInfo, bool initial)
 {
-    std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL(net, logger));
-
     try {
         // Check that connection with the DB is possible
         if (!dbHdl->openConnection()) {
             logger.warn("Cannot establish connection to database");
         }
 
+	//logger.debug(taskInfo);
+	json taskData = json::parse(taskInfo);
+	json task = 
+	    {{"taskName", taskId},
+	     {"taskStatus", taskStatus},
+	     {"taskExitCode", taskData["State"]["ExitCode"].get<int>()},
+	     {"taskPath", taskData["Config"]["WorkingDir"].get<string>()},
+	     {"taskStart", taskData["State"]["StartedAt"].get<string>()},
+	     {"taskEnd", taskData["State"]["FinishedAt"].get<string>()},
+	     {"taskProgress", 1},
+	     {"taskInfo", taskInfo},
+	     {"taskData", taskData}};
+
         // Try to store the task data into the DB
-        if (initial) { dbHdl->storeTask(taskInfo); }
-        else         { dbHdl->updateTask(taskInfo); }
+        if (initial) { dbHdl->storeTask(task); }
+        else         { dbHdl->updateTask(task); }
 
     } catch (RuntimeException & e) {
-        ErrMsg(e.what());
-        return;
+        logger.fatal(e.what());
     }
 
     // Close connection
@@ -117,11 +124,9 @@ void DataManager::storeTaskInfo(string & taskId, int taskStatus,
 
     // If task is not finished, we are done
     if ((taskStatus != TASK_FINISHED) &&
-        (taskStatus == TASK_FAILED)) { return; }
+        (taskStatus != TASK_FAILED)) { return; }
 
     // Otherwise, task is finished, save outputs metadata
-    json task = json::parse(taskInfo);
-    logger.debug(taskInfo);
 
 }
 
