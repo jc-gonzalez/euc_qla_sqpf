@@ -128,6 +128,7 @@ void DataManager::storeTaskInfo(string & taskId, int taskStatus,
 
     // Otherwise, task is finished, save outputs metadata
 
+    logger.debug(taskInfo);
 }
 
 //----------------------------------------------------------------------
