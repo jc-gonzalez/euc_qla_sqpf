@@ -303,8 +303,9 @@ bool Master::checkIfProduct(string & fileName, ProductMeta & meta)
 //----------------------------------------------------------------------
 void Master::distributeProducts()
 {
-    if (nodeInfoIsAvailable) {
-        for (int i = 0; i < nodeStatus.size(); ++i) {
+    for (int i = 0; i < nodeStatus.size(); ++i) {
+        if (nodeStatusIsAvailable[i]) { 
+            logger.info(std::to_string(i) + ": " + nodeStatus[i].dump());
             json jloads = nodeStatus[i]["machine"]["load"];
             //std::stringstream ss;
             //ss << "LOADS: " << jloads;
@@ -358,6 +359,7 @@ void Master::scheduleProductsForProcessing()
     // Process the products in one list
     ProductName prod;
     ProductMeta meta;
+    ProductMetaList products;
     while (productsForProcessing.get(prod)) {
         if (! checkIfProduct(prod, meta)) {
             logger.debug(meta.dump());
@@ -374,11 +376,15 @@ void Master::scheduleProductsForProcessing()
         if (! tskOrc->schedule(meta, *tskMng)) {
             (void)unlink(prod.c_str());
         }
+
+        products.push_back(meta);
     }
 
     // The inputs products dispatched to other nodes only have to be
     // then archived in the local archive (in case this is the commander)
     if (net->thisIsCommander) {
+        dataMng->storeProducts(products);
+
         while (productsForArchival.get(prod)) {
             (void)unlink(prod.c_str());
         }
@@ -393,15 +399,20 @@ void Master::archiveOutputs()
 {
     static FileNameSpec fns;
 
-    ProductMeta meta;
     ProductName prod;
+    ProductMeta meta;
+    ProductMetaList products;
     while (outputProducts.get(prod)) {
         if (fns.parse(prod, meta)) {
+            products.push_back(meta);
             ProductLocator::toLocalArchive(meta, wa, ProductLocator::MOVE);
             logger.debug("Moving output product " + prod + " to archive");
         } else {
             logger.warn("Found non-product file in local outputs folder: " + prod);
         }
+    }
+    if (products.size() > 0) {
+        dataMng->storeProducts(products);
     }
 }
 
@@ -449,25 +460,29 @@ void Master::transferFilesToCommander(Queue<string> & prodQueue,
 }
 
 //----------------------------------------------------------------------
-// Method: gatherNodesInfo
+// Method: gatherNodesStatus
 // Collects all nodes agents info
 //----------------------------------------------------------------------
-void Master::gatherNodesInfo()
+void Master::gatherNodesStatus()
 {
     nodeStatus.clear();
+    nodeStatusIsAvailable.clear();
+    
     for (auto & node: net->nodesButComm) {
         auto it = std::find(net->nodeName.begin(),
                             net->nodeName.end(), node);
         int i = it - net->nodeName.begin();
+
         httpRqstr->setServerUrl(net->nodeServerUrl.at(i));
         string resp;
         if (!httpRqstr->requestData("/status", resp)) {
             logger.warn("Couldn't get node '%s' information from "
                         "master commander", node.c_str());
             nodeStatus.push_back(json{-1});
+            nodeStatusIsAvailable.push_back(false);
             continue;
         }
-        //logger.debug("Response from %s: %s", node.c_str(), resp.c_str());
+
         json respObj;
         try {
             respObj = json::parse(resp);
@@ -475,9 +490,12 @@ void Master::gatherNodesInfo()
             logger.warn("Problems in the translation of node '%s' "
                         "information", node.c_str());
             nodeStatus.push_back(json{-1});
+            nodeStatusIsAvailable.push_back(false);
             continue;
         }
+        
         nodeStatus.push_back(respObj);
+        nodeStatusIsAvailable.push_back(true);
     }
 }
 
@@ -532,7 +550,7 @@ void Master::runMainLoop()
         // Retrieve nodes information
         if ((net->thisIsCommander) &&
             ((iteration == 1) || ((iteration % 20) == 0))) {
-            gatherNodesInfo();
+            gatherNodesStatus();
         }
 
         // Wait a little bit until next loop

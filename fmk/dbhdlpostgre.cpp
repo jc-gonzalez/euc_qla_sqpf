@@ -134,32 +134,38 @@ int DBHdlPostgreSQL::storeProducts(ProductMetaList & prodList)
             "product_version, product_size, creator_id, "
            << "obs_id, soc_id, "
            << "instrument_id, obsmode_id, signature, start_time, "
-            "end_time, registration_time, url, report) "
+            "end_time, registration_time, format, url, report) "
            << "VALUES ("
-           << str::quoted(m["productId"]) << ", "
-           << str::quoted(m["productType"]) << ", "
+           << str::quoted(m["id"]) << ", "
+           << str::quoted(m["fileinfo"]["base"]) << ", "
            << str::quoted("OK") << ", "
-           << str::quoted(m["productVersion"]) << ", "
+           << str::quoted(m["version"]) << ", "
            << m["size"] << ", "
            << str::quoted("SOC_QLA_TEST") << ", "
-           << str::quoted(m["obsIdStr"]) << ", "
-           << str::quoted(m["obsIdStr"]) << ", "
+           << str::quoted(m["obs_id"]) << ", "
+           << str::quoted(m["obs_id"]) << ", "
            << str::quoted(m["instrument"]) << ", "
-           << str::quoted(m["obsMode"]) << ", "
-           << str::quoted(m["signature"]) << ", "
-           << str::quoted(str::tagToTimestamp(m["startTime"])) << ", "
-           << str::quoted(str::tagToTimestamp(m["endTime"])) << ", "
+           << str::quoted(m["obs_mode"]) << ", "
+           << str::quoted(m["instance"]) << ", "
+           << str::quoted(str::tagToTimestamp(m["start_time"])) << ", "
+           << str::quoted(str::tagToTimestamp(m["end_time"])) << ", "
            << str::quoted(str::tagToTimestamp(timeTag())) << ", "
+           << str::quoted(m["format"]) << ", "
            << str::quoted(prodUrl) << ", "
            << str::quoted(repContent) << "::json) "
-           << "ON CONFLICT (product_id) DO UPDATE "
+           << "ON CONFLICT (product_id, format) DO UPDATE "
            << "SET report=" << str::quoted(repContent) << "::json;";
-        try { result = runCmd(ss.str()); }
-        catch(...) { logger.error("Cannot store product!"); }
-        PQclear(res);
+        try { 
+            result = runCmd(ss.str()); 
+            if (result) PQclear(res);
+            string id = m["id"];
+            logger.debug("Archived product: " + id);
+        } catch (RuntimeException &e) {
+            logger.error("Cannot store product!"); 
+            logger.error(e.what());
+        }
         nInsProd++;
     }
-
 
     result = runCmd("refresh materialized view products_info_filter;");
     PQclear(res);

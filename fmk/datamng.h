@@ -86,9 +86,9 @@ public:
     void initializeDB();
 
     //----------------------------------------------------------------------
-    // Method: storeProductInfo
+    // Method: storeProducts
     //----------------------------------------------------------------------
-    void storeProductInfo(ProductMeta & m);
+    void storeProducts(ProductMetaList &vm);
 
     //----------------------------------------------------------------------
     // Method: storeTaskInfo

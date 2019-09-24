@@ -79,11 +79,22 @@ void DataManager::initializeDB()
 }
 
 //----------------------------------------------------------------------
-// Method: storeProductInfo
+// Method: storeProducts
 //----------------------------------------------------------------------
-void DataManager::storeProductInfo(ProductMeta & m)
+void DataManager::storeProducts(ProductMetaList & vm)
 {
+    try {
+        // Check that connection with the DB is possible
+        if (!dbHdl->openConnection()) {
+            logger.warn("Cannot establish connection to database");
+        }
+        dbHdl->storeProducts(vm);
+    } catch (RuntimeException & e) {
+        logger.fatal(e.what());
+    }
 
+    // Close connection
+    dbHdl->closeConnection();
 }
 
 //----------------------------------------------------------------------
@@ -98,18 +109,18 @@ void DataManager::storeTaskInfo(string & taskId, int taskStatus,
             logger.warn("Cannot establish connection to database");
         }
 
-	//logger.debug(taskInfo);
-	json taskData = json::parse(taskInfo);
-	json task = 
-	    {{"taskName", taskId},
-	     {"taskStatus", taskStatus},
-	     {"taskExitCode", taskData["State"]["ExitCode"].get<int>()},
-	     {"taskPath", taskData["Config"]["WorkingDir"].get<string>()},
-	     {"taskStart", taskData["State"]["StartedAt"].get<string>()},
-	     {"taskEnd", taskData["State"]["FinishedAt"].get<string>()},
-	     {"taskProgress", 1},
-	     {"taskInfo", taskInfo},
-	     {"taskData", taskData}};
+        //logger.debug(taskInfo);
+        json taskData = json::parse(taskInfo);
+        json task = 
+            {{"taskName", taskId},
+                {"taskStatus", taskStatus},
+                {"taskExitCode", taskData["State"]["ExitCode"].get<int>()},
+                {"taskPath", taskData["Config"]["WorkingDir"].get<string>()},
+                {"taskStart", taskData["State"]["StartedAt"].get<string>()},
+                {"taskEnd", taskData["State"]["FinishedAt"].get<string>()},
+                {"taskProgress", 1},
+                {"taskInfo", taskInfo},
+                {"taskData", taskData}};
 
         // Try to store the task data into the DB
         if (initial) { dbHdl->storeTask(task); }

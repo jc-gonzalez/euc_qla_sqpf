@@ -181,9 +181,9 @@ private:
                                   string route = string("/outputs"));
     
     //----------------------------------------------------------------------
-    // Method: gatherNodesInfo
+    // Method: gatherNodesStatus
     //----------------------------------------------------------------------
-    void gatherNodesInfo();
+    void gatherNodesStatus();
 
     //----------------------------------------------------------------------
     // Method: runMainLoop
@@ -239,12 +239,13 @@ private:
 
     Queue<string> outputProducts;
 
+    bool nodeInfoIsAvailable;
     json nodeInfo;
 
     typedef int(*SelectNodeFn)(Master*);
     SelectNodeFn selectNodeFn;
 
-    bool nodeInfoIsAvailable;
+    vector<bool> nodeStatusIsAvailable;
     vector<json> nodeStatus;
 
     Logger logger;

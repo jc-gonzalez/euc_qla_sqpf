@@ -252,6 +252,7 @@ bool TaskAgent::prepareNewTask(string taskId, string taskFld, string proc)
     }
     logger.debug("Moving from %s to %s", curdir, taskFld.c_str());
 
+    //--- Get inputs --------------------
     p_inputs = getFiles(pcfg["input"].get<string>());
     if (p_inputs.size() < 1) {
         logger.error("No input files provided to the processor %s", proc.c_str());
@@ -259,7 +260,10 @@ bool TaskAgent::prepareNewTask(string taskId, string taskFld, string proc)
     }
     string p_input = str::join(p_inputs, ",");
     logger.debug("Processing task %s will process %s", taskId.c_str(), p_input.c_str());
+    for (auto & s: p_inputs) { s = str::getBaseName(s); }
+    i_input = str::join(p_inputs, ",");
 
+    //--- Get outputs --------------------
     string p_output = pcfg["output"].get<string>();
     if (isSubstitutionRules(p_output)) {
         p_outputs = doRules(p_output);
@@ -268,8 +272,11 @@ bool TaskAgent::prepareNewTask(string taskId, string taskFld, string proc)
     }
     p_output = str::join(p_outputs, ",");
     logger.debug("Output: %s", p_output.c_str());
+    for (auto & s: p_outputs) { s = str::getBaseName(s); }
+    i_output = str::join(p_outputs, ",");
 
-    string p_log    = pcfg["log"].get<string>();
+    //--- Get logs --------------------
+    string p_log = pcfg["log"].get<string>();
     if (isSubstitutionRules(p_log)) {
         p_logs = doRules(p_log);
     } else {
@@ -277,6 +284,11 @@ bool TaskAgent::prepareNewTask(string taskId, string taskFld, string proc)
     }
     p_log = str::join(p_logs, ",");
     logger.debug("Log: %s", p_log.c_str());
+    for (auto & s: p_logs) { s = str::getBaseName(s); }
+    i_log = str::join(p_logs, ",");
+
+    // Define IO section for task inspection object
+    jio = {{"input", i_input}, {"output", i_output}, {"p_log", i_log}};
 
     chdir(curdir);
     logger.debug("Back in %s", curdir);
@@ -355,6 +367,10 @@ string TaskAgent::inspectContainer(string cntId, bool fullInfo, string filter)
     info.str(fullInfo ? "" : "'" + filter + "'");
     if (!dckMng->getInfo(cntId, info)) {
         logger.error("Cannot inspect container with id %s", cntId.c_str());
+    } else {
+        json jinspect = json::parse(info);
+        jinspect["IO"] = jio;
+        info.str(jinspect.dump());
     }
     return info.str();
 }

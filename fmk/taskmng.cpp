@@ -349,10 +349,10 @@ void TaskManager::updateTasksInfo(DataManager & datmng)
             tq->get(status);
             int statusVal = TaskStatusVal[status];
             updateContainer(agName, contId, statusVal);
-	    if (!inspect.empty()) {
-		datmng.storeTaskInfo(taskId, statusVal,
-				     inspect, justCreated == "true");
-	    }
+            if (!inspect.empty()) {
+                datmng.storeTaskInfo(taskId, statusVal,
+                                     inspect, justCreated == "true");
+            }
         }
     }
 }

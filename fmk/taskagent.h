@@ -223,10 +223,15 @@ private:
     std::shared_ptr<ContainerMng> dckMng;
 
     Config pcfg;
+    string i_input;
+    string i_output;
+    string i_log;
     vector<string> p_inputs;
     vector<string> p_outputs;
     vector<string> p_logs;
 
+    json jio;
+    
     string dck_image;
     string dck_exe;
     vector<string> dck_args;
