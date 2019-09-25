@@ -128,7 +128,7 @@ Master::Master(string _cfg, string _id, int _port, string _wa, int _bMode)
         selectNodeFn = [](Master * m){ return m->genRandomNode(); };
         break;
     default:
-        selectNodeFn = [](Master * m){ return 0; };
+        selectNodeFn = [](Master * m){ return - m->balanceMode - 1; };
     }
     //selectNodeFn = [](Master * m){ return 1; };
 
@@ -412,7 +412,10 @@ void Master::archiveOutputs()
         }
     }
     if (products.size() > 0) {
+        logger.info("Found " + std::to_string(products.size()) + " products to archive");
         dataMng->storeProducts(products);
+    } else {
+        logger.warn("AAAARGH!! No products found to be archived!!");
     }
 }
 

@@ -263,8 +263,10 @@ void Deployer::sayHello()
     logger << log4cpp::Priority::INFO << "Running at " << currentHostAddr
            << ", HTTP server listening at port " << port;
     logger << log4cpp::Priority::INFO << "Working area located at " << workArea;
-    logger << log4cpp::Priority::INFO << "Node balancing mode is set to '"
-           << BalancingModeStr[balanceMode] << "'";
+    if (balanceMode > -1) {
+        logger << log4cpp::Priority::INFO << "Node balancing mode is set to '"
+            << BalancingModeStr[balanceMode] << "'";
+    }
     logger << log4cpp::Priority::INFO << hline;
 }
 

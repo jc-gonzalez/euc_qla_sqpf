@@ -260,38 +260,42 @@ bool TaskAgent::prepareNewTask(string taskId, string taskFld, string proc)
     }
     string p_input = str::join(p_inputs, ",");
     logger.debug("Processing task %s will process %s", taskId.c_str(), p_input.c_str());
-    for (auto & s: p_inputs) { s = str::getBaseName(s); }
-    i_input = str::join(p_inputs, ",");
+    vector<string> iv;
+    for (auto &s : p_inputs) { iv.push_back(str::getBaseName(s)); }
+    i_input = str::join(iv, ",");
 
     //--- Get outputs --------------------
     string p_output = pcfg["output"].get<string>();
     if (isSubstitutionRules(p_output)) {
+        logger.debug("Using substitution rules to obtain outputs...");
         p_outputs = doRules(p_output);
     } else {
         p_outputs = getFiles(p_output);
     }
     p_output = str::join(p_outputs, ",");
     logger.debug("Output: %s", p_output.c_str());
-    for (auto & s: p_outputs) { s = str::getBaseName(s); }
-    i_output = str::join(p_outputs, ",");
+    iv.clear();
+    for (auto & s: p_outputs) { iv.push_back(str::getBaseName(s)); }
+    i_output = str::join(iv, ",");
 
     //--- Get logs --------------------
     string p_log = pcfg["log"].get<string>();
     if (isSubstitutionRules(p_log)) {
+        logger.debug("Using substitution rules to obtain logs...");
         p_logs = doRules(p_log);
     } else {
         p_logs = getFiles(p_log);
     }
     p_log = str::join(p_logs, ",");
     logger.debug("Log: %s", p_log.c_str());
-    for (auto & s: p_logs) { s = str::getBaseName(s); }
-    i_log = str::join(p_logs, ",");
+    iv.clear();
+    for (auto & s: p_logs) { iv.push_back(str::getBaseName(s)); }
+    i_log = str::join(iv, ",");
 
     // Define IO section for task inspection object
     jio = {{"input", i_input}, {"output", i_output}, {"p_log", i_log}};
 
     chdir(curdir);
-    logger.debug("Back in %s", curdir);
     
     // 2. Processor subfolder name (folder under QPF_WA/bin/"
     string p_processor = pcfg["processor"].get<string>();
@@ -464,13 +468,15 @@ void TaskAgent::prepareOutputs()
 {
     static FileNameSpec fns;
 
+    logger.debug("Checking folder >> " + taskFolder + "/log");
+    logger.debug("Checking folder >> " + taskFolder + "/out");
     vector<string> logFiles = FileTools::filesInFolder(taskFolder + "/log", "log");
     vector<string> outFiles = FileTools::filesInFolder(taskFolder + "/out");
 
     logger.debug("logs: " + str::join(logFiles, ","));
     logger.debug("outputs: " + str::join(outFiles, ","));
 
-    // Move the outputs to the outbox folder, so they are sent to the archive
+    // Move the logs to the outbox folder, so they are sent to the archive
     for (auto & f: logFiles) {
         ProductMeta meta;
         if (! fns.parse(f, meta)) {
