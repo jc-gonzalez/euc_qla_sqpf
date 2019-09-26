@@ -110,4 +110,22 @@ bool Queue<T>::empty()
     return isEmpty;
 }
 
+//----------------------------------------------------------------------
+// Method: dump
+//----------------------------------------------------------------------
+template<typename T>
+bool Queue<T>::dump()
+{
+    queue<T> tmp_q;
+    {
+        std::lock_guard<std::mutex> lock(queueMutex);
+        tmp_q = objects;
+    }
+    while (!tmp_q.empty()) {
+        obj = tmp_q.front();
+        std::cout << ">>> " << obj << "\n";
+        tmp_q.pop();
+    } 
+}
+
 template class Queue<std::string>;
