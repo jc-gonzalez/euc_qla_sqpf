@@ -114,7 +114,7 @@ bool Queue<T>::empty()
 // Method: dump
 //----------------------------------------------------------------------
 template<typename T>
-bool Queue<T>::dump()
+void Queue<T>::dump()
 {
     queue<T> tmp_q;
     {
