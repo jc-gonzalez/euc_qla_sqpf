@@ -123,7 +123,6 @@ void Queue<T>::dump()
     }
     while (!tmp_q.empty()) {
         T obj = tmp_q.front();
-        std::cout << ">>> " << obj << "\n";
         tmp_q.pop();
     } 
 }

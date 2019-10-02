@@ -62,6 +62,7 @@
 #include "wa.h"
 
 class Master;
+class TaskManager;
 
 //==========================================================================
 // Class: MasterServer
@@ -72,7 +73,7 @@ public:
     //----------------------------------------------------------------------
     // Constructor
     //----------------------------------------------------------------------
-    MasterServer(Master * hdl, int prt, WorkArea & _wa);
+    MasterServer(Master * hdl, TaskManager * hdlt, int prt, WorkArea & _wa);
 
     //----------------------------------------------------------------------
     // Destructor
@@ -94,6 +95,7 @@ private:
 
 private:
     Master * mhdl;
+    TaskManager * thdl;
     WorkArea & wa;
 };
 

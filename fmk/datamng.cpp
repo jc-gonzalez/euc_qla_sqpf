@@ -111,20 +111,24 @@ void DataManager::storeTaskInfo(string & taskId, int taskStatus,
 
         //logger.debug(taskInfo);
         json taskData = json::parse(taskInfo);
-        json task = 
-            {{"taskName", taskId},
-                {"taskStatus", taskStatus},
-                {"taskExitCode", taskData["State"]["ExitCode"].get<int>()},
-                {"taskPath", taskData["Config"]["WorkingDir"].get<string>()},
-                {"taskStart", taskData["State"]["StartedAt"].get<string>()},
-                {"taskEnd", taskData["State"]["FinishedAt"].get<string>()},
-                {"taskProgress", 1},
-                {"taskInfo", taskInfo},
-                {"taskData", taskData}};
+        // json task = 
+        //     {{"taskName", taskId},
+        //         {"taskStatus", taskStatus},
+        //         {"taskExitCode", taskData["State"]["ExitCode"].get<int>()},
+        //         {"taskPath", taskData["Config"]["WorkingDir"].get<string>()},
+        //         {"taskStart", taskData["State"]["StartedAt"].get<string>()},
+        //         {"taskEnd", taskData["State"]["FinishedAt"].get<string>()},
+        //         {"taskProgress", 1},
+        //         {"taskInfo", taskInfo},
+        //         {"taskData", taskData}};
 
-        // Try to store the task data into the DB
-        if (initial) { dbHdl->storeTask(task); }
-        else         { dbHdl->updateTask(task); }
+        // // Try to store the task data into the DB
+        // if (initial) { dbHdl->storeTask(task); }
+        // else         { dbHdl->updateTask(task); }
+
+        if (!dbHdl->insertOrUpdateTask(taskId, taskStatus, taskData)) {
+            logger.warn("Cannot store task " + taskId + " in database");
+        }
 
     } catch (RuntimeException & e) {
         logger.fatal(e.what());
@@ -139,7 +143,7 @@ void DataManager::storeTaskInfo(string & taskId, int taskStatus,
 
     // Otherwise, task is finished, save outputs metadata
 
-    logger.debug(taskInfo);
+    //logger.debug(taskInfo);
 }
 
 //----------------------------------------------------------------------

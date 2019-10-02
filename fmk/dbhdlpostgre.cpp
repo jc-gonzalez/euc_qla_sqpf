@@ -329,6 +329,54 @@ bool DBHdlPostgreSQL::updateTask(TaskInfo & task)
 }
 
 //----------------------------------------------------------------------
+// Method: insertOrUpdateTask
+// Stores a task information to the database, or updates if exists
+//----------------------------------------------------------------------
+bool DBHdlPostgreSQL::insertOrUpdateTask(string & tname, int tstatus,
+                                         TaskInfo & info)
+{
+    bool result = true;
+
+    std::string registrationTime(tagToTimestamp(preciseTimeTag()));
+    std::stringstream ss;
+
+    int texitCode = info["State"]["ExitCode"].get<int>();
+    string tpath = info["Config"]["WorkingDir"];
+    string tstart = info["State"]["StartedAt"];
+    string tend = info["State"]["FinishedAt"];
+    
+    ss.str("");
+    ss << "INSERT INTO tasks_info "
+       << "(task_id, task_status_id, task_progress, task_exitcode, "
+       << "task_path, task_size, registration_time, "
+       << "start_time, end_time, task_info, task_data) "
+       << "VALUES (";
+    ss << str::quoted(tname) << ", " << tstatus << ", "
+       << 0 << ", " << texitCode << ", ";
+    ss << str::quoted(tpath) << ", " << 0 << ", "
+       << str::quoted(registrationTime) << ", ";
+    ss << str::quoted(tstart) << ", "
+       << str::quoted(tend) << ", "
+       << str::quoted(info.dump()) << "::json, "
+       << str::quoted(info.dump()) << "::json) ";
+    ss << "ON CONFLICT (task_id) DO UPDATE SET "
+       << "task_status_id=" << tstatus << ", "
+       << "end_time=" << str::quoted(tend) << ", "
+       << "task_info=" << str::quoted(info.dump()) << "::json, "
+       << "task_data=" << str::quoted(info.dump()) << "::json;";
+
+    try {
+        result = runCmd(ss.str());
+    } catch(...) {
+        result = false;
+        throw;
+    }
+     
+    PQclear(res);
+    return result;
+}
+
+//----------------------------------------------------------------------
 // Method: retrieveTask
 // Retrieves a task information from the database
 //----------------------------------------------------------------------

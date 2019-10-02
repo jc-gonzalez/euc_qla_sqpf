@@ -96,6 +96,11 @@ public:
     bool retrieveAgentsInfo(json & hi);
 
     //----------------------------------------------------------------------
+    // Method: getTaskInfo
+    //----------------------------------------------------------------------
+    string getTaskInfo();
+    
+    //----------------------------------------------------------------------
     // Method: showSpectra
     //----------------------------------------------------------------------
     void showSpectra();
@@ -108,7 +113,7 @@ public:
     //----------------------------------------------------------------------
     // Method: updateTasksInfo
     //----------------------------------------------------------------------
-    void updateTasksInfo(DataManager & datmng);
+    void updateTasksInfo();
 
     //----------------------------------------------------------------------
     // Method: schedule
@@ -197,7 +202,9 @@ private:
     vector<Queue<string>*> agentsOutQueue;
     vector<Queue<string>*> agentsTskQueue;
 
-    map< string, std::tuple<string, int> > agentsContainer;
+    map<string, string> agentTaskInfo;
+    
+    map<string, std::tuple<string, int>> agentsContainer;
         
     json agentsInfo;
 

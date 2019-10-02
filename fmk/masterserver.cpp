@@ -40,6 +40,7 @@
 
 #include "masterserver.h"
 #include "master.h"
+#include "taskmng.h"
 
 #include <memory>
 #include <fstream>
@@ -109,6 +110,22 @@ private:
     Master * mhdl;
 };
 
+class RscTaskStatus : public http_resource {
+public:
+    void setTaskMngHdl(TaskManager * hdl) { thdl = hdl; }
+    
+    const HttpRespPtr render_GET(const http_request&) {
+        return HttpRespPtr(new strResp(thdl->getTaskInfo(), 200,
+                                       "application/json"));
+    }
+
+    const HttpRespPtr render(const http_request&) {
+        return HttpRespPtr(new strResp("", 404));
+    }
+private:
+    TaskManager * thdl;
+};
+
 class RscPostReceiver : public http_resource {
 public:
     void setWorkArea(WorkArea * _wa) { wa = _wa; }
@@ -148,8 +165,8 @@ private:
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
-MasterServer::MasterServer(Master * hdl, int prt, WorkArea & _wa)
-    : HttpCommServer(prt, _wa.serverBase), mhdl(hdl), wa(_wa)
+MasterServer::MasterServer(Master * hdl, TaskManager * hdlt, int prt, WorkArea & _wa)
+    : HttpCommServer(prt, _wa.serverBase), mhdl(hdl), thdl(hdlt), wa(_wa)
 {
 }
 
@@ -184,6 +201,10 @@ void MasterServer::run()
     RscHostStatus rscStatus;
     rscStatus.setMasterHdl(mhdl);
     addRoute(ws, "/status", &rscStatus);
+
+    RscTaskStatus rscTStatus;
+    rscTStatus.setTaskMngHdl(thdl);
+    addRoute(ws, "/tstatus", &rscTStatus);
 
     RscPostReceiver rscPostRcv;
     rscPostRcv.setWorkArea(&wa);

@@ -82,6 +82,8 @@ void TaskManager::setDirectoryWatchers()
 {
     dirWatchers.push_back(DirWatchedAndQueue(new DirWatcher(wa.localOutputs),
                                              outboxProdQueue));
+    dirWatchers.push_back(DirWatchedAndQueue(new DirWatcher(wa.remoteOutputs),
+                                             outboxProdQueue));
 }
 
 //----------------------------------------------------------------------
@@ -334,7 +336,7 @@ void TaskManager::updateContainer(string & agName, string contId,
 // Method: updateTasksInfo
 // Update task info in task queue
 //----------------------------------------------------------------------
-void TaskManager::updateTasksInfo(DataManager & datmng)
+void TaskManager::updateTasksInfo()
 {
     int numOfAgents = net.thisNodeNumOfAgents;
     for (int agNum = 0; agNum < numOfAgents; ++agNum) {
@@ -349,10 +351,15 @@ void TaskManager::updateTasksInfo(DataManager & datmng)
             tq->get(status);
             int statusVal = TaskStatusVal[status];
             updateContainer(agName, contId, statusVal);
-            if (!inspect.empty()) {
-                datmng.storeTaskInfo(taskId, statusVal,
-                                     inspect, justCreated == "true");
-            }
+            if (inspect.empty()) { inspect = "{}"; }
+            
+            agentTaskInfo[agName] = "{" +
+                ("\"task_id\": \"" + taskId + "\"," +
+                 "\"status\": \"" + status + "\"," +
+                 "\"info\": " + inspect + "," +
+                 "\"new\": " + justCreated) + "}";
+            //            datmng.storeTaskInfo(taskId, statusVal,
+            //                     inspect, justCreated == "true");
         }
     }
 }
@@ -443,6 +450,19 @@ bool TaskManager::retrieveAgentsInfo(json & hi)
 
     hi = agentsInfo;
     return true;
+}
+
+//----------------------------------------------------------------------
+// Method: getTaskInfo
+//----------------------------------------------------------------------
+string TaskManager::getTaskInfo()
+{
+    string ret_taskInfo("{");
+    for (const auto & kv : agentTaskInfo) {
+        ret_taskInfo += "\"" + kv.first + "\": " + kv.second + ",";
+    }
+    if (ret_taskInfo.length() > 1) { ret_taskInfo.pop_back(); }
+    return ret_taskInfo + "}";
 }
 
 //----------------------------------------------------------------------

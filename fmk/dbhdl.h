@@ -162,6 +162,13 @@ public:
     virtual bool updateTask(TaskInfo & task)=0;
 
     //----------------------------------------------------------------------
+    // Method: insertOrUpdateTask
+    // Stores a task information to the database, or updates if exists
+    //----------------------------------------------------------------------
+    virtual bool insertOrUpdateTask(string & tname, int tstatus,
+                                    TaskInfo & info)=0;
+    
+    //----------------------------------------------------------------------
     // Method: retrieveTask
     // Retrieves a task information from the database
     //----------------------------------------------------------------------

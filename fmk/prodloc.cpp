@@ -55,7 +55,7 @@
 #include <libgen.h>
 
 #define TRACES
-#undef  TRACES
+//#undef  TRACES
 
 #ifdef TRACES
 #  define TRC(s)  std::cerr << s << '\n'

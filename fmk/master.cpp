@@ -99,7 +99,7 @@ Master::Master(string _cfg, string _id, int _port, string _wa, int _bMode)
     }
 
     // Create HTTP server and requester object
-    httpServer = new MasterServer(this, port, wa);
+    httpServer = new MasterServer(this, tskMng, port, wa);
     httpRqstr = new MasterRequester;
 
     logger.info("HTTP Server started at port " + std::to_string(port) +
@@ -362,7 +362,6 @@ void Master::scheduleProductsForProcessing()
     ProductMetaList products;
     while (productsForProcessing.get(prod)) {
         if (! checkIfProduct(prod, meta)) {
-            logger.debug(meta.dump());
             logger.warn("File '" + prod + "' doesn't seem to be a valid product");
             continue;
         }
@@ -383,6 +382,14 @@ void Master::scheduleProductsForProcessing()
     // The inputs products dispatched to other nodes only have to be
     // then archived in the local archive (in case this is the commander)
     if (net->thisIsCommander) {
+        while (productsForArchival.get(prod)) {
+            if (! checkIfProduct(prod, meta)) {
+                logger.warn("File '" + prod + "' doesn't seem to be a valid product");
+                continue;
+            }
+            products.push_back(meta);
+        }
+        
         dataMng->storeProducts(products);
 
         while (productsForArchival.get(prod)) {
@@ -412,10 +419,7 @@ void Master::archiveOutputs()
         }
     }
     if (products.size() > 0) {
-        logger.info("Found " + std::to_string(products.size()) + " products to archive");
         dataMng->storeProducts(products);
-    } else {
-        logger.warn("AAAARGH!! No products found to be archived!!");
     }
 }
 
@@ -486,6 +490,8 @@ void Master::gatherNodesStatus()
             continue;
         }
 
+        //logger.debug("NodeStatus gathered: " + node + " := " + resp);
+        
         json respObj;
         try {
             respObj = json::parse(resp);
@@ -499,6 +505,51 @@ void Master::gatherNodesStatus()
         
         nodeStatus.push_back(respObj);
         nodeStatusIsAvailable.push_back(true);
+    }
+}
+
+//----------------------------------------------------------------------
+// Method: gatherTasksStatus
+// Collects all nodes tasks info
+//----------------------------------------------------------------------
+void Master::gatherTasksStatus()
+{
+    int i = -1;
+    for (auto & node: net->nodeName) {
+        ++i;
+        httpRqstr->setServerUrl(net->nodeServerUrl.at(i));
+        string resp;
+        if (!httpRqstr->requestData("/tstatus", resp)) {
+            logger.warn("Couldn't get node '%s' information from "
+                        "master commander", node.c_str());
+            continue;
+        }
+
+        if (resp == "{}") { continue; }
+        
+        json respObj;
+        try {
+            respObj = json::parse(resp);
+        } catch(...) {
+            logger.warn("Problems in the translation of tasks info. from node '%s'",
+                        node.c_str());
+            continue;
+        }
+
+        // Retrieve info for tasks on the node, and store it into DB
+        for (auto & kv: respObj.items()) {
+            string const & agName = kv.key();
+            json const & agTaskInfo = kv.value();
+
+            string tid = agTaskInfo["task_id"];
+            string tinfo = agTaskInfo["info"].dump();
+            string tstatus = agTaskInfo["status"];
+            int statusVal = TaskStatusVal[tstatus];
+            bool isNew = agTaskInfo["new"];
+            //logger.debug("Storing Task " + tid + " (" + tstatus + ") " + (isNew ? "NEW" : ""));
+            
+            dataMng->storeTaskInfo(tid, statusVal, tinfo, isNew);
+        }
     }
 }
 
@@ -530,7 +581,7 @@ void Master::runMainLoop()
         }
 
         // Retrieve agents information
-        if ((iteration == 1) || ((iteration % 10) == 0)) {
+        if ((iteration == 1) || ((iteration % 5) == 0)) {
             nodeInfoIsAvailable = tskMng->retrieveAgentsInfo(nodeInfo);
             //logger.debug("Node info retrieved: " + nodeInfo.dump());
             tskMng->showSpectra();
@@ -538,22 +589,35 @@ void Master::runMainLoop()
 
         // Retrieve pending outputs
         tskMng->retrieveOutputs(outputProducts);
+        //outputProducts.dump();
+        
         if (net->thisIsCommander) {
+            // FOR COMMANDER
+
+            // Place products in outputProducts list into the archive (and DB)
             archiveOutputs();
         } else {
+            // FOR REMOTE NODES
+
+            // 1. Takes all files in data/archive, and transfer them to commander
+            //      REMOTE:data/archive  ==>  COMMANDER:server/outputs
             transferRemoteLocalArchiveToCommander();
+            
+            // 2. Transfer files declared as outputs to commander
+            //      REMOTE:data/archive  ==>  COMMANDER:server/outputs
             transferOutputsToCommander();
         }
 
         // Update tasks information
-        if (net->thisIsCommander) {
-            tskMng->updateTasksInfo(*dataMng);
-        }
+        //if (net->thisIsCommander) {
+        tskMng->updateTasksInfo();
+        //}
 
         // Retrieve nodes information
         if ((net->thisIsCommander) &&
-            ((iteration == 1) || ((iteration % 20) == 0))) {
+            ((iteration == 1) || ((iteration % 5) == 0))) {
             gatherNodesStatus();
+            gatherTasksStatus();            
         }
 
         // Wait a little bit until next loop
