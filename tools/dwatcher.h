@@ -94,6 +94,11 @@ public:
     bool nextEvent(DirWatchEvent & event);
     void stop();
 
+public:
+    void lockDir(std::string d);
+    void unlockDir(std::string d);
+    void skip(std::string fname, bool delfile);
+
 private:
     void start();
     bool convertSymbolicLinks(std::string & path, std::string & name);
@@ -103,6 +108,8 @@ private:
     std::map<int, std::string>  watchedDirs;
     std::queue<DirWatchEvent>   events;
     bool                        keepWatching;
+    std::string                 fileToSkip;
+    bool                        deleteFileToSkip;
 };
 
 //}

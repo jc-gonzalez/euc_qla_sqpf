@@ -252,10 +252,10 @@ bool Master::getNewEntries()
 //----------------------------------------------------------------------
 bool Master::getNewEntriesFromDirWatcher(DirWatcher * dw, Queue<string> & q)
 {
-    DirWatcher::DirWatchEvent e;
-
     // Process new events, at most 5 per iteration
-    int numMaxEventsPerIter = 5;
+    static const int numMaxEventsPerIter = 5;
+
+    DirWatcher::DirWatchEvent e;
     int numEvents = 0;
     while ((dw->nextEvent(e)) && (numEvents < numMaxEventsPerIter)) {
         logger.info("New DirWatchEvent: " + e.path + "/" + e.name
@@ -291,10 +291,11 @@ string Master::getHostInfo()
 // Method: checkIfProduct
 //
 //----------------------------------------------------------------------
-bool Master::checkIfProduct(string & fileName, ProductMeta & meta)
+bool Master::checkIfProduct(string & fileName, ProductMeta & meta,
+                            bool & needsVersion)
 {
     static FileNameSpec fns;
-    return fns.parse(fileName, meta);
+    return fns.parse(fileName, meta, needsVersion);
 }
 
 //----------------------------------------------------------------------
@@ -304,24 +305,56 @@ bool Master::checkIfProduct(string & fileName, ProductMeta & meta)
 void Master::distributeProducts()
 {
     for (int i = 0; i < nodeStatus.size(); ++i) {
-        if (nodeStatusIsAvailable[i]) { 
-            logger.info(std::to_string(i) + ": " + nodeStatus[i].dump());
-            json jloads = nodeStatus[i]["machine"]["load"];
-            //std::stringstream ss;
-            //ss << "LOADS: " << jloads;
-            //logger.debug(ss.str());
-            loads[i] = jloads[0].get<double>();
+        if (nodeStatusIsAvailable[i]) {
+            try {
+                //logger.info(std::to_string(i) + ": " + nodeStatus[i].dump());
+                json jloads = nodeStatus[i]["machine"]["load"];
+                //std::stringstream ss;
+                //ss << "LOADS: " << jloads;
+                //logger.debug(ss.str());
+                loads[i] = jloads[0].get<double>();
+            } catch (...) {
+                loads[i] = 1.0;
+            }
         }
     }
 
     ProductName prod;
+    ProductMeta meta;
+    bool needsVersion;
+
     while (productList.get(prod)) {
         int numOfNodeToUse = selectNodeFn(this);
         string nodeToUse = net->nodeName[numOfNodeToUse];
+        bool processInThisNode = nodeToUse == id;
+        
+        if (! checkIfProduct(prod, meta, needsVersion)) {
+            logger.warn("File '" + prod + "' doesn't seem to be a valid product");
+            continue;
+        } else {
+            //logger.debug("META >>>>>> " + meta.dump());
+            if (needsVersion) {
+                string newVersion = dataMng->getNewVersionForSignature(meta["instance"]);
+                json & fs = meta["fileinfo"];
+                string folder = fs["path"].get<string>();
+                string newName = (fs["sname"].get<string>() + "_" + newVersion +
+                                  "." + fs["ext"].get<string>());
+                string newProd = folder + "/" + newName;
+                logger.debug("Changing name from " + prod + " to " + newProd);                
+                DirWatcher * dw = std::get<0>(dirWatchers.back());
+                dw->skip(newName, !processInThisNode);
+                if (rename(prod.c_str(), newProd.c_str()) != 0) {
+                    logger.error("Couldn't add version tag to product " + prod);
+                    continue;
+                }
+                prod = newProd;
+                (void)checkIfProduct(prod, meta, needsVersion);
+            }
+        }
 
         logger.debug("Processing of " + prod + " will be done by node " + nodeToUse);
 
-        if (nodeToUse != id) {
+        if (! processInThisNode) {
             // If the node is not the commander (I'm the commander in
             // this function), dispatch it to the selected node, and
             // save it to remove it from the list
@@ -356,22 +389,25 @@ void Master::scheduleProductsForProcessing()
         productsForProcessing.append(productList);
     }
 
-    // Process the products in one list
     ProductName prod;
     ProductMeta meta;
+    bool b;
     ProductMetaList products;
+    
+    // Process the products in one list
     while (productsForProcessing.get(prod)) {
-        if (! checkIfProduct(prod, meta)) {
+        if (! checkIfProduct(prod, meta, b)) {
             logger.warn("File '" + prod + "' doesn't seem to be a valid product");
             continue;
         }
-        logger.info("Product '" + prod + "' will be processed");
 
+        logger.info("Product '" + prod + "' will be processed");
+        
         if (!ProductLocator::toLocalArchive(meta, wa)) {
             logger.error("Move (link) to archive of %s failed", prod.c_str());
             continue;
         }
-
+       
         if (! tskOrc->schedule(meta, *tskMng)) {
             (void)unlink(prod.c_str());
         }
@@ -383,7 +419,7 @@ void Master::scheduleProductsForProcessing()
     // then archived in the local archive (in case this is the commander)
     if (net->thisIsCommander) {
         while (productsForArchival.get(prod)) {
-            if (! checkIfProduct(prod, meta)) {
+            if (! checkIfProduct(prod, meta, b)) {
                 logger.warn("File '" + prod + "' doesn't seem to be a valid product");
                 continue;
             }
@@ -404,16 +440,15 @@ void Master::scheduleProductsForProcessing()
 //----------------------------------------------------------------------
 void Master::archiveOutputs()
 {
-    static FileNameSpec fns;
-
     ProductName prod;
     ProductMeta meta;
     ProductMetaList products;
+    bool needsVersion;
     while (outputProducts.get(prod)) {
-        if (fns.parse(prod, meta)) {
+        if (checkIfProduct(prod, meta, needsVersion)) {
             products.push_back(meta);
-            ProductLocator::toLocalArchive(meta, wa, ProductLocator::MOVE);
             logger.debug("Moving output product " + prod + " to archive");
+            ProductLocator::toLocalArchive(meta, wa, ProductLocator::MOVE);
         } else {
             logger.warn("Found non-product file in local outputs folder: " + prod);
         }
@@ -560,13 +595,15 @@ void Master::gatherTasksStatus()
 void Master::runMainLoop()
 {
     logger.info("Start!");
-    int iteration = 0;
+    int iteration = 1;
 
-    FileNameSpec fns;
+    // Get start time
+    auto start_time = std::chrono::steady_clock::now();
+    // Compute end time
+    auto next_time = start_time + std::chrono::seconds(1);
 
     forever {
 
-        ++iteration;
         logger.debug("Iteration " + std::to_string(iteration));
 
         // Collect new products to process
@@ -621,7 +658,11 @@ void Master::runMainLoop()
         }
 
         // Wait a little bit until next loop
-        delay(masterLoopSleep_ms);
+        while (next_time < std::chrono::steady_clock::now()) {
+            next_time += std::chrono::seconds(1);
+            ++iteration;
+        }
+        std::this_thread::sleep_until(next_time);
 
     }
 }
@@ -637,7 +678,7 @@ void Master::delay(int ms)
 
 //----------------------------------------------------------------------
 // Method: terminate
-//
+// Delete handlers amnd cleanup
 //----------------------------------------------------------------------
 void Master::terminate()
 {

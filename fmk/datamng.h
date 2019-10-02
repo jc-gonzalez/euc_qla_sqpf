@@ -106,6 +106,11 @@ public:
     //----------------------------------------------------------------------
     void storeHostsSpectra(dict & info);
 
+    //----------------------------------------------------------------------
+    // Method: getNewVersionForSignature
+    //----------------------------------------------------------------------
+    string getNewVersionForSignature(string s);
+    
 private:
     ProcessingNetwork & net;
     Config & cfg;

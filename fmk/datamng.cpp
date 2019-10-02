@@ -39,6 +39,7 @@
  ******************************************************************************/
 
 #include "datamng.h"
+#include "fv.h"
 
 //----------------------------------------------------------------------
 // Constructor
@@ -160,4 +161,34 @@ void DataManager::storeProductQueue(queue<ProductName> & q)
 void DataManager::storeHostsSpectra(dict & info)
 {
     
+}
+
+//----------------------------------------------------------------------
+// Method: getNewVersionForSignature
+//----------------------------------------------------------------------
+string DataManager::getNewVersionForSignature(string s)
+{
+    string newVer = "01.00";
+    
+    try {
+        // Check that connection with the DB is possible
+        if (!dbHdl->openConnection()) {
+            logger.warn("Cannot establish connection to database");
+        }
+
+        string lastVer;
+        if (dbHdl->checkSignature(s, lastVer)) {           
+            FileVersion fver(lastVer);
+            fver.incr();
+            newVer = fver.getVersion();
+        }
+        
+    } catch (RuntimeException & e) {
+        logger.fatal(e.what());
+    }
+
+    // Close connection
+    dbHdl->closeConnection();
+
+    return newVer;
 }

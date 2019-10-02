@@ -87,13 +87,14 @@ public:
     //----------------------------------------------------------------------
     // Method: parse
     //----------------------------------------------------------------------
-    bool parse(string & fullFileName, ProductMeta & meta);
+    bool parse(string & fullFileName, ProductMeta & meta,
+               bool & needsVersion);
 
 private:
     //----------------------------------------------------------------------
     // Method: genProdFormat
     //----------------------------------------------------------------------
-    std::string genProdFormat(string & ext);
+    std::string genProdFormat(string e);
 
     //----------------------------------------------------------------------
     // Method: parseInstance

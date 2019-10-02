@@ -146,7 +146,8 @@ private:
     //----------------------------------------------------------------------
     // Method: checkIfProduct
     //----------------------------------------------------------------------
-    bool checkIfProduct(string & fileName, ProductMeta & meta);
+    bool checkIfProduct(string & fileName, ProductMeta & meta,
+                            bool & needsVersion);
 
     //----------------------------------------------------------------------
     // Method: distributeProducts

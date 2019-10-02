@@ -476,10 +476,12 @@ void TaskAgent::prepareOutputs()
     logger.debug("logs: " + str::join(logFiles, ","));
     logger.debug("outputs: " + str::join(outFiles, ","));
 
+    ProductMeta meta;
+    bool b;
+
     // Move the logs to the outbox folder, so they are sent to the archive
     for (auto & f: logFiles) {
-        ProductMeta meta;
-        if (! fns.parse(f, meta)) {
+        if (! fns.parse(f, meta, b)) {
             logger.error("Cannot parse file name for product %s", f.c_str());
             continue;
         }
@@ -491,8 +493,7 @@ void TaskAgent::prepareOutputs()
     // Move, instead, the output files to the inbox, so they are checked
     // if they trigger a new rule
     for (auto & f: outFiles) {
-        ProductMeta meta;
-        if (! fns.parse(f, meta)) {
+        if (! fns.parse(f, meta, b)) {
             logger.error("Cannot parse file name for product %s", f.c_str());
             continue;
         }

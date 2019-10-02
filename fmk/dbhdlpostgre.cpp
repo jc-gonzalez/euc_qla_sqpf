@@ -137,7 +137,7 @@ int DBHdlPostgreSQL::storeProducts(ProductMetaList & prodList)
             "end_time, registration_time, format, url, report) "
            << "VALUES ("
            << str::quoted(m["id"]) << ", "
-           << str::quoted(m["fileinfo"]["base"]) << ", "
+           << str::quoted(m["type"]) << ", "
            << str::quoted("OK") << ", "
            << str::quoted(m["version"]) << ", "
            << m["size"] << ", "
@@ -780,30 +780,19 @@ int DBHdlPostgreSQL::getVersionCounter(std::string & procName)
 // Method: checkSignature
 // Check if a product with the same signature exists in the archive
 //----------------------------------------------------------------------
-bool DBHdlPostgreSQL::checkSignature(std::string & sgnt, std::string & ptype, 
-                                     std::string & ver)
+bool DBHdlPostgreSQL::checkSignature(std::string & sgnt, std::string & ver)
 {
     bool result = true;
 
     std::string cmd("SELECT product_version FROM products_info "
-                    "WHERE signature LIKE " + str::quoted(sgnt + "%") +
-                    " AND product_type = " + str::quoted(ptype) +
-                    " AND ((NOW() - registration_time) > INTERVAL '10 sec')"
-                    " ORDER BY id "
+                    "WHERE signature=" + str::quoted(sgnt) + " "
+                    "ORDER BY id "
                     "DESC LIMIT 1;");
-
-    //TRC("CHECKING VERSION: " + cmd);
-    // The 10 sec of margin are taken to avoid to count as existing, by
-    // the TskOrc, products that where just inserted, by the DataMng,
-    // into the local archive, since TskOrc and DataMng are receiving
-    // almost at the same time the same INDATA message
 
     try {
         result = runCmd(cmd);
         result = PQntuples(res) > 0;
-        if (result) {
-            ver = std::string(PQgetvalue(res, 0, 0));
-        }
+        if (result) { ver = std::string(PQgetvalue(res, 0, 0)); }
     } catch(...) {
         throw;
     }

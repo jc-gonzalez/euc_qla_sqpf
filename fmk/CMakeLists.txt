@@ -21,6 +21,7 @@ set (libfmk_hdr
   fifo.h
   fmt.h
   fnamespec.h
+  fv.h
   log.h
   master.h
   masterrequester.h
@@ -44,6 +45,7 @@ set (libfmk_src
   dbhdlpostgre.cpp
   fifo.cpp
   fnamespec.cpp
+  fv.cpp
   log.cpp
   master.cpp
   masterrequester.cpp

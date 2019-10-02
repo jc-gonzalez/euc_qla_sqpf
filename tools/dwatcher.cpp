@@ -41,6 +41,7 @@
 #include "dwatcher.h"
 
 #include <iostream>
+#include <fstream>
 #include <thread>
 #include <sstream>
 #include <cerrno>
@@ -58,7 +59,8 @@ using namespace FileTools;
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
-DirWatcher::DirWatcher(std::string pth)
+DirWatcher::DirWatcher(std::string pth) :
+    fileToSkip(std::string("")), deleteFileToSkip(false)
 {
     // Initialize file descriptor for inotify API
     fd = inotify_init();
@@ -138,6 +140,7 @@ void DirWatcher::start()
     int poll_num;
     nfds_t nfds;
     struct pollfd fds[1];
+    bool isLocked = false;
 
 #define MAX_EVENTS  1024 // Max. number of events to process at one go
 #define LEN_NAME     256 // Assuming that the length of the filename won't exceed 256 bytes
@@ -197,9 +200,16 @@ void DirWatcher::start()
                     std::string file;
                     try {
                         dwe.name = std::string(event->name);
-                        if (dwe.name == lastTriggerEventFileName) { continue; }
-
                         dwe.path = itWatchedDir->second;
+                        
+                        if (dwe.name == lastTriggerEventFileName) { continue; }
+                        if (dwe.name == fileToSkip) {
+                            if (deleteFileToSkip) {
+                                unlink((dwe.path + "/" + dwe.name).c_str());
+                            }
+                            continue;
+                        }
+                        
                         dwe.mask = event->mask;
                         dwe.isDir = (event->mask & IN_ISDIR);
 
@@ -214,13 +224,14 @@ void DirWatcher::start()
                     // Check file size
                     if (!dwe.isDir) {
                         struct stat dweStat;
+                        /*
                         if (stat(file.c_str(), &dweStat) != 0) {
                             perror("stat");
-//                             std::cerr << file << std::endl;
                             exit(EXIT_FAILURE);
                         } else {
                             dwe.size = dweStat.st_size;
                         }
+                        */
                         // In case it is a symbolic link, and internally allowed,
                         // remove symbolic link and create hard link, or copy file
                         lstat(file.c_str(), &dweStat);
@@ -260,5 +271,42 @@ bool DirWatcher::nextEvent(DirWatchEvent & event)
         return true;
     }
     return false;
+}
+
+//----------------------------------------------------------------------
+// Method: lockDir
+//----------------------------------------------------------------------
+void DirWatcher::lockDir(std::string d)
+{
+    // std::ofstream f(d + "/.lock");
+    // f.close();
+    if (inotify_add_watch(fd, d.c_str(), IN_MOVE_SELF) == -1) {
+        perror("inotify_add_watch");
+        exit(EXIT_FAILURE);
+    }
+}
+
+//----------------------------------------------------------------------
+// Method: unlockDir
+//----------------------------------------------------------------------
+void DirWatcher::unlockDir(std::string d)
+{
+    // std::string flck(d + "/.lock");
+    // std::string fulck(d + "/.unlock");
+    // rename(flck.c_str(), fulck.c_str());
+    if (inotify_add_watch(fd, d.c_str(),
+                          IN_CLOSE_WRITE | IN_MOVED_TO | IN_CREATE) == -1) {
+        perror("inotify_add_watch");
+        exit(EXIT_FAILURE);
+    }
+}
+
+//----------------------------------------------------------------------
+// Method: skip
+//----------------------------------------------------------------------
+void DirWatcher::skip(std::string fname, bool delfile)
+{
+    fileToSkip = fname;
+    deleteFileToSkip = delfile;
 }
 

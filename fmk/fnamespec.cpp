@@ -43,6 +43,8 @@
 #include "filetools.h"
 #include "metadatareader.h"
 
+#include <locale> 
+
 #define USE_CXX11_REGEX
 #undef  USE_CXX11_REGEX
 
@@ -63,7 +65,8 @@ FileNameSpec::~FileNameSpec()
 //----------------------------------------------------------------------
 // Method: parse
 //----------------------------------------------------------------------
-bool FileNameSpec::parse(string & fullFileName, ProductMeta & meta)
+bool FileNameSpec::parse(string & fullFileName, ProductMeta & meta,
+                         bool & needsVersion)
 {
     static const int
         Mission = 1,
@@ -83,7 +86,14 @@ bool FileNameSpec::parse(string & fullFileName, ProductMeta & meta)
     string dname, bname, name, suffix, sname, ext;
     std::tie(dname, bname, name,
              suffix, sname, ext) = FileTools::fileinfo(fullFileName);
-
+    /*
+    std::cerr <<  dname << '\n'
+              << bname << '\n'
+              << name << '\n'
+              << suffix << '\n'
+              << sname << '\n'
+              << ext << '\n';
+    */
     meta["id"] = bname;
     dict fs;
     fs["full"] = fullFileName;
@@ -95,28 +105,28 @@ bool FileNameSpec::parse(string & fullFileName, ProductMeta & meta)
     fs["ext"] = ext;
     meta["fileinfo"] = fs;
     meta["url"] = "file://" + fullFileName;
-    meta["format"] = genProdFormat(ext);
 
+    string format(ext);
+    meta["format"] = genProdFormat(format);
+
+    string mission, proc_func, instance, datetime, version;
+    
 #ifdef USE_CXX11_REGEX
     std::regex re(BnameRe);
     std::smatch matches;
     if (!std::regex_search(sname, matches, re)) { return false; }
-
-    meta["mission"] =    matches[Mission].str();
-    meta["proc_func"] =  matches[ProcFunc].str();
-    meta["creator"] =    matches[ProcFunc].str();
-    meta["instance"] =   matches[Instance].str();
-    meta["start_time"] = matches[Date].str();
-    meta["end_time"] =   matches[Date].str();
-    meta["version"] =    matches[Version].str();
-
-    parseInstance(matches[Instance].str(), meta);
+    mission =    matches[Mission].str();
+    proc_func =  matches[ProcFunc].str();
+    instance =   matches[Instance].str();
+    datetime =   matches[Date].str();
+    version =    matches[Version].str();
 #else
-    
-    string mission, proc_func, instance, datetime, version;
     parseSnameNoRE(sname, mission, proc_func, instance,
-                   datetime, version);
-        
+                   datetime, version);        
+#endif // USE_CXX11_REGEX
+
+    needsVersion = version.length() < 1;
+    
     meta["mission"] =    mission;
     meta["proc_func"] =  proc_func;
     meta["creator"] =    proc_func;
@@ -125,9 +135,8 @@ bool FileNameSpec::parse(string & fullFileName, ProductMeta & meta)
     meta["end_time"] =   datetime;
     meta["version"] =    version;
 
-    parseInstance(instance, meta);
-#endif // USE_CXX11_REGEX
-    
+    parseInstance(meta["instance"], meta);
+
     bool fileExists = FileTools::exists(fullFileName);
     meta["exists"] = fileExists ? "yes" : "no";
     meta["size"] = FileTools::fileSize(fullFileName);
@@ -212,11 +221,14 @@ bool FileNameSpec::fieldIsMadeOf(string & fld, string chars)
 //----------------------------------------------------------------------
 // Method: genProdFormat
 //----------------------------------------------------------------------
-std::string FileNameSpec::genProdFormat(string & ext)
+std::string FileNameSpec::genProdFormat(string e)
 {
-    string format(ext);
-    str::toUpper(format);
-    return format;
+    std::locale loc; 
+    string n; 
+    for (string::size_type i = 0; i < e.length(); ++i) {
+        n += toupper(e.at(i), loc);
+    }
+    return n;
 }
 
 //----------------------------------------------------------------------
