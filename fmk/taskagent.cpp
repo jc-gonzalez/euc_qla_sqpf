@@ -397,7 +397,14 @@ string TaskAgent::launchNewTask()
     string contId("");
     if (launchContainer(contId)) {
 	delay(100);
+
+        inspectSelection = (inspectSelection1 +
+                        (iAmQuitting ? "RUNNING" : "STOPPED") +
+                        inspectSelection2);
+
+        logger.info(inspectSelection);
         inspect = inspectContainer(contId, false, inspectSelection);
+        logger.info(inspect);
         //string statusLowStr(TaskStatusStr[TASK_RUNNING]);
         //str::toLower(statusLowStr);
         for (auto & s : vector<string> {"true", ntaskId, contId,
@@ -529,14 +536,21 @@ void TaskAgent::monitorTasks()
         contId = containerId;
     }
 
+    inspectSelection = (inspectSelection1 +
+                        (iAmQuitting ? "RUNNING" : "STOPPED") +
+                        inspectSelection2);
+
+    logger.info(inspectSelection);
     inspect = inspectContainer(contId, false, inspectSelection);
+    logger.info(inspect);
     if (! inspect.empty()) {
         json jinspect = json::parse(inspect);
-
-        string inspStatus = jinspect["State"]["Status"].get<string>();
-        int inspCode      = jinspect["State"]["ExitCode"].get<int>();
-        status = stateToTaskStatus(inspStatus, inspCode);
-        string statusStr = TaskStatusStr[status];
+        string statusStr = jinspect["Task_Status"].get<string>();
+        status = TaskStatusEnum(TaskStatusVal[statusStr]);        
+        // string inspStatus = jinspect["State"]["Status"].get<string>();
+        // int inspCode      = jinspect["State"]["ExitCode"].get<int>();
+        // status = stateToTaskStatus(inspStatus, inspCode);
+        // string statusStr = TaskStatusStr[status];
         //string statusLowStr = TaskStatusStr[status];
         //str::toLower(statusLowStr);
 
@@ -616,8 +630,27 @@ void TaskAgent::run()
     }
 }
 
-const string TaskAgent::inspectSelection("{\"Id\":{{json .Id}},"
-					 "\"State\":{{json .State}},"
-					 "\"Path\":{{json .Path}},"
-					 "\"Args\":{{json .Args}},"
-					 "\"Config\":{{json .Config}}}");
+const string TaskAgent::inspectSelection1("{{- define \"CheckCode\" -}}"
+                                          "{{- $c := printf \"%s\" .ExitCode -}}"
+                                          "{{- if eq $c \"0\" -}}\"FINISHED\""
+                                          "{{- else if le $c \"128\" -}}\"FAILED\""
+                                          "{{- else if ge $c \"160\" -}}\"FAILED\""
+                                          "{{- else -}}\"");
+const string TaskAgent::inspectSelection2("\""
+                                          "{{- end -}}"
+                                          "{{- end -}}"
+                                          "{{-  define \"TaskStatus\" -}}"
+                                          "{{- if eq .Status \"running\" -}}\"RUNNING\""
+                                          "{{- else if eq .Status \"paused\" -}}\"PAUSED\""
+                                          "{{- else if eq .Status \"created\" -}}\"ABORTED\""
+                                          "{{- else if eq .Status \"dead\" -}}\"STOPPED\""
+                                          "{{- else if eq .Status \"exited\" -}}{{- template \"CheckCode\" . -}}"
+                                          "{{- else -}}\"UNKNOWN_STATE\""
+                                          "{{- end -}}"
+                                          "{{- end -}}"
+                                          "{\"Id\":{{- json .Id -}}"
+                                          ",\"State\":{{- json .State -}}"
+                                          ",\"Path\":{{- json .Path -}}"
+                                          ",\"Args\":{{- json .Args -}}"
+                                          ",\"Config\":{{- json .Config -}}"
+                                          ",\"Task_Status\":{{template \"TaskStatus\" .State}}}");

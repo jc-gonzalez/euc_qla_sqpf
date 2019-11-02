@@ -237,6 +237,8 @@ private:
     vector<string> dck_args;
     string dck_workdir;
     map<string, string> dck_mapping;
+
+    string inspectSelection;
     
     Logger logger;
 
@@ -244,7 +246,8 @@ private:
     static const string QPFDckImageRunPath;
     static const string QPFDckImageProcPath;
 
-    static const string inspectSelection;
+    static const string inspectSelection1;
+    static const string inspectSelection2;
 };
 
 #endif // TASKAGENT_H
