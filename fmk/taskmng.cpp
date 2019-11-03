@@ -46,6 +46,7 @@
 #include "prodloc.h"
 #include "str.h"
 #include "dwatcher.h"
+#include "types.h"
 
 #include <fstream>
 
@@ -204,9 +205,6 @@ void TaskManager::createAgents()
         ai.agent_num_tasks.push_back(0);
     }
 
-//     std::cerr << ai.str() << '\n';
-//     std::cerr << agentsInfo.dump() << '\n';
-
     agentsInfo["agents"] = agentsData;
     agentsInfo["agent_names"] = agentsNames;
     agentsInfo["agent_num_tasks"] = agentsTasks;
@@ -297,39 +295,50 @@ void TaskManager::updateAgent(string & taskId, int agNum,
 void TaskManager::updateContainer(string & agName, string contId,
                                   TaskStatus contStatus)
 {
-    json & agInfo = agentsInfo["agents"][agName];
-    agInfo["cont_id"] = contId;
-    agInfo["cont_status"] = int(contStatus);
-    json & agInfoSpec = agInfo["spectrum"];
-    
+#ifdef SHOW_CONTID_STATUS_CHANGE    
+    // Take currently stored container Id and status for the agent
     string storedContId;
     int storedStatusVal;
     std::tie(storedContId, storedStatusVal) = agentsContainer[agName];
-    TaskStatus storedContStatus(storedStatusVal);
-    string storedContStatusStr = storedContStatus.str();
-    int count = 0;
-    bool newCont = storedContId.empty();
 
-    if (newCont) {
-        logger.info("Container %s launched, current status is %s",
-                    contId.c_str(), contStatus.str().c_str());
+    TaskStatus storedStatus(storedStatusVal);
+    string storedStatusStr = storedStatus.str();
+
+    // Get agent info struc., store new contId and status, and take spectrum
+    json & agInfo = agentsInfo["agents"][agName];
+    agInfo["cont_id"] = contId;
+    agInfo["cont_status"] = int(contStatus);
+    //json & agInfoSpec = agInfo["spectrum"];
+
+    string contStatusStr = contStatus.str();
+
+    // See what updates we must do
+    if (storedContId.empty()) {
+        // Stored contId was empty, this means a first container is launched
+        logger.info(fmt("$ >> First container $ launched, current status is $",
+                        agName, contId, contStatusStr)); 
     } else {
-        count = agInfoSpec[storedContStatusStr].get<int>();
-        agInfoSpec[storedContStatusStr] = count - 1;
-        if (storedContStatus != contStatus) {
-            logger.debug("Container %s changed from (%d) %s to (%d) %s",
-                         contId.c_str(),
-                         storedStatusVal,
-                         storedContStatus.str().c_str(),
-                         int(contStatus),
-                         contStatus.str().c_str());
+        // A previous container was running
+        if (storedContId != contId) {
+            // A new container has been launched
+            logger.info(fmt("$ >> New container $ launched, current status is $",
+                            agName, contId, contStatusStr));            
+        } else {
+            // The same container, we must check if status is the same
+            if (storedStatus != contStatus) {
+                // Different status
+                logger.debug(fmt("$ >> Container $ changed from $ ($) to $ ($)",
+                                 agName, contId,
+                                 storedStatusStr, int(storedStatus),
+                                 contStatusStr, int(contStatus)));                
+            } else {
+                // Same container, same status, do nothing
+            }
         }
     }
-    
+            
+#endif
     agentsContainer[agName] = std::make_tuple(contId, int(contStatus));
-    string newStatusStr = contStatus.str();
-    count = agInfoSpec[newStatusStr].get<int>();
-    agInfoSpec[newStatusStr] = count + 1;
 }
 
 //----------------------------------------------------------------------
@@ -412,7 +421,7 @@ void TaskManager::retrieveOutputs(Queue<string> & outputs)
 //----------------------------------------------------------------------
 bool TaskManager::retrieveAgentsInfo(json & hi)
 {
-//     std::cerr << agentsInfo.dump() << '\n';
+    //logger.debug(agentsInfo.dump());
 
     vector<string> & nodeAgNames = net.nodeAgents[id];
     
