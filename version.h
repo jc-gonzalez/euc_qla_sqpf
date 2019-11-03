@@ -53,7 +53,7 @@
 #define APP_RELEASE      "2.3beta"
 
 //! Application release date
-#define APP_DATE         "OCT 2019"
+#define APP_DATE         "NOV 2019"
 
 //! Application developer company
 #define APP_COMPANY      "Euclid SOC Team"
