@@ -121,8 +121,6 @@ bool TaskManager::getNewEntriesFromDirWatcher(DirWatcher * dw, Queue<string> & q
         // TODO: Process directories that appear at inbox
         if (! e.isDir) {
             // Build full file name and add it to the queue
-            // q.push(std::string(e.path) + "/" +
-            //            std::string(e.name));
             q.push(fmt("$/$", e.path, e.name));
             ++numEvents;
         }
@@ -295,49 +293,6 @@ void TaskManager::updateAgent(string & taskId, int agNum,
 void TaskManager::updateContainer(string & agName, string contId,
                                   TaskStatus contStatus)
 {
-#ifdef SHOW_CONTID_STATUS_CHANGE    
-    // Take currently stored container Id and status for the agent
-    string storedContId;
-    int storedStatusVal;
-    std::tie(storedContId, storedStatusVal) = agentsContainer[agName];
-
-    TaskStatus storedStatus(storedStatusVal);
-    string storedStatusStr = storedStatus.str();
-
-    // Get agent info struc., store new contId and status, and take spectrum
-    json & agInfo = agentsInfo["agents"][agName];
-    agInfo["cont_id"] = contId;
-    agInfo["cont_status"] = int(contStatus);
-    //json & agInfoSpec = agInfo["spectrum"];
-
-    string contStatusStr = contStatus.str();
-
-    // See what updates we must do
-    if (storedContId.empty()) {
-        // Stored contId was empty, this means a first container is launched
-        logger.info(fmt("$ >> First container $ launched, current status is $",
-                        agName, contId, contStatusStr)); 
-    } else {
-        // A previous container was running
-        if (storedContId != contId) {
-            // A new container has been launched
-            logger.info(fmt("$ >> New container $ launched, current status is $",
-                            agName, contId, contStatusStr));            
-        } else {
-            // The same container, we must check if status is the same
-            if (storedStatus != contStatus) {
-                // Different status
-                logger.debug(fmt("$ >> Container $ changed from $ ($) to $ ($)",
-                                 agName, contId,
-                                 storedStatusStr, int(storedStatus),
-                                 contStatusStr, int(contStatus)));                
-            } else {
-                // Same container, same status, do nothing
-            }
-        }
-    }
-            
-#endif
     agentsContainer[agName] = std::make_tuple(contId, int(contStatus));
 }
 
@@ -367,8 +322,8 @@ void TaskManager::updateTasksInfo()
                  "\"status\": \"" + status + "\"," +
                  "\"info\": " + inspect + "," +
                  "\"new\": " + justCreated) + "}";
-            //            datmng.storeTaskInfo(taskId, statusVal,
-            //                     inspect, justCreated == "true");
+            // datmng.storeTaskInfo(taskId, statusVal,
+            //                      inspect, justCreated == "true");
         }
     }
 }
@@ -397,7 +352,6 @@ void TaskManager::schedule(ProductMeta & meta, string & processor)
 
     // Update agents information structures
     updateAgent(taskId, agNum, agName, numTasks);
-    //updateContainer(agName);
 }
 
 //----------------------------------------------------------------------
@@ -421,8 +375,6 @@ void TaskManager::retrieveOutputs(Queue<string> & outputs)
 //----------------------------------------------------------------------
 bool TaskManager::retrieveAgentsInfo(json & hi)
 {
-    //logger.debug(agentsInfo.dump());
-
     vector<string> & nodeAgNames = net.nodeAgents[id];
     
     for (int agNum = 0; agNum < numOfAgents; ++agNum) {

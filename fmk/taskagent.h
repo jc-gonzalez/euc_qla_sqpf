@@ -123,11 +123,6 @@ private:
     bool isSubstitutionRules(string item);
 
     //----------------------------------------------------------------------
-    // Method: stateToTaskStatus
-    //----------------------------------------------------------------------
-    TaskStatus stateToTaskStatus(string inspStatus, int inspCode);
-
-    //----------------------------------------------------------------------
     // Method: isEnded
     //----------------------------------------------------------------------
     bool isEnded(TaskStatus st);
@@ -214,6 +209,7 @@ private:
     ContainerSpectrum containerSpectrum;
     string inspect;
     TaskStatus status;
+    string statusStr;
 
     string uid;
     string uname;
@@ -246,8 +242,12 @@ private:
     static const string QPFDckImageRunPath;
     static const string QPFDckImageProcPath;
 
-    static const string inspectSelection1;
-    static const string inspectSelection2;
+    static const string InspectSelection1;
+    static const string InspectSelection2;
+
+    static const int DelayAgentMainLoop;
+    static const int DelayAfterContainerLaunch;
+    static const double DelayForEndedContainerRemoval;
 };
 
 #endif // TASKAGENT_H

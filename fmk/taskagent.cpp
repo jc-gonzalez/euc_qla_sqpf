@@ -44,6 +44,7 @@
 #include "filetools.h"
 #include "prodloc.h"
 #include "jsonfhdl.h"
+#include "limits.h"
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -89,6 +90,8 @@ void TaskAgent::init()
     ss << getuid();
     uid = ss.str();
     uname = string(getenv("USER"));
+
+    statusStr = status.str();
 }
 
 //----------------------------------------------------------------------
@@ -131,50 +134,6 @@ bool TaskAgent::isSubstitutionRules(string item)
     logger.debug("Subs.rule: %s", item.c_str());
     if (item.length() < 1) { return false; }
     return (item[0] == '{') && (item[item.length() - 1] == '}');
-}
-
-//----------------------------------------------------------------------
-// Method: stateToTaskStatus
-// Class method to convert status/code to TaskStatus
-//----------------------------------------------------------------------
-TaskStatus TaskAgent::stateToTaskStatus(string inspStatus, int inspCode)
-{
-    TaskStatus calcst = TASK_RUNNING;
-    if        (inspStatus == "running") {
-        calcst = TASK_RUNNING;
-    } else if (inspStatus == "paused") {
-        calcst = TASK_PAUSED;
-    } else if (inspStatus == "created") {
-        calcst = TASK_ABORTED;
-    } else if (inspStatus == "dead") {
-        calcst = TASK_STOPPED;
-    } else if (inspStatus == "exited") {
-        if (inspCode == 0) {
-            calcst = TASK_FINISHED;
-        } else if ((inspCode > 128) && (inspCode < 160)) {
-            calcst = iAmQuitting ? TASK_RUNNING : TASK_STOPPED;
-        } else {
-            calcst = TASK_FAILED;
-        }
-    } else {
-        calcst = TASK_UNKNOWN_STATE;
-    }
-
-    string strStatus = TaskStatusStr[calcst];
-    logger.debug("[%s, %d] => %s", inspStatus.c_str(), inspCode, 
-		 strStatus.c_str());
-
-    return calcst;
-}
-
-//----------------------------------------------------------------------
-// Method: isEnded
-//----------------------------------------------------------------------
-bool TaskAgent::isEnded(TaskStatus st)
-{
-    return ((st == TASK_STOPPED) ||
-            (st == TASK_FAILED) ||
-            (st == TASK_FINISHED));
 }
 
 //----------------------------------------------------------------------
@@ -230,7 +189,6 @@ void TaskAgent::sendSpectrumToMng()
 //----------------------------------------------------------------------
 bool TaskAgent::prepareNewTask(string taskId, string taskFld, string proc)
 {
-    string p_proc_dir = wa.procArea;  // + "/" + p_processor
     // Read processor config. file
     string cfgFile(taskFld + "/" + proc + ".cfg");
     logger.debug("%s: %s", id.c_str(), cfgFile.c_str());
@@ -244,8 +202,8 @@ bool TaskAgent::prepareNewTask(string taskId, string taskFld, string proc)
 
     // Evaluate configuration entries
     // 1. Input file(s), outputs and log)
-    char curdir[200];
-    getcwd(curdir, 200);
+    char curdir[PATH_MAX];
+    getcwd(curdir, PATH_MAX);
     if (chdir(taskFld.c_str()) < 0) {
         logger.error("Cannot change to task folder " + taskFld);
         return false;
@@ -300,7 +258,7 @@ bool TaskAgent::prepareNewTask(string taskId, string taskFld, string proc)
     // 2. Processor subfolder name (folder under QPF_WA/bin/"
     string p_processor = pcfg["processor"].get<string>();
     // 3. Processor entire subfolder name
-    //string p_proc_dir = wa.procArea;  // + "/" + p_processor
+    string p_proc_dir = wa.procArea;  // + "/" + p_processor
     // 4. Main script to invoke processor (something like driver.py)
     string p_script = pcfg["script"].get<string>();
 
@@ -350,14 +308,13 @@ bool TaskAgent::launchContainer(string & contId)
     
     if (! dckMng->createContainer(dck_image, opts, dck_mapping,
                                   dck_exe, dck_args,
-                                  containerId, cmd_line)) {
-        containerId = "";
+                                  contId, cmd_line)) {
         logger.error("Cannot launch container as follows: ");
         logger.fatal(cmd_line);
         return false;
     }
 
-    contId = containerId;
+    delay(DelayAfterContainerLaunch);
     return true;
 }
 
@@ -396,19 +353,17 @@ string TaskAgent::launchNewTask()
 
     string contId("");
     if (launchContainer(contId)) {
-	delay(100);
-
-        inspectSelection = (inspectSelection1 +
+        inspectSelection = (InspectSelection1 +
                         (iAmQuitting ? "RUNNING" : "STOPPED") +
-                        inspectSelection2);
+                        InspectSelection2);
 
-        logger.info(inspectSelection);
         inspect = inspectContainer(contId, false, inspectSelection);
-        logger.info(inspect);
-        //string statusLowStr(TaskStatusStr[TASK_RUNNING]);
-        //str::toLower(statusLowStr);
+        
+        status = TaskStatus(TASK_SCHEDULED);
+        statusStr = status.str();
+        
         for (auto & s : vector<string> {"true", ntaskId, contId,
-		    inspect, "1", "scheduled"}) {
+		    inspect, "1", statusStr}) {
             tq->push(std::move(s));
         }
         taskId = ntaskId;
@@ -429,6 +384,7 @@ void TaskAgent::scheduleContainerForRemoval()
     containersToRemove.push_back(std::make_pair(now, containerId));
     logger.debug("Scheduling container %s for removal",
                  containerId.c_str());
+    containerId = "";
 }
 
 //----------------------------------------------------------------------
@@ -437,7 +393,7 @@ void TaskAgent::scheduleContainerForRemoval()
 //----------------------------------------------------------------------
 void TaskAgent::removeOldContainers()
 {
-    static const double minElapsedMsec = 60000.; // 60 seconds
+    static const double minElapsedMsec = DelayForEndedContainerRemoval;
     static auto  elapsed_ms =
         [](hires_time x, hires_time ref) {
             return duration_cast<milliseconds>(x - ref).count(); };
@@ -523,54 +479,43 @@ void TaskAgent::monitorTasks()
         if (taskQueue.empty()) { return; }
 
         contId = launchNewTask();
-        if (contId.empty()) {
-            return;
-        } else {
-            // Send information of new container
-            logger.info("New task launched in container: " + contId);
-            containerId = contId;
-            containerSpectrum.append(contId, "scheduled");
-            delay(200);
-        }
+        if (contId.empty()) { return; }
+        
+        // Send information of new container
+        logger.info("New task launched in container: " + contId);
+        containerId = contId;
+        containerSpectrum.append(contId, statusStr);
     } else {
         contId = containerId;
     }
 
-    inspectSelection = (inspectSelection1 +
+    inspectSelection = (InspectSelection1 +
                         (iAmQuitting ? "RUNNING" : "STOPPED") +
-                        inspectSelection2);
+                        InspectSelection2);
 
-    logger.info(inspectSelection);
     inspect = inspectContainer(contId, false, inspectSelection);
-    logger.info(inspect);
     if (! inspect.empty()) {
         json jinspect = json::parse(inspect);
-        string statusStr = jinspect["Task_Status"].get<string>();
-        status = TaskStatusEnum(TaskStatusVal[statusStr]);        
-        // string inspStatus = jinspect["State"]["Status"].get<string>();
-        // int inspCode      = jinspect["State"]["ExitCode"].get<int>();
-        // status = stateToTaskStatus(inspStatus, inspCode);
-        // string statusStr = TaskStatusStr[status];
-        //string statusLowStr = TaskStatusStr[status];
-        //str::toLower(statusLowStr);
-
+        statusStr = jinspect["Task_Status"].get<string>();
+        status = TaskStatusEnum(TaskStatusVal[statusStr]);
         for (auto & s : vector<string> {"false", taskId, contId,
 		    inspect, "1", statusStr}) {
             tq->push(std::move(s));
         }
 
         containerSpectrum.append(contId, statusStr);
+    } else {
+        logger.warn("Couldn't get inspection information from container " + contId);
     }
 
     sendSpectrumToMng();
 
     // If finished, set current container to None
     // (TBD: and remove info from internal lists and dicts)
-    if (isEnded(status)) {
+    if (status.isEnded()) {
         logger.debug("!!!!!!!!!!!!!!!! ENDED !!!!!!!!!!!!!!");
         prepareOutputs();
         scheduleContainerForRemoval();
-        containerId = "";
     }
 }
 
@@ -625,18 +570,18 @@ void TaskAgent::run()
         removeOldContainers();
 
         // Minor sleep
-        delay(333);
+        delay(DelayAgentMainLoop);
         
     }
 }
 
-const string TaskAgent::inspectSelection1("{{- define \"CheckCode\" -}}"
+const string TaskAgent::InspectSelection1("{{- define \"CheckCode\" -}}"
                                           "{{- $c := printf \"%s\" .ExitCode -}}"
                                           "{{- if eq $c \"0\" -}}\"FINISHED\""
                                           "{{- else if le $c \"128\" -}}\"FAILED\""
                                           "{{- else if ge $c \"160\" -}}\"FAILED\""
                                           "{{- else -}}\"");
-const string TaskAgent::inspectSelection2("\""
+const string TaskAgent::InspectSelection2("\""
                                           "{{- end -}}"
                                           "{{- end -}}"
                                           "{{-  define \"TaskStatus\" -}}"
@@ -654,3 +599,8 @@ const string TaskAgent::inspectSelection2("\""
                                           ",\"Args\":{{- json .Args -}}"
                                           ",\"Config\":{{- json .Config -}}"
                                           ",\"Task_Status\":{{template \"TaskStatus\" .State}}}");
+
+const int TaskAgent::DelayAgentMainLoop = 333;
+const int TaskAgent::DelayAfterContainerLaunch = 1000;
+
+const double TaskAgent::DelayForEndedContainerRemoval = 60000.;  // 60 seconds

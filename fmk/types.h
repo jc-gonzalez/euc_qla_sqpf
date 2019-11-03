@@ -151,6 +151,7 @@ public:
     operator int() const;
     std::string str() const;
     void fromStr(std::string & s);
+    bool isEnded();
 };
 
 //==========================================================================

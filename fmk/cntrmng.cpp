@@ -74,9 +74,6 @@ bool ContainerMng::createContainer(std::string img, std::vector<std::string> opt
         cnt.add_argument(kv.first + ":" + kv.second);
     }
 
-    //cnt.add_argument("-u");
-    //cnt.add_argument("eucops");
-    
     std::string tmpFileName("docker.id");
     //(void)mkTmpFileName(fileIdTpl, tmpFileName);
 
@@ -105,14 +102,13 @@ bool ContainerMng::createContainer(std::string img, std::vector<std::string> opt
 //     std::cerr << "CNT: " << info.str() << '\n';
     cnt.wait();
 
-    std::ofstream dockerIdFile(tmpFileName);
-    dockerIdFile << info.str() << '\n';
-    dockerIdFile.close();
-    
     containerId = info.str();
     containerId.pop_back();
 
-//     std::cerr << "CONTAINER CODE: " << cnt.code() << '\n';
+    std::ofstream dockerIdFile(tmpFileName);
+    dockerIdFile << containerId << '\n';
+    dockerIdFile.close();
+    
     return (cnt.code() == 0);
 }
 

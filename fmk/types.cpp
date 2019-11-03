@@ -75,6 +75,13 @@ void TaskStatus::fromStr(std::string & s)
     value = TaskStatusEnum(TaskStatusVal[s]);
 }
 
+bool TaskStatus::isEnded()
+{
+    return ((value == TASK_STOPPED) ||
+            (value == TASK_FAILED) ||
+            (value == TASK_FINISHED));
+}
+
 //==========================================================================
 // Enum: BalancingMode
 //==========================================================================

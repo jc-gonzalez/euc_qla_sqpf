@@ -333,6 +333,10 @@ void Master::distributeProducts()
             continue;
         } else {
             //logger.debug("META >>>>>> " + meta.dump());
+            if ("JSON" == meta["format"].get<string>()) {
+                nodeToUse = id;
+                processInThisNode = true;
+            }
             if (needsVersion) {
                 string newVersion = dataMng->getNewVersionForSignature(meta["instance"]);
                 json & fs = meta["fileinfo"];
