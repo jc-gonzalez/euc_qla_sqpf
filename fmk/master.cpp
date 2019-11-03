@@ -414,6 +414,7 @@ void Master::scheduleProductsForProcessing()
        
         if (! tskOrc->schedule(meta, *tskMng)) {
             (void)unlink(prod.c_str());
+            continue;
         }
 
         products.push_back(meta);
