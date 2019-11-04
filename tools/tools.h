@@ -54,6 +54,16 @@
 #include <vector>
 #include <sstream>
 
+#include <execinfo.h>
+
+#define ShowBacktrace() do {                                            \
+        const int BT_BUFF_SIZE = 200;                                   \
+        void * buffer[BT_BUFF_SIZE];                                    \
+        int nptrs = backtrace(buffer, BT_BUFF_SIZE);                    \
+        std::cerr << "backtrace() returned " << nptrs << " addresses\n"; \
+        backtrace_symbols_fd(buffer, nptrs, STDOUT_FILENO);             \
+    } while(0)
+
 //------------------------------------------------------------
 // Topic: External packages
 //   none
