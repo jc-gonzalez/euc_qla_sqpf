@@ -132,11 +132,6 @@ public:
     
     const HttpRespPtr render_POST(const http_request&rqst) {
         std::vector<std::string> pathItems = rqst.get_path_pieces();
-        /*
-        std::cerr << rqst.content_too_large() << '\n';
-        std::cerr << rqst << "\n\n";
-        for (auto & p : pathItems) { std::cerr << p << " | "; }
-        std::cerr << '\n'; */
 
         // Save content to local file in server folder
         string fullFileName = wa->serverBase + rqst.get_path();
@@ -144,14 +139,19 @@ public:
         fout << rqst.get_content();
         fout.close();
 
-        //system(("ls -l " + fullFileName).c_str());
-        
         // Move created file to local inbox
+        /*
         string newFullFileName = ((pathItems.at(0) == "inbox") ? 
                                   wa->localInbox :
                                   wa->archive) + "/" + pathItems.at(1);
         int res = ProductLocator::relocate(fullFileName, newFullFileName,
                                            ProductLocator::MOVE);
+        */
+        if (pathItems.at(0) == "inbox") {
+            string newFullFileName = wa->localInbox + "/" + pathItems.at(1);
+            int res = ProductLocator::relocate(fullFileName, newFullFileName,
+                                               ProductLocator::MOVE);
+        }
         
         return HttpRespPtr(new strResp("Done.", 200));
     }

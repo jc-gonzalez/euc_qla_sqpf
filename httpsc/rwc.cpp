@@ -292,6 +292,7 @@ void RWC::postFile(std::string url, std::string localFile,
     if (fp == 0) {
         fprintf(stderr, "RWC cannot open file '%s' to post it to '%s'\n",
                 pLocalFile, url.c_str());
+        system("find /home/eucops/sqpf0/data -type f -ls");
         return;
     }
     ScopeExit file_close([fp] { fclose(fp); });

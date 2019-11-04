@@ -333,9 +333,15 @@ void Master::distributeProducts()
             continue;
         } else {
             //logger.debug("META >>>>>> " + meta.dump());
+            // If it is a JSON file, we assume it is a QLA report, so we will use the
+            // current node to process it
+            // In this case, the version will already be in the file name, so we
+            // can skip next "if"
             if ("JSON" == meta["format"].get<string>()) {
+                numOfNodeToUse = net->commanderNum;
                 nodeToUse = id;
                 processInThisNode = true;
+                break;
             }
             if (needsVersion) {
                 string newVersion = dataMng->getNewVersionForSignature(meta["instance"]);
@@ -359,29 +365,34 @@ void Master::distributeProducts()
         logger.debug("Processing of " + prod + " will be done by node " + nodeToUse);
 
         if (! processInThisNode) {
-            // If the node is not the commander (I'm the commander in
-            // this function), dispatch it to the selected node, and
-            // save it to remove it from the list
+            // If the processing node is not the commander (I'm the
+            // commander in this function), dispatch it to the
+            // selected node, and save it to remove it from the list
             httpRqstr->setServerUrl(net->nodeServerUrl[numOfNodeToUse]);
-            if (!httpRqstr->postFile("/inbox", prod,
+            if (httpRqstr->postFile("/inbox", prod,
                                      "application/octet-stream")) {
+                productsForArchival.push(std::move(prod));
+            } else {
                 logger.error("Cannot send file %s to node %s",
                              prod.c_str(), nodeToUse.c_str());
-                continue;
-            } else {
-                productsForArchival.push(std::move(prod));
+                logger.warn("Product will be processed by master node");
+                processInThisNode = true;
+                numOfNodeToUse = net->commanderNum;
+                nodeToUse = id;
             }
-        } else {
-            productsForProcessing.push(std::move(prod));
         }
 
+        if (processInThisNode) {
+            productsForProcessing.push(std::move(prod));
+        }
+        
         lastNodeUsed = numOfNodeToUse;
     }
 }
 
 //----------------------------------------------------------------------
 // Method: scheduleProductsForProcessing
-//
+// Schedule products for processing in one of the proc. nodes
 //----------------------------------------------------------------------
 void Master::scheduleProductsForProcessing()
 {
@@ -398,7 +409,7 @@ void Master::scheduleProductsForProcessing()
     bool b;
     ProductMetaList products;
     
-    // Process the products in one list
+    // Take and handle the products in processing list
     while (productsForProcessing.get(prod)) {
         if (! checkIfProduct(prod, meta, b)) {
             logger.warn("File '" + prod + "' doesn't seem to be a valid product");
@@ -406,13 +417,17 @@ void Master::scheduleProductsForProcessing()
         }
 
         logger.info("Product '" + prod + "' will be processed");
-        
+
+        logger.debug(fmt("$:$: Try to archive product $",
+                         __FUNCTION__, __LINE__, prod));
+
         if (!ProductLocator::toLocalArchive(meta, wa)) {
             logger.error("Move (link) to archive of %s failed", prod.c_str());
             continue;
         }
        
         if (! tskOrc->schedule(meta, *tskMng)) {
+            logger.error("Couldn't schedule the processing of %s", prod.c_str());
             (void)unlink(prod.c_str());
             continue;
         }
@@ -433,7 +448,9 @@ void Master::scheduleProductsForProcessing()
         
         dataMng->storeProducts(products);
 
-        while (productsForArchival.get(prod)) {
+        for (auto & m: products) {
+            string prod = m["fileinfo"]["full"].get<string>();
+            logger.debug("Removing archived product %s", prod.c_str());
             (void)unlink(prod.c_str());
         }
     }
@@ -453,6 +470,9 @@ void Master::archiveOutputs()
         if (checkIfProduct(prod, meta, needsVersion)) {
             products.push_back(meta);
             logger.debug("Moving output product " + prod + " to archive");
+
+            logger.debug(fmt("$:$: Try to archive product $",
+                             __FUNCTION__, __LINE__, prod));
             ProductLocator::toLocalArchive(meta, wa, ProductLocator::MOVE);
         } else {
             logger.warn("Found non-product file in local outputs folder: " + prod);
@@ -495,13 +515,13 @@ void Master::transferFilesToCommander(Queue<string> & prodQueue,
 {
     ProductName prod;
     while (prodQueue.get(prod)) {
+        logger.info("Transfer of product " + prod + " for archival");
         httpRqstr->setServerUrl(net->commanderUrl);
         if (!httpRqstr->postFile(route, prod,
                                  "application/octet-stream")) {
             logger.error("Cannot send file " + prod + " to " + net->commander);
             continue;
         } 
-        logger.info("Transfer of product " + prod + " for archival");
         unlink(prod.c_str());
     }
 }

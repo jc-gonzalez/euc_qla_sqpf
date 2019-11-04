@@ -11,12 +11,13 @@ include (../common.cmake)
 project (tools)
 
 set (libtools_hdr
-  process.h
-  propdef.h
   alert.h
+  bt.h
   dwatcher.h
   launcher.h
   metadatareader.h
+  process.h
+  propdef.h
   scopeexit.h
   sm.h
   timer.h
@@ -25,6 +26,7 @@ set (libtools_hdr
 
 set (libtools_src
   alert.cpp
+  bt.cpp
   dwatcher.cpp
   launcher.cpp
   metadatareader.cpp

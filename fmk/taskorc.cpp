@@ -120,4 +120,5 @@ bool TaskOrchestrator::schedule(ProductMeta & meta, TaskManager & manager)
     for (auto & v: firedRules) {
         manager.schedule(meta, v["processor"]);
     }
+    return true;
 }

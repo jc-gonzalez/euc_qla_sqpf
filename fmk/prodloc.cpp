@@ -241,7 +241,6 @@ int ProductLocator::relocate(std::string & sFrom, std::string & sTo,
                 ") relocating product:\n\t" +
                 sFrom + std::string(" => ") + sTo).c_str());
         abort();
-        //showBacktrace();
     }
     return retVal;
 }
