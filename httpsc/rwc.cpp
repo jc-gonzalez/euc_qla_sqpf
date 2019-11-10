@@ -158,6 +158,7 @@ void RWC::get(std::string url, std::string localFile,
 
     // Set callback on receiving data
     FILE * fLocalFileHdl = fopen(localFile.c_str(), "wb");
+    ScopeExit file_close([fLocalFileHdl] { fclose(fLocalFileHdl); });
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, fwriteFunc);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)fLocalFileHdl);
         
@@ -172,7 +173,6 @@ void RWC::get(std::string url, std::string localFile,
                 curl_easy_strerror(res));
         return;
     }
-    fclose(fLocalFileHdl);
 
     result = std::string(responseHdr.memory);
 }
@@ -289,13 +289,12 @@ void RWC::postFile(std::string url, std::string localFile,
 
     const char * pLocalFile = localFile.c_str();
     FILE * fp = fopen(pLocalFile, "rb");
+    ScopeExit file_close([fp] { fclose(fp); });
     if (fp == 0) {
         fprintf(stderr, "RWC cannot open file '%s' to post it to '%s'\n",
                 pLocalFile, url.c_str());
-        system("find /home/eucops/sqpf0/data -type f -ls");
         return;
     }
-    ScopeExit file_close([fp] { fclose(fp); });
     
     // we want to use our own read function 
     curl_easy_setopt(curl, CURLOPT_READFUNCTION, freadFunc);
