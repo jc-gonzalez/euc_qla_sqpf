@@ -265,8 +265,6 @@ bool Master::getNewEntriesFromDirWatcher(DirWatcher * dw, Queue<string> & q)
         // TODO: Process directories that appear at inbox
         if (! e.isDir) {
             // Build full file name and add it to the queue
-            // q.push(std::string(e.path) + "/" +
-            //            std::string(e.name));
             q.push(fmt("$/$", e.path, e.name));
             ++numEvents;
         }
@@ -337,6 +335,7 @@ void Master::distributeProducts()
             // current node to process it
             // In this case, the version will already be in the file name, so we
             // can skip next "if"
+            // logger.info("Product to process: " + meta.dump());
             if ("JSON" == meta["format"].get<string>()) {
                 numOfNodeToUse = net->commanderNum;
                 nodeToUse = id;
@@ -351,14 +350,15 @@ void Master::distributeProducts()
                                   "." + fs["ext"].get<string>());
                 string newProd = folder + "/" + newName;
                 logger.debug("Changing name from " + prod + " to " + newProd);                
-                DirWatcher * dw = std::get<0>(dirWatchers.back());
-                dw->skip(newName, !processInThisNode);
+                //DirWatcher * dw = std::get<0>(dirWatchers.back());
+                //dw->skip(newName, false); // !processInThisNode);
                 if (rename(prod.c_str(), newProd.c_str()) != 0) {
                     logger.error("Couldn't add version tag to product " + prod);
-                    continue;
                 }
-                prod = newProd;
-                (void)checkIfProduct(prod, meta, needsVersion);
+                //prod = newProd;
+                //(void)checkIfProduct(prod, meta, needsVersion);
+                // logger.info("Product to process: " + meta.dump());
+                continue;
             }
         }
 

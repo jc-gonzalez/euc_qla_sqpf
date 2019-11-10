@@ -206,6 +206,7 @@ void DirWatcher::start()
                         if (dwe.name == fileToSkip) {
                             if (deleteFileToSkip) {
                                 unlink((dwe.path + "/" + dwe.name).c_str());
+                                deleteFileToSkip = false;                                
                             }
                             continue;
                         }
