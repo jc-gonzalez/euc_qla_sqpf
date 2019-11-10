@@ -100,7 +100,8 @@ void storeFileIntoString(std::string & iFile, std::string & s)
 
     char * where = new char[size];
     fread(where, sizeof(char), size, f);
-
+    fclose(f);
+    
     s.assign((const char*)(where), size);
 
     delete[] where;
