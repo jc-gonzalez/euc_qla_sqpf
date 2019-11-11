@@ -73,7 +73,6 @@ Master::Master(string _cfg, string _id, int _port, string _wa, int _bMode)
         logger.fatal("Cannot open config. file '" + cfgFileName + "'. Exiting.");
     }
     cfg = jFile.getData();
-    //logger.debug(cfg.dump());
 
     cfg["general"]["workArea"] = workArea;
 
@@ -305,11 +304,7 @@ void Master::distributeProducts()
     for (int i = 0; i < nodeStatus.size(); ++i) {
         if (nodeStatusIsAvailable[i]) {
             try {
-                //logger.info(std::to_string(i) + ": " + nodeStatus[i].dump());
                 json jloads = nodeStatus[i]["machine"]["load"];
-                //std::stringstream ss;
-                //ss << "LOADS: " << jloads;
-                //logger.debug(ss.str());
                 loads[i] = jloads[0].get<double>();
             } catch (...) {
                 loads[i] = 1.0;
@@ -330,12 +325,10 @@ void Master::distributeProducts()
             logger.warn("File '" + prod + "' doesn't seem to be a valid product");
             continue;
         } else {
-            //logger.debug("META >>>>>> " + meta.dump());
             // If it is a JSON file, we assume it is a QLA report, so we will use the
             // current node to process it
             // In this case, the version will already be in the file name, so we
             // can skip next "if"
-            // logger.info("Product to process: " + meta.dump());
             if ("JSON" == meta["format"].get<string>()) {
                 numOfNodeToUse = net->commanderNum;
                 nodeToUse = id;
@@ -350,14 +343,9 @@ void Master::distributeProducts()
                                   "." + fs["ext"].get<string>());
                 string newProd = folder + "/" + newName;
                 logger.debug("Changing name from " + prod + " to " + newProd);                
-                //DirWatcher * dw = std::get<0>(dirWatchers.back());
-                //dw->skip(newName, false); // !processInThisNode);
                 if (rename(prod.c_str(), newProd.c_str()) != 0) {
                     logger.error("Couldn't add version tag to product " + prod);
                 }
-                //prod = newProd;
-                //(void)checkIfProduct(prod, meta, needsVersion);
-                // logger.info("Product to process: " + meta.dump());
                 continue;
             }
         }
