@@ -140,13 +140,6 @@ public:
         fout.close();
 
         // Move created file to local inbox
-        /*
-        string newFullFileName = ((pathItems.at(0) == "inbox") ? 
-                                  wa->localInbox :
-                                  wa->archive) + "/" + pathItems.at(1);
-        int res = ProductLocator::relocate(fullFileName, newFullFileName,
-                                           ProductLocator::MOVE);
-        */
         if (pathItems.at(0) == "inbox") {
             string newFullFileName = wa->localInbox + "/" + pathItems.at(1);
             int res = ProductLocator::relocate(fullFileName, newFullFileName,

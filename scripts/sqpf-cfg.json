@@ -3,7 +3,7 @@
         "appName": "sQPF",
         "appVersion": "2.1",
         "cfgVersion": "1.0",
-        "lastAccess": "20190705T121212",
+        "lastAccess": "20191111T121212",
         "userAreaType": "user",
         "userArea": "",
         "workArea": "/home/eucops/sqpf",
@@ -15,7 +15,7 @@
     "network": {
         "commander": "master",
         "processingNodes": {
-            "master": { "address": "127.0.0.1", "port": 50000, "agents": 2},
+            "master": { "address": "127.0.0.1", "port": 50000, "agents": 3},
             "node1": { "address": "127.0.0.1", "port": 50001, "agents": 5},
             "node2": { "address": "127.0.0.1", "port": 50002, "agents": 4}
         }

@@ -603,4 +603,4 @@ const string TaskAgent::InspectSelection2("\""
 const int TaskAgent::DelayAgentMainLoop = 333;
 const int TaskAgent::DelayAfterContainerLaunch = 1000;
 
-const double TaskAgent::DelayForEndedContainerRemoval = 60000.;  // 60 seconds
+const double TaskAgent::DelayForEndedContainerRemoval = 180000.;  // 180 s = 3 min
