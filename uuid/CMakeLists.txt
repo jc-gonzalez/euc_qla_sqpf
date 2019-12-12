@@ -4,9 +4,23 @@
 # Library project file
 # Author: J C Gonzalez - 2015-2018
 #======================================================================
-include (../common.cmake)
 
 project (uuidxx)
+
+#-----------------------------------------------------------------
+cmake_minimum_required (VERSION 2.8.2)
+cmake_policy (SET CMP0015 NEW)
+
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
+set (PWD ${uuidx_SOURCE_DIR})
+
+set (HTOOLS_ROOT_DIR    ${PWD}/../htools)
+
+INCLUDE_DIRECTORIES (. /usr/include $ENV{HOME}/opt/include
+  ${HTOOLS_ROOT_DIR})
+LINK_DIRECTORIES (/usr/lib64 /usr/lib $ENV{HOME}/opt/lib)
+#-----------------------------------------------------------------
 
 set (uuidxxLib_hdr
   uuidxx.h)

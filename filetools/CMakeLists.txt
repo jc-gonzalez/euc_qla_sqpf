@@ -6,9 +6,25 @@
 # Author: J C Gonzalez - 2015-2018
 # Copyright (C) 2015-2018 Euclid SOC Team at ESAC
 #======================================================================
-include (../common.cmake)
 
 project (filetools)
+
+#-----------------------------------------------------------------
+cmake_minimum_required (VERSION 2.8.2)
+cmake_policy (SET CMP0015 NEW)
+
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
+set (PWD ${filetools_SOURCE_DIR})
+
+set (HTOOLS_ROOT_DIR ${PWD}/../htools)
+set (TOOLS_ROOT_DIR  ${PWD}/../tools)
+set (STR_ROOT_DIR    ${PWD}/../str)
+set (JSON_ROOT_DIR   ${PWD}/../json)
+
+INCLUDE_DIRECTORIES (. /usr/include $ENV{HOME}/opt/include)
+LINK_DIRECTORIES (/usr/lib64 /usr/lib $ENV{HOME}/opt/lib)
+#-----------------------------------------------------------------
 
 set (libfiletools_hdr
   filetools.h
@@ -27,26 +43,7 @@ set (libfiletools_src
 
 add_library(filetools SHARED ${libfiletools_src})
 target_include_directories (filetools PUBLIC .
-#  ${PSQLINCDIR}
-#  ${NNMSG_ROOT_DIR}/include
-  ${JSON_ROOT_DIR}
-  ${INFIX_ROOT_DIR}
-#  ${NNCOMM_ROOT_DIR}
-  ${TOOLS_ROOT_DIR}
-  ${STR_ROOT_DIR}
-  ${LOG_ROOT_DIR}
-  ${UUID_ROOT_DIR}
-  ${FILETOOLS_ROOT_DIR}
-#  ${PCRE2LIBDIR}
-#  ${PSQLLIBDIR}
-#  ${MONGOOSEDIR}
-  )
-#target_link_libraries (filetools
-  #json infix str log tools
-  #nncomm nanomsg mongoose
-  # ${PCRE2LIB} ${PSQLLIB}
-  #uuid pthread
-#  )
+  ${HTOOLS_ROOT_DIR} ${TOOLS_ROOT_DIR} ${STR_ROOT_DIR} ${JSON_ROOT_DIR})
 set_target_properties (filetools PROPERTIES LINKER_LANGUAGE CXX)
 install (TARGETS filetools
          RUNTIME DESTINATION bin

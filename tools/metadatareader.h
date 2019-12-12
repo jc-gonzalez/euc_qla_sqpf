@@ -61,7 +61,8 @@
 // Topic: Project headers
 //------------------------------------------------------------
 #include "str.h"
-#include "types.h"
+#include "json.hpp"
+using json = nlohmann::json;
 
 //==========================================================================
 // Class: MetadataReader

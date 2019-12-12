@@ -50,6 +50,7 @@
 //   - iostream
 //------------------------------------------------------------
 #include <iostream>
+using std::string;
 
 //------------------------------------------------------------
 // Topic: External packages
@@ -58,7 +59,6 @@
 //------------------------------------------------------------
 // Topic: Project headers
 //------------------------------------------------------------
-#include "types.h"
 
 #include <httpserver.hpp>
 using namespace httpserver;

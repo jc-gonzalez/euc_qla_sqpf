@@ -6,10 +6,11 @@
 # Author: J C Gonzalez - 2015-2018
 # Copyright (C) 2015-2018 Euclid SOC Team at ESAC
 #======================================================================
-cmake_minimum_required(VERSION 2.8)
-cmake_policy (SET CMP0015 OLD)
 
-include (common.cmake)
+#-----------------------------------------------------------------
+cmake_minimum_required(VERSION 2.8.2)
+cmake_policy (SET CMP0015 NEW)
+#-----------------------------------------------------------------
 
 project (sQPF)
 
@@ -30,15 +31,26 @@ execute_process(
 #== Get BUILD_ID
 set (BUILD_ID $ENV{BUILD_ID})
 if ("${BUILD_ID}" STREQUAL "")
-  execute_process(
-    COMMAND svn info 
-    COMMAND grep Revision
-    COMMAND cut -d\  -f2
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-    OUTPUT_VARIABLE COMMIT_NUMBER
-    OUTPUT_STRIP_TRAILING_WHITESPACE)
-  set (BUILD_ID ${DATE}_${COMMIT_NUMBER})
-  message (STATUS "Build id generated from svn info")
+  if (EXISTS "${PROJECT_SOURCE_DIR}/.svn")
+    execute_process(
+      COMMAND svn info 
+      COMMAND grep Revision
+      COMMAND cut -d\  -f2
+      WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+      OUTPUT_VARIABLE COMMIT_NUMBER
+      OUTPUT_STRIP_TRAILING_WHITESPACE)
+    set (BUILD_ID ${DATE}_${COMMIT_NUMBER})
+    message (STATUS "Build id generated from svn info")
+  endif()
+  if (EXISTS "${PROJECT_SOURCE_DIR}/.git")
+    execute_process(
+      COMMAND git rev-parse HEAD
+      WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+      OUTPUT_VARIABLE COMMIT_NUMBER
+      OUTPUT_STRIP_TRAILING_WHITESPACE)
+    set (BUILD_ID ${DATE}_${COMMIT_NUMBER})
+    message (STATUS "Build id generated from git info")
+  endif()
 endif()
 
 add_definitions(-DBUILD_ID="${BUILD_ID}")
@@ -55,21 +67,10 @@ if (COV)
   set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS}" )
 endif()
 
-#==== Coverage
-
-if (COV)
-  message ("Coverage will be computed . . .")
-  set(GCC_COVERAGE_COMPILE_FLAGS "-g -O0 -coverage -fprofile-arcs -ftest-coverage")
-  set(GCC_COVERAGE_LINK_FLAGS    "-coverage -lgcov -fprofile-arcs -ftest-coverage")
-  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}" )
-  set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS}" )
-endif()
-
 #== Define subprojects
 
-#add_subdirectory (nanomsg)
-#add_subdirectory (mongoose)
-
+add_subdirectory (q)
+add_subdirectory (log)
 add_subdirectory (str)
 add_subdirectory (infix)
 add_subdirectory (filetools)
@@ -78,11 +79,7 @@ add_subdirectory (httpsc)
 add_subdirectory (vos)
 add_subdirectory (fmk)
 add_subdirectory (qpf)
-
-#add_subdirectory (json)
-#add_subdirectory (log)
-#add_subdirectory (uuid)
-#add_subdirectory (nncomm)
+add_subdirectory (uuid)
 
 if (HMI)
   message ("HMI component will be built . . .")
