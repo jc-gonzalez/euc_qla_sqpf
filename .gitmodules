@@ -22,3 +22,6 @@
 [submodule "vos"]
 	path = vos
 	url = https://github.com/jc-gonzalez/euc_qla_vos.git
+[submodule "httpsc"]
+	path = httpsc
+	url = https://github.com/jc-gonzalez/euc_qla_httpsc.git
