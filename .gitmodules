@@ -31,9 +31,6 @@
 [submodule "tools"]
 	path = tools
 	url = https://github.com/jc-gonzalez/euc_qla_tools.git
-[submodule "vis_converter"]
-	path = vis_converter
-	url = https://github.com/jc-gonzalez/euc_qla_viscnv.git
 [submodule "htools"]
 	path = htools
 	url = https://github.com/jc-gonzalez/euc_qla_htools.git
