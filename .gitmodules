@@ -25,3 +25,6 @@
 [submodule "httpsc"]
 	path = httpsc
 	url = https://github.com/jc-gonzalez/euc_qla_httpsc.git
+[submodule "json"]
+	path = json
+	url = https://github.com/jc-gonzalez/euc_qla_json.git
