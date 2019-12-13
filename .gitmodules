@@ -16,3 +16,6 @@
 [submodule "filetools"]
 	path = filetools
 	url = https://github.com/jc-gonzalez/euc_qla_filetools.git
+[submodule "uuid"]
+	path = uuid
+	url = https://github.com/jc-gonzalez/euc_qla_uuidxx.git
