@@ -19,3 +19,6 @@
 [submodule "uuid"]
 	path = uuid
 	url = https://github.com/jc-gonzalez/euc_qla_uuidxx.git
+[submodule "vos"]
+	path = vos
+	url = https://github.com/jc-gonzalez/euc_qla_vos.git
