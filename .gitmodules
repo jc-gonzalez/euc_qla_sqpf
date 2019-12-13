@@ -4,3 +4,6 @@
 [submodule "infix"]
 	path = infix
 	url = https://github.com/jc-gonzalez/euc_qla_infix.git
+[submodule "q"]
+	path = q
+	url = https://github.com/jc-gonzalez/euc_qla_q.git
