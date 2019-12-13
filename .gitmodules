@@ -7,3 +7,6 @@
 [submodule "q"]
 	path = q
 	url = https://github.com/jc-gonzalez/euc_qla_q.git
+[submodule "str"]
+	path = str
+	url = https://github.com/jc-gonzalez/euc_qla_str.git
