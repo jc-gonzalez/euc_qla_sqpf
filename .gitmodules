@@ -1,3 +1,6 @@
 [submodule "libhttpserver"]
 	path = libhttpserver
 	url = https://github.com/etr/libhttpserver.git
+[submodule "infix"]
+	path = infix
+	url = https://github.com/jc-gonzalez/euc_qla_infix.git
