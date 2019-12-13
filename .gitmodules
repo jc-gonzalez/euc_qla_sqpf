@@ -10,3 +10,6 @@
 [submodule "str"]
 	path = str
 	url = https://github.com/jc-gonzalez/euc_qla_str.git
+[submodule "log"]
+	path = log
+	url = https://github.com/jc-gonzalez/euc_qla_log.git
