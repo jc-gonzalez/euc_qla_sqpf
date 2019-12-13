@@ -13,3 +13,6 @@
 [submodule "log"]
 	path = log
 	url = https://github.com/jc-gonzalez/euc_qla_log.git
+[submodule "filetools"]
+	path = filetools
+	url = https://github.com/jc-gonzalez/euc_qla_filetools.git
