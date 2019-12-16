@@ -1,36 +1,36 @@
 [submodule "libhttpserver"]
 	path = libhttpserver
 	url = https://github.com/etr/libhttpserver.git
-[submodule "infix"]
-	path = infix
-	url = https://github.com/jc-gonzalez/euc_qla_infix.git
-[submodule "q"]
-	path = q
-	url = https://github.com/jc-gonzalez/euc_qla_q.git
-[submodule "str"]
-	path = str
-	url = https://github.com/jc-gonzalez/euc_qla_str.git
-[submodule "log"]
-	path = log
-	url = https://github.com/jc-gonzalez/euc_qla_log.git
 [submodule "filetools"]
 	path = filetools
-	url = https://github.com/jc-gonzalez/euc_qla_filetools.git
-[submodule "uuid"]
-	path = uuid
-	url = https://github.com/jc-gonzalez/euc_qla_uuidxx.git
-[submodule "vos"]
-	path = vos
-	url = https://github.com/jc-gonzalez/euc_qla_vos.git
-[submodule "httpsc"]
-	path = httpsc
-	url = https://github.com/jc-gonzalez/euc_qla_httpsc.git
-[submodule "json"]
-	path = json
-	url = https://github.com/jc-gonzalez/euc_qla_json.git
-[submodule "tools"]
-	path = tools
-	url = https://github.com/jc-gonzalez/euc_qla_tools.git
+	url = https://github.com/jc-gonzalez/euc_soc_filetools.git
 [submodule "htools"]
 	path = htools
-	url = https://github.com/jc-gonzalez/euc_qla_htools.git
+	url = https://github.com/jc-gonzalez/euc_soc_htools.git
+[submodule "httpsc"]
+	path = httpsc
+	url = https://github.com/jc-gonzalez/euc_soc_httpsc.git
+[submodule "infix"]
+	path = infix
+	url = https://github.com/jc-gonzalez/euc_soc_infix.git
+[submodule "json"]
+	path = json
+	url = https://github.com/jc-gonzalez/euc_soc_json.git
+[submodule "log"]
+	path = log
+	url = https://github.com/jc-gonzalez/euc_soc_log.git
+[submodule "q"]
+	path = q
+	url = https://github.com/jc-gonzalez/euc_soc_q.git
+[submodule "str"]
+	path = str
+	url = https://github.com/jc-gonzalez/euc_soc_str.git
+[submodule "tools"]
+	path = tools
+	url = https://github.com/jc-gonzalez/euc_soc_tools.git
+[submodule "vos"]
+	path = vos
+	url = https://github.com/jc-gonzalez/euc_soc_vos.git
+[submodule "uuid"]
+	path = uuid
+	url = https://github.com/jc-gonzalez/euc_soc_uuidxx.git
